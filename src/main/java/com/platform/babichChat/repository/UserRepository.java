@@ -1,6 +1,6 @@
-package com.selikhov_factory.babichChat.repository;
+package com.platform.babichChat.repository;
 
-import com.selikhov_factory.babichChat.entity.User;
+import com.platform.babichChat.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

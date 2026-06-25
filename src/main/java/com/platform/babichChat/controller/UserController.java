@@ -1,7 +1,7 @@
-package com.selikhov_factory.babichChat.controller;
+package com.platform.babichChat.controller;
 
-import com.selikhov_factory.babichChat.entity.User;
-import com.selikhov_factory.babichChat.service.UserService;
+import com.platform.babichChat.entity.User;
+import com.platform.babichChat.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

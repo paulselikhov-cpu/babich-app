@@ -1,7 +1,7 @@
-package com.selikhov_factory.babichChat.service;
+package com.platform.babichChat.service;
 
-import com.selikhov_factory.babichChat.entity.User;
-import com.selikhov_factory.babichChat.repository.UserRepository;
+import com.platform.babichChat.entity.User;
+import com.platform.babichChat.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

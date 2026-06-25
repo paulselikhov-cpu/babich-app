@@ -8,7 +8,7 @@
 		<version>4.0.7</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.selikhov-factory</groupId>
+	<groupId>com.platform</groupId>
 	<artifactId>babichChat</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name/>

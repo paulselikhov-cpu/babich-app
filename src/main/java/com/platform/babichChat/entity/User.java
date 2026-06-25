@@ -1,4 +1,4 @@
-package com.selikhov_factory.babichChat.entity;
+package com.platform.babichChat.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
