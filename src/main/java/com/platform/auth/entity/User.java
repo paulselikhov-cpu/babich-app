@@ -1,4 +1,4 @@
-package com.platform.babichChat.entity;
+package com.platform.auth.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 @Data               // Lombok: генерирует геттеры, сеттеры, toString автоматически
 @Entity             // говорит Hibernate — это таблица в БД
 @Table(name = "users") // название таблицы (без аннотации = название класса)
+@Inheritance(strategy = InheritanceType.JOINED)  // ← обязательно на родителе
 public class User {
 
     @Id                                                    // первичный ключ

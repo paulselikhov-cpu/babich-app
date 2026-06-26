@@ -9,6 +9,13 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+    properties:
+      hibernate:
+        default_schema: public   # пока одна схема, потом разделим
 
 server:
   port: 8080
+
+jwt:
+  secret: "babich-super-secret-key-minimum-256-bits-long-for-hs256-algorithm"
+  expiration: 86400000   # 24 часа в миллисекундах

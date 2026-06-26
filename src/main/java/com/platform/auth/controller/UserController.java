@@ -1,7 +1,7 @@
-package com.platform.babichChat.controller;
+package com.platform.auth.controller;
 
-import com.platform.babichChat.entity.User;
-import com.platform.babichChat.service.UserService;
+import com.platform.auth.entity.User;
+import com.platform.auth.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

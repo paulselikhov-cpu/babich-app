@@ -1,7 +1,7 @@
-package com.platform.babichChat.service;
+package com.platform.auth.service;
 
-import com.platform.babichChat.entity.User;
-import com.platform.babichChat.repository.UserRepository;
+import com.platform.auth.entity.User;
+import com.platform.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
