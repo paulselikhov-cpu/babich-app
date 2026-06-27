@@ -31,10 +31,14 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // публичные эндпоинты
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
                         // всё остальное требует токен
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .headers(headers -> headers
+                        .frameOptions(frame -> frame.sameOrigin()) // для SockJS
+                );
 
         return http.build();
     }
