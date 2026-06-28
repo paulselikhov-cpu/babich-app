@@ -1,5 +1,6 @@
 package com.platform.chat.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -29,6 +30,7 @@ public class TemplateRoom {
      * ManyToOne = много комнат принадлежат одному шаблону.
      * FetchType.LAZY = шаблон не загружается автоматически — только по запросу.
      */
+    @JsonBackReference // эта сторона НЕ сериализуется — разрываем цикл
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "template_id", nullable = false)
     private LocationTemplate template;

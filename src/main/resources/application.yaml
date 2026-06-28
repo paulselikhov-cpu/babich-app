@@ -13,6 +13,9 @@ spring:
     properties:
       hibernate:
         default_schema: public   # пока одна схема, потом разделим
+  sql:
+    init:
+      mode: always   # ← добавь это
 
 server:
   port: 8080

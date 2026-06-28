@@ -1,5 +1,6 @@
 package com.platform.chat.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.util.List;
@@ -79,6 +80,7 @@ public class LocationTemplate {
      * mappedBy = "template" означает что связь описана в TemplateRoom.
      * CascadeType.ALL = при удалении шаблона удаляются и его комнаты.
      */
-    @OneToMany(mappedBy = "template", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference // эта сторона сериализуется
+    @OneToMany(mappedBy = "template", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<TemplateRoom> templateRooms;
 }
