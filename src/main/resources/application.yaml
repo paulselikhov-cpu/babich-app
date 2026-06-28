@@ -9,6 +9,7 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+    open-in-view: false  # отключаем — предотвращает случайные запросы к БД при рендеринге
     properties:
       hibernate:
         default_schema: public   # пока одна схема, потом разделим
