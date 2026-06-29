@@ -1,5 +1,6 @@
 package com.platform.chat.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.platform.chat.enums.LocationMemberRole;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -37,6 +38,7 @@ public class LocationMember {
     /**
      * Локация в которой состоит персонаж.
      */
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_id", nullable = false)
     private Location location;
@@ -44,6 +46,7 @@ public class LocationMember {
     /**
      * Персонаж который состоит в локации.
      */
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "character_id", nullable = false)
     private ChatUser character;

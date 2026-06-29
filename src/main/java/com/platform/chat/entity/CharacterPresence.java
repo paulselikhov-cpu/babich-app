@@ -1,5 +1,6 @@
 package com.platform.chat.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -29,6 +30,7 @@ public class CharacterPresence {
      * OneToOne с точки зрения BASIC персонажа,
      * OneToMany с точки зрения PREMIUM.
      */
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "character_id", nullable = false)
     private ChatUser character;
@@ -37,6 +39,7 @@ public class CharacterPresence {
      * Локация в которой находится персонаж.
      * Нужна для быстрого получения всех онлайн персонажей локации.
      */
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_id", nullable = false)
     private Location location;
@@ -46,6 +49,7 @@ public class CharacterPresence {
      * Персонаж может быть в локации, но не в конкретной комнате —
      * например в "холле" при входе.
      */
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id")
     private Room room;

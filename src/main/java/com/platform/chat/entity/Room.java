@@ -1,5 +1,6 @@
 package com.platform.chat.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -24,6 +25,7 @@ public class Room {
      * Локация которой принадлежит комната.
      * ManyToOne = много комнат в одной локации.
      */
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_id", nullable = false)
     private Location location;
@@ -78,6 +80,7 @@ public class Room {
      * Это критично для производительности: у активной комнаты
      * могут быть тысячи сообщений.
      */
+    @JsonIgnore
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Message> messages;
 

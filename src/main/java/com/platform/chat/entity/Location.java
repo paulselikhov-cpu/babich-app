@@ -1,5 +1,6 @@
 package com.platform.chat.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -84,6 +85,7 @@ public class Location {
      * Если шаблон расширяемый — сюда же добавляются новые комнаты.
      * CascadeType.ALL = при удалении локации удаляются все её комнаты.
      */
+    @JsonIgnore
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Room> rooms;
 
@@ -91,6 +93,7 @@ public class Location {
      * Список участников локации.
      * Через эту связь можно получить всех кто вступил в локацию.
      */
+    @JsonIgnore
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<LocationMember> members;
 

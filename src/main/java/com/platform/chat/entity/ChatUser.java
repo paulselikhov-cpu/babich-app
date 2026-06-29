@@ -1,5 +1,6 @@
 package com.platform.chat.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.platform.auth.entity.User;
 import com.platform.chat.enums.ChatRole;
 import jakarta.persistence.*;
@@ -82,6 +83,7 @@ public class ChatUser extends User {
      * FetchType.LAZY = локации не загружаются пока явно не запросишь —
      * это важно для производительности.
      */
+    @JsonIgnore
     @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
     private List<Location> ownedLocations;
 
@@ -89,6 +91,7 @@ public class ChatUser extends User {
      * Локации в которых состоит персонаж (вступил по ссылке).
      * Связь многие-ко-многим через таблицу location_members.
      */
+    @JsonIgnore
     @OneToMany(mappedBy = "character", fetch = FetchType.LAZY)
     private List<LocationMember> locationMemberships;
 }

@@ -1,5 +1,6 @@
 package com.platform.chat.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.platform.chat.enums.MessageType;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -32,6 +33,7 @@ public class Message {
     /**
      * Комната в которой отправлено сообщение.
      */
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id", nullable = false)
     private Room room;
@@ -40,6 +42,7 @@ public class Message {
      * Персонаж который отправил сообщение.
      * null = системное сообщение (юзер вошёл/вышел).
      */
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "character_id")
     private ChatUser character;
