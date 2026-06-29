@@ -28,6 +28,7 @@ public class Location {
      * Нужен чтобы знать базовые настройки (можно ли достраивать, цену и тд).
      * ManyToOne = много локаций создано из одного шаблона.
      */
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "template_id", nullable = false)
     private LocationTemplate template;
@@ -37,6 +38,7 @@ public class Location {
      * Он автоматически получает роль OWNER в location_members.
      * ManyToOne = у одного персонажа может быть много локаций.
      */
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
     private ChatUser owner;
