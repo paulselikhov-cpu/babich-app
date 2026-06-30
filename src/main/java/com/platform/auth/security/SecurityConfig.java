@@ -1,5 +1,6 @@
 package com.platform.auth.security;
 
+import com.platform.auth.config.CorsProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.*;
 import org.springframework.security.authentication.*;
@@ -20,6 +21,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
+    private final CorsProperties corsProperties; // ← из application.yaml
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -29,17 +31,15 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // публичные эндпоинты
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/ws/**").permitAll()
-                        // всё остальное требует токен
+                        .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .headers(headers -> headers
-                        .frameOptions(frame -> frame.sameOrigin()) // для SockJS
+                        .frameOptions(frame -> frame.sameOrigin())
                 );
-
         return http.build();
     }
 
@@ -57,27 +57,16 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of(
-                "http://localhost:4200",
-                "http://localhost:4201",
-                "http://localhost",
-                "http://192.168.0.102"
-        ));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
+        // origins из application.yaml — не хардкод
+        config.setAllowedOriginPatterns(corsProperties.getAllowedOrigins());
+
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
-        // WebSocket endpoint — разрешаем всё
-        CorsConfiguration wsConfig = new CorsConfiguration();
-        wsConfig.setAllowedOriginPatterns(List.of("*"));
-        wsConfig.setAllowedMethods(List.of("GET", "POST"));
-        wsConfig.setAllowedHeaders(List.of("*"));
-        wsConfig.setAllowCredentials(true);
-
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/**", config);
-        source.registerCorsConfiguration("/ws/**", wsConfig);  // отдельно для WS
-        source.registerCorsConfiguration("/ws", wsConfig);     // и без слеша
+        source.registerCorsConfiguration("/**", config);
         return source;
     }
 }

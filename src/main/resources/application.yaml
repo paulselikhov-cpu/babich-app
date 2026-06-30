@@ -29,3 +29,9 @@ logging:
 jwt:
   secret: "babich-super-secret-key-minimum-256-bits-long-for-hs256-algorithm"
   expiration: 86400000   # 24 часа в миллисекундах
+cors:
+  allowed-origins:
+    - http://localhost:4200
+    - http://localhost:4201
+    - http://localhost
+    - http://192.168.0.*:*
