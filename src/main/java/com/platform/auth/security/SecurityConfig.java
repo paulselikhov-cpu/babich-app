@@ -58,13 +58,26 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(
-                "http://localhost:4200",  // platform dev
-                "http://localhost:4201",  // chat dev
-                "http://localhost"        // nginx prod
+                "http://localhost:4200",
+                "http://localhost:4201",
+                "http://localhost",
+                "http://192.168.0.102"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
-        return source -> config;
+
+        // WebSocket endpoint — разрешаем всё
+        CorsConfiguration wsConfig = new CorsConfiguration();
+        wsConfig.setAllowedOriginPatterns(List.of("*"));
+        wsConfig.setAllowedMethods(List.of("GET", "POST"));
+        wsConfig.setAllowedHeaders(List.of("*"));
+        wsConfig.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/api/**", config);
+        source.registerCorsConfiguration("/ws/**", wsConfig);  // отдельно для WS
+        source.registerCorsConfiguration("/ws", wsConfig);     // и без слеша
+        return source;
     }
 }

@@ -17,30 +17,40 @@ public class ChatController {
     // клиент отправляет на /app/chat.send
     // сервер рассылает всем подписчикам /topic/messages
     @MessageMapping("/chat.send")
-    @SendTo("/topic/messages")
-    public ChatMessage sendMessage(ChatMessage message, Principal principal) {
-        message.setSender(principal.getName()); // берём username из JWT
+    public void sendMessage(ChatMessage message, Principal principal) {
+        message.setSender(principal.getName());
         message.setTimestamp(LocalDateTime.now());
-        return message;
+
+        // рассылаем только в топик конкретной комнаты
+        messagingTemplate.convertAndSend(
+                "/topic/room." + message.getRoomId(),
+                message
+        );
     }
 
     // клиент подключается — уведомляем всех
     @MessageMapping("/chat.join")
-    @SendTo("/topic/users")
-    public ChatMessage joinChat(ChatMessage message, Principal principal) {
+    public void joinChat(ChatMessage message, Principal principal) {
         message.setSender(principal.getName());
         message.setType(ChatMessage.MessageType.JOIN);
         message.setTimestamp(LocalDateTime.now());
-        return message;
+
+        messagingTemplate.convertAndSend(
+                "/topic/room." + message.getRoomId(),
+                message
+        );
     }
 
     // клиент отключается — уведомляем всех
     @MessageMapping("/chat.leave")
-    @SendTo("/topic/users")
-    public ChatMessage leaveChat(ChatMessage message, Principal principal) {
+    public void leaveChat(ChatMessage message, Principal principal) {
         message.setSender(principal.getName());
         message.setType(ChatMessage.MessageType.LEAVE);
         message.setTimestamp(LocalDateTime.now());
-        return message;
+
+        messagingTemplate.convertAndSend(
+                "/topic/room." + message.getRoomId(),
+                message
+        );
     }
 }
