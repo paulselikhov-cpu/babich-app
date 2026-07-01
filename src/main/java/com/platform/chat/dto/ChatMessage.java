@@ -9,7 +9,8 @@ public class ChatMessage {
     public enum MessageType {
         CHAT,   // обычное сообщение
         JOIN,   // юзер зашёл
-        LEAVE   // юзер вышел
+        LEAVE,   // юзер вышел
+        TYPING // уведолмение о печати
     }
 
     private MessageType type = MessageType.CHAT;

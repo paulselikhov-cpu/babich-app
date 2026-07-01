@@ -55,4 +55,18 @@ public class ChatController {
         );
         // LEAVE не сохраняем в историю
     }
+
+    // клиент печатает — уведомляем остальных в комнате
+    @MessageMapping("/chat.typing")
+    public void typing(ChatMessage message, Principal principal) {
+        // не сохраняем в БД — это временное событие
+        message.setSender(principal.getName());
+        message.setType(ChatMessage.MessageType.TYPING);
+        message.setTimestamp(LocalDateTime.now());
+
+        messagingTemplate.convertAndSend(
+                "/topic/typing." + message.getRoomId(),
+                message
+        );
+    }
 }
