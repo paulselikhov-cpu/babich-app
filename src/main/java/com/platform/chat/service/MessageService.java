@@ -1,6 +1,7 @@
 package com.platform.chat.service;
 
 import com.platform.chat.dto.ChatMessage;
+import com.platform.chat.dto.MessageResponse;
 import com.platform.chat.entity.Message;
 import com.platform.chat.entity.Room;
 import com.platform.chat.entity.ChatUser;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -88,14 +90,17 @@ public class MessageService {
      * @param page   номер страницы (0 = последние сообщения)
      * @param size   количество сообщений на странице
      */
-    public List<Message> getHistory(Long roomId, int page, int size) {
+    public List<MessageResponse> getHistory(Long roomId, int page, int size) {
         Page<Message> result = messageRepository.findByRoomIdOrderByCreatedAtDesc(
                 roomId,
                 PageRequest.of(page, size)
         );
-        // создаём новый изменяемый список перед reverse
         List<Message> messages = new ArrayList<>(result.getContent());
-        java.util.Collections.reverse(messages);
-        return messages;
+        Collections.reverse(messages);
+
+        // конвертируем в DTO
+        return messages.stream()
+                .map(MessageResponse::from)
+                .collect(java.util.stream.Collectors.toList());
     }
 }

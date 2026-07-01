@@ -1,5 +1,6 @@
 package com.platform.chat.controller;
 
+import com.platform.chat.dto.MessageResponse;
 import com.platform.chat.entity.Message;
 import com.platform.chat.service.MessageService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class MessageController {
      * page=0 = последние 50 сообщений.
      */
     @GetMapping("/room/{roomId}")
-    public List<Message> getHistory(
+    public List<MessageResponse> getHistory(
             @PathVariable Long roomId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size) {
