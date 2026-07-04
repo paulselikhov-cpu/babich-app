@@ -1,5 +1,6 @@
 package com.platform.chat.service;
 
+import com.platform.chat.dto.LocationResponse;
 import com.platform.chat.entity.*;
 import com.platform.chat.enums.LocationMemberRole;
 import com.platform.chat.repository.*;
@@ -41,8 +42,19 @@ public class LocationService {
      * Получить все локации персонажа (где он участник).
      * Показываем в боковом меню — "мои локации".
      */
-    public List<Location> getMyLocations(Long characterId) {
-        return locationRepository.findAllByMemberCharacterId(characterId);
+    /**
+     * Получить локации пользователя с его ролью в каждой.
+     */
+    public List<LocationResponse> getMyLocations(Long characterId) {
+        List<LocationMember> memberships = locationMemberRepository
+                .findByCharacterId(characterId);
+
+        return memberships.stream()
+                .map(member -> LocationResponse.from(
+                        member.getLocation(),
+                        member.getRole()
+                ))
+                .collect(java.util.stream.Collectors.toList());
     }
 
     /**
@@ -316,5 +328,38 @@ public class LocationService {
                     .substring(0, 8);
         } while (locationRepository.existsByInviteCode(code));
         return code;
+    }
+
+    /**
+     * Покинуть локацию (для участника/модератора).
+     */
+    @Transactional
+    public void leaveLocation(Long locationId, Long characterId) {
+        LocationMember member = locationMemberRepository
+                .findByLocationIdAndCharacterId(locationId, characterId)
+                .orElseThrow(() -> new RuntimeException("Вы не состоите в этой локации"));
+
+        if (member.getRole() == LocationMemberRole.OWNER) {
+            throw new RuntimeException("Владелец не может покинуть локацию — только удалить");
+        }
+
+        locationMemberRepository.delete(member);
+    }
+
+    /**
+     * Удалить локацию (только для владельца).
+     * Удаляет всё — комнаты, сообщения, участников.
+     */
+    @Transactional
+    public void deleteLocation(Long locationId, Long characterId) {
+        LocationMember member = locationMemberRepository
+                .findByLocationIdAndCharacterId(locationId, characterId)
+                .orElseThrow(() -> new RuntimeException("Вы не состоите в этой локации"));
+
+        if (member.getRole() != LocationMemberRole.OWNER) {
+            throw new RuntimeException("Только владелец может удалить локацию");
+        }
+
+        locationRepository.deleteById(locationId);
     }
 }

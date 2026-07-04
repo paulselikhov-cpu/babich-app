@@ -2,6 +2,7 @@ package com.platform.chat.repository;
 
 import com.platform.chat.entity.LocationMember;
 import com.platform.chat.enums.LocationMemberRole;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.List;
@@ -26,6 +27,7 @@ public interface LocationMemberRepository extends JpaRepository<LocationMember, 
     List<LocationMember> findByLocationId(Long locationId);
 
     // все локации конкретного персонажа
+    @EntityGraph(attributePaths = {"location", "location.template"})
     List<LocationMember> findByCharacterId(Long characterId);
 
     // модераторы и владелец конкретной локации

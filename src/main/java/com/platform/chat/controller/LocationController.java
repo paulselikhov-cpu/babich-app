@@ -47,7 +47,7 @@ public class LocationController {
      * Показываем в боковом меню — "мои локации".
      */
     @GetMapping("/my/{characterId}")
-    public List<Location> getMyLocations(@PathVariable Long characterId) {
+    public List<LocationResponse> getMyLocations(@PathVariable Long characterId) {
         return locationService.getMyLocations(characterId);
     }
 
@@ -176,5 +176,23 @@ public class LocationController {
                 targetCharacterId
         );
         return ResponseEntity.ok(member);
+    }
+
+    // покинуть локацию
+    @DeleteMapping("/{locationId}/leave")
+    public ResponseEntity<Void> leaveLocation(
+            @PathVariable Long locationId,
+            @RequestParam Long characterId) {
+        locationService.leaveLocation(locationId, characterId);
+        return ResponseEntity.ok().build();
+    }
+
+    // удалить локацию (только владелец)
+    @DeleteMapping("/{locationId}")
+    public ResponseEntity<Void> deleteLocation(
+            @PathVariable Long locationId,
+            @RequestParam Long characterId) {
+        locationService.deleteLocation(locationId, characterId);
+        return ResponseEntity.ok().build();
     }
 }
