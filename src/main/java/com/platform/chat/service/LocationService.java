@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -147,25 +148,20 @@ public class LocationService {
      */
     @Transactional
     public LocationMember joinByInviteCode(String inviteCode, Long characterId) {
-        // находим локацию по коду
         Location location = locationRepository.findByInviteCode(inviteCode)
-                .orElseThrow(() -> new RuntimeException(
-                        "Локация не найдена по коду: " + inviteCode
-                ));
+                .orElseThrow(() -> new RuntimeException("Локация не найдена"));
 
-        // проверяем что персонаж ещё не состоит в этой локации
-        if (locationMemberRepository.existsByLocationIdAndCharacterId(
-                location.getId(), characterId)) {
-            throw new RuntimeException("Персонаж уже состоит в этой локации");
+        // если уже состоит — возвращаем существующее членство вместо ошибки
+        Optional<LocationMember> existing = locationMemberRepository
+                .findByLocationIdAndCharacterId(location.getId(), characterId);
+
+        if (existing.isPresent()) {
+            return existing.get();
         }
 
-        // получаем персонажа
         ChatUser character = chatUserRepository.findById(characterId)
-                .orElseThrow(() -> new RuntimeException(
-                        "Персонаж не найден: " + characterId
-                ));
+                .orElseThrow(() -> new RuntimeException("Персонаж не найден: " + characterId));
 
-        // добавляем как обычного участника
         LocationMember member = new LocationMember();
         member.setLocation(location);
         member.setCharacter(character);
