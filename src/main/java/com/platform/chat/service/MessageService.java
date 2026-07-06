@@ -5,6 +5,8 @@ import com.platform.chat.dto.MessageResponse;
 import com.platform.chat.entity.Message;
 import com.platform.chat.entity.Room;
 import com.platform.chat.entity.ChatUser;
+import com.platform.chat.enums.LocationMemberRole;
+import com.platform.chat.repository.LocationMemberRepository;
 import com.platform.chat.enums.MessageType;
 import com.platform.chat.repository.MessageRepository;
 import com.platform.chat.repository.RoomRepository;
@@ -33,6 +35,7 @@ public class MessageService {
     private final MessageRepository messageRepository;
     private final RoomRepository roomRepository;
     private final ChatUserRepository chatUserRepository;
+    private final LocationMemberRepository locationMemberRepository;
 
     /**
      * Сохранить сообщение в БД.
@@ -102,5 +105,54 @@ public class MessageService {
         return messages.stream()
                 .map(MessageResponse::from)
                 .collect(java.util.stream.Collectors.toList());
+    }
+
+    /**
+     * Мягкое удаление одного сообщения.
+     * Только автор или модератор/владелец локации может удалять.
+     * soft delete — запись остаётся в БД, isDeleted = true.
+     */
+    @Transactional
+    public void deleteMessage(Long messageId, String username) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new RuntimeException("Сообщение не найдено"));
+
+        ChatUser character = chatUserRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Персонаж не найден"));
+
+        // проверяем права: автор или модератор/владелец локации
+        boolean isAuthor = message.getCharacter() != null &&
+                message.getCharacter().getId().equals(character.getId());
+
+        if (!isAuthor) {
+            // проверяем роль в локации
+            var member = message.getRoom().getLocation() != null
+                    ? locationMemberRepository
+                    .findByLocationIdAndCharacterId(
+                            message.getRoom().getLocation().getId(),
+                            character.getId()
+                    ).orElse(null)
+                    : null;
+
+            boolean isModerator = member != null &&
+                    (member.getRole() == LocationMemberRole.OWNER ||
+                            member.getRole() == LocationMemberRole.MODERATOR);
+
+            if (!isModerator) {
+                throw new RuntimeException("Нет прав для удаления сообщения");
+            }
+        }
+
+        message.setIsDeleted(true);
+        messageRepository.save(message);
+    }
+
+    /**
+     * Удалить несколько сообщений сразу.
+     * Используется при групповом удалении выделенных сообщений.
+     */
+    @Transactional
+    public void deleteMessages(List<Long> messageIds, String username) {
+        messageIds.forEach(id -> deleteMessage(id, username));
     }
 }

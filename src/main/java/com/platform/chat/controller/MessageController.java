@@ -4,7 +4,10 @@ import com.platform.chat.dto.MessageResponse;
 import com.platform.chat.entity.Message;
 import com.platform.chat.service.MessageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 import java.util.List;
 
 /**
@@ -30,5 +33,29 @@ public class MessageController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size) {
         return messageService.getHistory(roomId, page, size);
+    }
+
+    /**
+     * DELETE /api/messages/{id}
+     * Удалить одно сообщение (soft delete).
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteMessage(
+            @PathVariable Long id,
+            Principal principal) {
+        messageService.deleteMessage(id, principal.getName());
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * DELETE /api/messages/batch
+     * Удалить несколько сообщений сразу.
+     */
+    @DeleteMapping("/batch")
+    public ResponseEntity<Void> deleteMessages(
+            @RequestBody List<Long> messageIds,
+            Principal principal) {
+        messageService.deleteMessages(messageIds, principal.getName());
+        return ResponseEntity.ok().build();
     }
 }
