@@ -19,12 +19,11 @@ public class ChatMessageResponse {
 
     private Long id;
     private MessageType messageType;
-    private MessageActionType actionType = MessageActionType.CHAT; // null для JOIN/LEAVE/TYPING
+    private MessageActionType actionType = MessageActionType.CHAT;// null для JOIN/LEAVE/TYPING
     private String content;
-    private String roomId;
     private LocalDateTime timestamp;
     private Boolean isDeleted = false;
-    private CharacterInfo character;    // null для JOIN/LEAVE/TYPING
+    private CharacterInfo character;// null для JOIN/LEAVE/TYPING
 
     @Data
     public static class CharacterInfo {
@@ -41,7 +40,6 @@ public class ChatMessageResponse {
         dto.setIsDeleted(message.getIsDeleted());
         dto.setTimestamp(message.getCreatedAt());
 
-        // если персонаж есть — заполняем CharacterInfo
         if (message.getCharacter() != null) {
             CharacterInfo info = new ChatMessageResponse.CharacterInfo();
             info.setUserId(message.getCharacter().getId());
@@ -51,5 +49,15 @@ public class ChatMessageResponse {
         }
 
         return dto;
+    }
+
+    public static ChatMessageResponse from(MessageActionType actionType, String characterName) {
+        ChatMessageResponse messageResponse = new ChatMessageResponse();
+        messageResponse.setCharacter(new ChatMessageResponse.CharacterInfo());
+        messageResponse.getCharacter().setCharacterName(characterName);
+        messageResponse.setActionType(actionType);
+        messageResponse.setTimestamp(LocalDateTime.now());
+
+        return messageResponse;
     }
 }

@@ -1,5 +1,6 @@
 package com.platform.chat.controller;
 
+import com.platform.chat.dto.ChatMessageParams;
 import com.platform.chat.dto.ChatMessageResponse;
 import com.platform.chat.entity.ChatUser;
 import com.platform.chat.enums.MessageActionType;
@@ -22,67 +23,50 @@ public class ChatController {
 
     // ─── отправить сообщение ──────────────────────────────────────────────
     @MessageMapping("/chat.send")
-    public void sendMessage(ChatMessageResponse message, Principal principal) {
-        message.setCharacter(new ChatMessageResponse.CharacterInfo());
-        message.getCharacter().setCharacterName((getCharacterName(principal.getName())));
-        message.setTimestamp(LocalDateTime.now());
+    public void sendMessage(ChatMessageParams messageParams, Principal principal) {
+        ChatMessageResponse messageResponse = ChatMessageResponse.from(messageParams.getActionType(), principal.getName());
 
         // сохраняем в БД и обогащаем message id + character
-        if (message.getActionType() == MessageActionType.CHAT) {
-            messageService.enrichAfterSave(message, principal.getName());
+        if (messageParams.getActionType() == MessageActionType.CHAT) {
+            messageResponse = messageService.enrichAfterSave(messageResponse, principal.getName(), messageParams.getRoomId(), messageParams);
         }
 
         messagingTemplate.convertAndSend(
-                "/topic/room." + message.getRoomId(),
-                message
+                "/topic/room." + messageParams.getRoomId(),
+                messageResponse
         );
     }
 
     // ─── вошёл в комнату ─────────────────────────────────────────────────
     @MessageMapping("/chat.join")
-    public void joinChat(ChatMessageResponse message, Principal principal) {
-        message.setCharacter(new ChatMessageResponse.CharacterInfo());
-        message.getCharacter().setCharacterName((getCharacterName(principal.getName())));
-        message.setActionType(MessageActionType.JOIN);
-        message.setTimestamp(LocalDateTime.now());
+    public void joinChat(ChatMessageParams messageParams, Principal principal) {
+        ChatMessageResponse messageResponse = ChatMessageResponse.from(MessageActionType.JOIN, principal.getName());
 
         messagingTemplate.convertAndSend(
-                "/topic/room." + message.getRoomId(),
-                message
+                "/topic/room." + messageParams.getRoomId(),
+                messageResponse
         );
     }
 
     // ─── покинул комнату ─────────────────────────────────────────────────
     @MessageMapping("/chat.leave")
-    public void leaveChat(ChatMessageResponse message, Principal principal) {
-        message.setCharacter(new ChatMessageResponse.CharacterInfo());
-        message.getCharacter().setCharacterName((getCharacterName(principal.getName())));
-        message.setActionType(MessageActionType.LEAVE);
-        message.setTimestamp(LocalDateTime.now());
+    public void leaveChat(ChatMessageParams message, Principal principal) {
+        ChatMessageResponse messageResponse = ChatMessageResponse.from(MessageActionType.LEAVE, principal.getName());
 
         messagingTemplate.convertAndSend(
                 "/topic/room." + message.getRoomId(),
-                message
+                messageResponse
         );
     }
 
     // ─── индикатор печати ────────────────────────────────────────────────
     @MessageMapping("/chat.typing")
-    public void typing(ChatMessageResponse message, Principal principal) {
-        message.setCharacter(new ChatMessageResponse.CharacterInfo());
-        message.getCharacter().setCharacterName((getCharacterName(principal.getName())));
-        message.setActionType(MessageActionType.TYPING);
+    public void typing(ChatMessageParams message, Principal principal) {
+        ChatMessageResponse messageResponse = ChatMessageResponse.from(MessageActionType.TYPING, principal.getName());
 
         messagingTemplate.convertAndSend(
                 "/topic/room." + message.getRoomId(),
-                message
+                messageResponse
         );
-    }
-
-    // ─── хелпер ──────────────────────────────────────────────────────────
-    private String getCharacterName(String username) {
-        return chatUserRepository.findByUsername(username)
-                .map(ChatUser::getCharacterName)
-                .orElse(username); // fallback на username если нет персонажа
     }
 }

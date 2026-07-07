@@ -1,5 +1,6 @@
 package com.platform.chat.service;
 
+import com.platform.chat.dto.ChatMessageParams;
 import com.platform.chat.dto.ChatMessageResponse;
 import com.platform.chat.entity.Message;
 import com.platform.chat.entity.Room;
@@ -44,18 +45,18 @@ public class MessageService {
      * Вызывается только для MessageType.CHAT.
      */
     @Transactional
-    public void enrichAfterSave(ChatMessageResponse chatMessage, String username) {
-        Long roomId = Long.parseLong(chatMessage.getRoomId());
+    public ChatMessageResponse enrichAfterSave(ChatMessageResponse messageResponse, String username, String stringRoomId, ChatMessageParams messageParams) {
+        Long roomId = Long.parseLong(stringRoomId);
         Room room = roomRepository.findById(roomId).orElse(null);
 
         if (room == null) {
             log.warn("Комната не найдена: {}", roomId);
-            return;
+            return null;
         }
 
         if (!room.getStoreHistory()) {
             log.debug("Комната {} не хранит историю — пропускаем", roomId);
-            return;
+            return null;
         }
 
         ChatUser character = chatUserRepository
@@ -64,29 +65,31 @@ public class MessageService {
 
         if (character == null) {
             log.warn("Персонаж не найден для username: {}", username);
-            return;
+            return null;
         }
 
         Message message = new Message();
         message.setRoom(room);
         message.setCharacter(character);
-        message.setContent(chatMessage.getContent());
+        message.setContent(messageParams.getContent());
         message.setType(MessageType.CHAT);
         message.setIsDeleted(false);
 
         Message saved = messageRepository.save(message);
 
         // обогащаем ChatMessage данными из БД
-        chatMessage.setId(saved.getId());
-        chatMessage.setIsDeleted(false);
+        messageResponse.setId(saved.getId());
+        messageResponse.setIsDeleted(false);
+        messageResponse.setContent(messageParams.getContent());
 
         ChatMessageResponse.CharacterInfo info = new ChatMessageResponse.CharacterInfo();
         info.setUserId(character.getId());
         info.setCharacterName(character.getCharacterName());
         info.setAvatarUrl(character.getAvatarUrl());
-        chatMessage.setCharacter(info);
+        messageResponse.setCharacter(info);
 
         log.debug("Сообщение {} сохранено в комнате {}", saved.getId(), roomId);
+        return messageResponse;
     }
 
     /**
