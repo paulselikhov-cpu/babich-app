@@ -1,7 +1,7 @@
 package com.platform.chat.dto;
+import com.platform.chat.entity.ChatUser;
 import com.platform.chat.entity.Message;
 import com.platform.chat.enums.MessageActionType;
-import com.platform.chat.enums.MessageType;
 import lombok.Data;
 import java.time.LocalDateTime;
 
@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 public class ChatMessageResponse {
 
     private Long id;
-    private MessageType messageType;
     private MessageActionType actionType = MessageActionType.CHAT;// null для JOIN/LEAVE/TYPING
     private String content;
     private LocalDateTime timestamp;
@@ -32,11 +31,10 @@ public class ChatMessageResponse {
         private String avatarUrl;
     }
 
-    public static ChatMessageResponse from(Message message) {
+    public static ChatMessageResponse getResponseForHistory(Message message) {
         ChatMessageResponse dto = new ChatMessageResponse();
         dto.setId(message.getId());
         dto.setContent(message.getContent());
-        dto.setMessageType(message.getType());
         dto.setIsDeleted(message.getIsDeleted());
         dto.setTimestamp(message.getCreatedAt());
 
@@ -51,7 +49,26 @@ public class ChatMessageResponse {
         return dto;
     }
 
-    public static ChatMessageResponse from(MessageActionType actionType, String characterName) {
+    public static ChatMessageResponse getResponseWithMessageId(ChatUser user, String content, Long messageId) {
+        ChatMessageResponse messageResponse = new ChatMessageResponse();
+
+        messageResponse.setId(messageId);
+        messageResponse.setActionType(MessageActionType.CHAT);
+        messageResponse.setTimestamp(LocalDateTime.now());
+
+        messageResponse.setIsDeleted(false);
+        messageResponse.setContent(content);
+
+        ChatMessageResponse.CharacterInfo info = new ChatMessageResponse.CharacterInfo();
+        info.setUserId(user.getId());
+        info.setCharacterName(user.getCharacterName());
+        info.setAvatarUrl(user.getAvatarUrl());
+        messageResponse.setCharacter(info);
+
+        return messageResponse;
+    }
+
+    public static ChatMessageResponse getResponseByActionType(MessageActionType actionType, String characterName) {
         ChatMessageResponse messageResponse = new ChatMessageResponse();
         messageResponse.setCharacter(new ChatMessageResponse.CharacterInfo());
         messageResponse.getCharacter().setCharacterName(characterName);

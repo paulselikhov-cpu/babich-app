@@ -45,51 +45,29 @@ public class MessageService {
      * Вызывается только для MessageType.CHAT.
      */
     @Transactional
-    public ChatMessageResponse enrichAfterSave(ChatMessageResponse messageResponse, String username, String stringRoomId, ChatMessageParams messageParams) {
+    public Long saveByUser(ChatUser chatUser, String content, String stringRoomId) {
         Long roomId = Long.parseLong(stringRoomId);
         Room room = roomRepository.findById(roomId).orElse(null);
 
         if (room == null) {
-            log.warn("Комната не найдена: {}", roomId);
+            log.debug("Комната с id {} не найдена в системе", roomId);
             return null;
         }
 
-        if (!room.getStoreHistory()) {
-            log.debug("Комната {} не хранит историю — пропускаем", roomId);
-            return null;
-        }
-
-        ChatUser character = chatUserRepository
-                .findByUsername(username)
-                .orElse(null);
-
-        if (character == null) {
-            log.warn("Персонаж не найден для username: {}", username);
-            return null;
-        }
-
-        Message message = new Message();
-        message.setRoom(room);
-        message.setCharacter(character);
-        message.setContent(messageParams.getContent());
-        message.setType(MessageType.CHAT);
-        message.setIsDeleted(false);
-
-        Message saved = messageRepository.save(message);
-
-        // обогащаем ChatMessage данными из БД
-        messageResponse.setId(saved.getId());
-        messageResponse.setIsDeleted(false);
-        messageResponse.setContent(messageParams.getContent());
-
-        ChatMessageResponse.CharacterInfo info = new ChatMessageResponse.CharacterInfo();
-        info.setUserId(character.getId());
-        info.setCharacterName(character.getCharacterName());
-        info.setAvatarUrl(character.getAvatarUrl());
-        messageResponse.setCharacter(info);
+        Message saved = saveMessage(room, chatUser, content);
 
         log.debug("Сообщение {} сохранено в комнате {}", saved.getId(), roomId);
-        return messageResponse;
+        return saved.getId();
+    }
+
+    public Message saveMessage(Room room, ChatUser chatUser, String content) {
+        Message message = new Message();
+        message.setRoom(room);
+        message.setCharacter(chatUser);
+        message.setContent(content);
+        message.setType(MessageType.CHAT);
+        message.setIsDeleted(false);
+        return messageRepository.save(message);
     }
 
     /**
@@ -110,7 +88,7 @@ public class MessageService {
 
         // конвертируем в DTO
         return messages.stream()
-                .map(ChatMessageResponse::from)
+                .map(ChatMessageResponse::getResponseForHistory)
                 .collect(java.util.stream.Collectors.toList());
     }
 

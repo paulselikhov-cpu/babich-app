@@ -6,11 +6,13 @@ import com.platform.chat.entity.ChatUser;
 import com.platform.chat.enums.ChatRole;
 import com.platform.chat.repository.ChatUserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChatUserService {
@@ -33,6 +35,15 @@ public class ChatUserService {
     public ChatUser getChatUserByUserId(Long userId) {
         return chatUserRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Персонаж для userId не найден: " + userId));
+    }
+
+    public ChatUser getChatUserByUserName(String userName) {
+        ChatUser chatUser = chatUserRepository.findByUsername(userName).orElse(null);
+        if (chatUser == null) {
+            log.debug("Пользователь {} не найден в системе", userName);
+            return null;
+        }
+        return chatUser;
     }
 
     // создать персонажа для уже существующего User
