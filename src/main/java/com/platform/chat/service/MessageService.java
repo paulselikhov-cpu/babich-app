@@ -1,7 +1,6 @@
 package com.platform.chat.service;
 
 import com.platform.chat.dto.ChatMessage;
-import com.platform.chat.dto.MessageResponse;
 import com.platform.chat.entity.Message;
 import com.platform.chat.entity.Room;
 import com.platform.chat.entity.ChatUser;
@@ -38,16 +37,14 @@ public class MessageService {
     private final LocationMemberRepository locationMemberRepository;
 
     /**
-     * Сохранить сообщение в БД.
-     * Вызывается из ChatController только для CHAT типа.
-     * JOIN/LEAVE не сохраняются — они временные события.
+     * Сохраняет сообщение в БД и обогащает ChatMessage:
+     * - устанавливает id из БД
+     * - устанавливает character (userId, characterName, avatarUrl)
      *
-     * @param chatMessage DTO из WebSocket
-     * @param username    имя пользователя из JWT (Principal.getName())
+     * Вызывается только для MessageType.CHAT.
      */
     @Transactional
-    public void saveMessage(ChatMessage chatMessage, String username) {
-        // находим комнату
+    public void enrichAfterSave(ChatMessage chatMessage, String username) {
         Long roomId = Long.parseLong(chatMessage.getRoomId());
         Room room = roomRepository.findById(roomId).orElse(null);
 
@@ -56,14 +53,11 @@ public class MessageService {
             return;
         }
 
-        // проверяем флаг хранения истории
         if (!room.getStoreHistory()) {
-            log.debug("Комната {} не хранит историю — пропускаем сохранение", roomId);
+            log.debug("Комната {} не хранит историю — пропускаем", roomId);
             return;
         }
 
-        // находим персонажа по username
-        // username из JWT → users.username → chat_users
         ChatUser character = chatUserRepository
                 .findByUsername(username)
                 .orElse(null);
@@ -73,7 +67,6 @@ public class MessageService {
             return;
         }
 
-        // создаём и сохраняем сообщение
         Message message = new Message();
         message.setRoom(room);
         message.setCharacter(character);
@@ -81,8 +74,19 @@ public class MessageService {
         message.setType(MessageType.CHAT);
         message.setIsDeleted(false);
 
-        messageRepository.save(message);
-        log.debug("Сообщение сохранено в комнате {}", roomId);
+        Message saved = messageRepository.save(message);
+
+        // обогащаем ChatMessage данными из БД
+        chatMessage.setId(saved.getId());
+        chatMessage.setIsDeleted(false);
+
+        ChatMessage.CharacterInfo info = new ChatMessage.CharacterInfo();
+        info.setUserId(character.getId());
+        info.setCharacterName(character.getCharacterName());
+        info.setAvatarUrl(character.getAvatarUrl());
+        chatMessage.setCharacter(info);
+
+        log.debug("Сообщение {} сохранено в комнате {}", saved.getId(), roomId);
     }
 
     /**
@@ -93,7 +97,7 @@ public class MessageService {
      * @param page   номер страницы (0 = последние сообщения)
      * @param size   количество сообщений на странице
      */
-    public List<MessageResponse> getHistory(Long roomId, int page, int size) {
+    public List<ChatMessage> getHistory(Long roomId, int page, int size) {
         Page<Message> result = messageRepository.findByRoomIdOrderByCreatedAtDesc(
                 roomId,
                 PageRequest.of(page, size)
@@ -103,7 +107,7 @@ public class MessageService {
 
         // конвертируем в DTO
         return messages.stream()
-                .map(MessageResponse::from)
+                .map(ChatMessage::from)
                 .collect(java.util.stream.Collectors.toList());
     }
 
