@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
  * TYPING  → только sender, roomId
  */
 @Data
-public class ChatMessage {
+public class ChatMessageResponse {
 
     private Long id;
     private MessageType messageType;
@@ -33,8 +33,8 @@ public class ChatMessage {
         private String avatarUrl;
     }
 
-    public static ChatMessage from(Message message) {
-        ChatMessage dto = new ChatMessage();
+    public static ChatMessageResponse from(Message message) {
+        ChatMessageResponse dto = new ChatMessageResponse();
         dto.setId(message.getId());
         dto.setContent(message.getContent());
         dto.setMessageType(message.getType());
@@ -43,7 +43,7 @@ public class ChatMessage {
 
         // если персонаж есть — заполняем CharacterInfo
         if (message.getCharacter() != null) {
-            CharacterInfo info = new ChatMessage.CharacterInfo();
+            CharacterInfo info = new ChatMessageResponse.CharacterInfo();
             info.setUserId(message.getCharacter().getId());
             info.setCharacterName(message.getCharacter().getCharacterName());
             info.setAvatarUrl(message.getCharacter().getAvatarUrl());

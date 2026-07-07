@@ -1,6 +1,6 @@
 package com.platform.chat.controller;
 
-import com.platform.chat.dto.ChatMessage;
+import com.platform.chat.dto.ChatMessageResponse;
 import com.platform.chat.entity.ChatUser;
 import com.platform.chat.enums.MessageActionType;
 import com.platform.chat.repository.ChatUserRepository;
@@ -22,8 +22,8 @@ public class ChatController {
 
     // ─── отправить сообщение ──────────────────────────────────────────────
     @MessageMapping("/chat.send")
-    public void sendMessage(ChatMessage message, Principal principal) {
-        message.setCharacter(new ChatMessage.CharacterInfo());
+    public void sendMessage(ChatMessageResponse message, Principal principal) {
+        message.setCharacter(new ChatMessageResponse.CharacterInfo());
         message.getCharacter().setCharacterName((getCharacterName(principal.getName())));
         message.setTimestamp(LocalDateTime.now());
 
@@ -40,8 +40,8 @@ public class ChatController {
 
     // ─── вошёл в комнату ─────────────────────────────────────────────────
     @MessageMapping("/chat.join")
-    public void joinChat(ChatMessage message, Principal principal) {
-        message.setCharacter(new ChatMessage.CharacterInfo());
+    public void joinChat(ChatMessageResponse message, Principal principal) {
+        message.setCharacter(new ChatMessageResponse.CharacterInfo());
         message.getCharacter().setCharacterName((getCharacterName(principal.getName())));
         message.setActionType(MessageActionType.JOIN);
         message.setTimestamp(LocalDateTime.now());
@@ -54,8 +54,8 @@ public class ChatController {
 
     // ─── покинул комнату ─────────────────────────────────────────────────
     @MessageMapping("/chat.leave")
-    public void leaveChat(ChatMessage message, Principal principal) {
-        message.setCharacter(new ChatMessage.CharacterInfo());
+    public void leaveChat(ChatMessageResponse message, Principal principal) {
+        message.setCharacter(new ChatMessageResponse.CharacterInfo());
         message.getCharacter().setCharacterName((getCharacterName(principal.getName())));
         message.setActionType(MessageActionType.LEAVE);
         message.setTimestamp(LocalDateTime.now());
@@ -68,8 +68,8 @@ public class ChatController {
 
     // ─── индикатор печати ────────────────────────────────────────────────
     @MessageMapping("/chat.typing")
-    public void typing(ChatMessage message, Principal principal) {
-        message.setCharacter(new ChatMessage.CharacterInfo());
+    public void typing(ChatMessageResponse message, Principal principal) {
+        message.setCharacter(new ChatMessageResponse.CharacterInfo());
         message.getCharacter().setCharacterName((getCharacterName(principal.getName())));
         message.setActionType(MessageActionType.TYPING);
 

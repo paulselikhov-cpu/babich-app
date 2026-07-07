@@ -1,6 +1,6 @@
 package com.platform.chat.service;
 
-import com.platform.chat.dto.ChatMessage;
+import com.platform.chat.dto.ChatMessageResponse;
 import com.platform.chat.entity.Message;
 import com.platform.chat.entity.Room;
 import com.platform.chat.entity.ChatUser;
@@ -44,7 +44,7 @@ public class MessageService {
      * Вызывается только для MessageType.CHAT.
      */
     @Transactional
-    public void enrichAfterSave(ChatMessage chatMessage, String username) {
+    public void enrichAfterSave(ChatMessageResponse chatMessage, String username) {
         Long roomId = Long.parseLong(chatMessage.getRoomId());
         Room room = roomRepository.findById(roomId).orElse(null);
 
@@ -80,7 +80,7 @@ public class MessageService {
         chatMessage.setId(saved.getId());
         chatMessage.setIsDeleted(false);
 
-        ChatMessage.CharacterInfo info = new ChatMessage.CharacterInfo();
+        ChatMessageResponse.CharacterInfo info = new ChatMessageResponse.CharacterInfo();
         info.setUserId(character.getId());
         info.setCharacterName(character.getCharacterName());
         info.setAvatarUrl(character.getAvatarUrl());
@@ -97,7 +97,7 @@ public class MessageService {
      * @param page   номер страницы (0 = последние сообщения)
      * @param size   количество сообщений на странице
      */
-    public List<ChatMessage> getHistory(Long roomId, int page, int size) {
+    public List<ChatMessageResponse> getHistory(Long roomId, int page, int size) {
         Page<Message> result = messageRepository.findByRoomIdOrderByCreatedAtDesc(
                 roomId,
                 PageRequest.of(page, size)
@@ -107,7 +107,7 @@ public class MessageService {
 
         // конвертируем в DTO
         return messages.stream()
-                .map(ChatMessage::from)
+                .map(ChatMessageResponse::from)
                 .collect(java.util.stream.Collectors.toList());
     }
 
