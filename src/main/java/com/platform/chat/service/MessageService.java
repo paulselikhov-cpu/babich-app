@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +37,7 @@ public class MessageService {
     private final RoomRepository roomRepository;
     private final ChatUserRepository chatUserRepository;
     private final LocationMemberRepository locationMemberRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     /**
      * Сохраняет сообщение в БД и обогащает ChatMessage:
@@ -105,18 +107,15 @@ public class MessageService {
         ChatUser character = chatUserRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Персонаж не найден"));
 
-        // проверяем права: автор или модератор/владелец локации
         boolean isAuthor = message.getCharacter() != null &&
                 message.getCharacter().getId().equals(character.getId());
 
         if (!isAuthor) {
-            // проверяем роль в локации
             var member = message.getRoom().getLocation() != null
-                    ? locationMemberRepository
-                    .findByLocationIdAndCharacterId(
-                            message.getRoom().getLocation().getId(),
-                            character.getId()
-                    ).orElse(null)
+                    ? locationMemberRepository.findByLocationIdAndCharacterId(
+                    message.getRoom().getLocation().getId(),
+                    character.getId()
+            ).orElse(null)
                     : null;
 
             boolean isModerator = member != null &&
@@ -130,6 +129,13 @@ public class MessageService {
 
         message.setIsDeleted(true);
         messageRepository.save(message);
+
+        // уведомляем всех в комнате об удалении
+        Long roomId = message.getRoom().getId();
+        messagingTemplate.convertAndSend(
+                "/topic/room." + roomId,
+                ChatMessageResponse.deleted(messageId, roomId)
+        );
     }
 
     /**

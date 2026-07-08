@@ -4,5 +4,6 @@ public enum MessageActionType {
     CHAT,
     JOIN,
     LEAVE,
-    TYPING
+    TYPING,
+    DELETE
 }

@@ -17,12 +17,12 @@ import java.time.LocalDateTime;
 @Data
 public class ChatMessageResponse {
 
-    private Long id;
-    private MessageActionType actionType = MessageActionType.CHAT;// null для JOIN/LEAVE/TYPING
+    private Long id; // null для JOIN/LEAVE/TYPING
+    private MessageActionType actionType = MessageActionType.CHAT; // null для JOIN/LEAVE/TYPING
     private String content;
     private LocalDateTime timestamp;
     private Boolean isDeleted = false;
-    private CharacterInfo character;// null для JOIN/LEAVE/TYPING
+    private CharacterInfo character; // null для JOIN/LEAVE/TYPING
 
     @Data
     public static class CharacterInfo {
@@ -74,7 +74,15 @@ public class ChatMessageResponse {
         messageResponse.getCharacter().setCharacterName(characterName);
         messageResponse.setActionType(actionType);
         messageResponse.setTimestamp(LocalDateTime.now());
-
         return messageResponse;
+    }
+
+    public static ChatMessageResponse deleted(Long messageId, Long roomId) {
+        ChatMessageResponse response = new ChatMessageResponse();
+        response.setId(messageId);
+        response.setActionType(MessageActionType.DELETE);
+        response.setIsDeleted(true);
+        response.setTimestamp(LocalDateTime.now());
+        return response;
     }
 }
