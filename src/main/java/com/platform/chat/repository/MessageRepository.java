@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+
 /**
  * Репозиторий для работы с сообщениями чата.
  *
@@ -43,4 +45,8 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     // количество непрочитанных сообщений в комнате
     // (сообщения после определённого времени)
     long countByRoomIdAndIsDeletedFalse(Long roomId);
+
+    long countByRoomIdAndCreatedAtAfterAndCharacter_IdNotAndIsDeletedFalse(
+            Long roomId, LocalDateTime after, Long characterId
+    );
 }

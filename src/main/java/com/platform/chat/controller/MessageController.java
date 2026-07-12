@@ -1,6 +1,7 @@
 package com.platform.chat.controller;
 
 import com.platform.chat.dto.ChatMessageResponse;
+import com.platform.chat.dto.RoomHistoryResponse;
 import com.platform.chat.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,11 +28,12 @@ public class MessageController {
      * page=0 = последние 50 сообщений.
      */
     @GetMapping("/room/{roomId}")
-    public List<ChatMessageResponse> getHistory(
+    public RoomHistoryResponse getHistory(
             @PathVariable Long roomId,
+            @RequestParam Long characterId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size) {
-        return messageService.getHistory(roomId, page, size);
+        return messageService.getHistoryAndMarkRead(roomId,characterId, page, size);
     }
 
     /**

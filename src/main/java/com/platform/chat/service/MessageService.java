@@ -2,15 +2,14 @@ package com.platform.chat.service;
 
 import com.platform.chat.dto.ChatMessageParams;
 import com.platform.chat.dto.ChatMessageResponse;
+import com.platform.chat.dto.RoomHistoryResponse;
 import com.platform.chat.entity.Message;
 import com.platform.chat.entity.Room;
 import com.platform.chat.entity.ChatUser;
+import com.platform.chat.entity.RoomReadStatus;
 import com.platform.chat.enums.LocationMemberRole;
-import com.platform.chat.repository.LocationMemberRepository;
+import com.platform.chat.repository.*;
 import com.platform.chat.enums.MessageType;
-import com.platform.chat.repository.MessageRepository;
-import com.platform.chat.repository.RoomRepository;
-import com.platform.chat.repository.ChatUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -19,9 +18,11 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Сервис для работы с сообщениями чата.
@@ -38,7 +39,9 @@ public class MessageService {
     private final ChatUserRepository chatUserRepository;
     private final LocationMemberRepository locationMemberRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final RoomReadStatusRepository readStatusRepository;
 
+    private static final LocalDateTime EPOCH = LocalDateTime.of(1970, 1, 1, 0, 0);
     /**
      * Сохраняет сообщение в БД и обогащает ChatMessage:
      * - устанавливает id из БД
@@ -70,6 +73,64 @@ public class MessageService {
         message.setType(MessageType.CHAT);
         message.setIsDeleted(false);
         return messageRepository.save(message);
+    }
+
+    /**
+     * Загружает историю И атомарно помечает комнату прочитанной — в ОДНОЙ
+     * транзакции, чтобы не зависеть от порядка REST-запроса и WS-события
+     * входа в комнату (они сейчас гоняются гонкой на фронте).
+     *
+     * Порядок действий важен:
+     *  1) сначала читаем СТАРУЮ метку lastReadAt (что было непрочитано ДО этого визита)
+     *  2) считаем по ней firstUnreadMessageId/unreadCount
+     *  3) только теперь обновляем метку на "сейчас"
+     * Если поменять порядок — потеряем возможность узнать, что было непрочитанным.
+     */
+    @Transactional
+    public RoomHistoryResponse getHistoryAndMarkRead(Long roomId, Long characterId, int page, int size) {
+        LocalDateTime previousReadAt = readStatusRepository.findByCharacterIdAndRoomId(characterId, roomId)
+                .map(RoomReadStatus::getLastReadAt)
+                .orElse(EPOCH); // ни разу не заходил — считаем непрочитанным всё
+
+        Page<Message> result = messageRepository.findByRoomIdOrderByCreatedAtDesc(
+                roomId, PageRequest.of(page, size)
+        );
+        List<Message> messages = new ArrayList<>(result.getContent());
+        Collections.reverse(messages);
+
+        // первое сообщение НЕ от самого пользователя, написанное после его последнего визита
+        Long firstUnreadMessageId = messages.stream()
+                .filter(m -> m.getCreatedAt().isAfter(previousReadAt))
+                .filter(m -> !m.getCharacter().getId().equals(characterId))
+                .map(Message::getId)
+                .findFirst()
+                .orElse(null);
+
+        long unreadCount = messages.stream()
+                .filter(m -> m.getCreatedAt().isAfter(previousReadAt))
+                .filter(m -> !m.getCharacter().getId().equals(characterId))
+                .count();
+
+        // теперь, когда посчитали разницу, обновляем метку — комната официально прочитана
+        markRead(characterId, roomId);
+
+        List<ChatMessageResponse> dtos = messages.stream()
+                .map(ChatMessageResponse::getResponseForHistory)
+                .collect(Collectors.toList());
+
+        return new RoomHistoryResponse(dtos, firstUnreadMessageId, unreadCount);
+    }
+
+    private void markRead(Long characterId, Long roomId) {
+        RoomReadStatus status = readStatusRepository.findByCharacterIdAndRoomId(characterId, roomId)
+                .orElseGet(() -> {
+                    RoomReadStatus s = new RoomReadStatus();
+                    s.setCharacter(chatUserRepository.getReferenceById(characterId));
+                    s.setRoom(roomRepository.getReferenceById(roomId));
+                    return s;
+                });
+        status.setLastReadAt(LocalDateTime.now());
+        readStatusRepository.save(status);
     }
 
     /**

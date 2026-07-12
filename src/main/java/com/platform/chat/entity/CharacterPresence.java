@@ -6,15 +6,15 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
- * Присутствие персонажа — в какой комнате он сейчас онлайн.
- * Обновляется при каждом переходе между комнатами через WebSocket.
+ * Присутствие персонажа — ГДЕ он сейчас онлайн.
  *
- * Именно здесь реализуется механика BASIC/PREMIUM:
- * - BASIC персонаж может иметь только 1 запись в этой таблице
- * - PREMIUM персонаж может иметь несколько записей (несколько локаций онлайн)
+ * Одна запись НА ПЕРСОНАЖА (character_id уникален), а не на сессию/локацию.
+ * Если персонаж открывает вторую вкладку — она просто перезаписывает эту
+ * же строку новым sessionId. Первая вкладка становится "немой" и сама
+ * протухнет по heartbeat-таймауту (см. PresenceService.cleanupStalePresences).
  *
- * При выходе из комнаты — запись удаляется.
- * При отключении WebSocket — запись удаляется автоматически.
+ * room_id NOT NULL — по бизнес-правилу пользователь online всегда находится
+ * в какой-то комнате (минимум — в дефолтной "прихожей" локации).
  */
 @Data
 @Entity
@@ -25,44 +25,47 @@ public class CharacterPresence {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     * Персонаж который сейчас онлайн в этой комнате.
-     * OneToOne с точки зрения BASIC персонажа,
-     * OneToMany с точки зрения PREMIUM.
-     */
+    @Column(name = "character_id", nullable = false, unique = true) //зачем дублирование
+    private Long characterId;
+
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "character_id", nullable = false)
-    private ChatUser character;
+    @JoinColumn(name = "character_id", insertable = false, updatable = false)
+    private ChatUser character; //зачем дублирование
 
     /**
-     * Локация в которой находится персонаж.
-     * Нужна для быстрого получения всех онлайн персонажей локации.
+     * ID текущей STOMP-сессии. Нужен, чтобы при дисконнекте понять,
+     * какую именно вкладку закрыли — актуальную или уже "перезахваченную"
+     * второй вкладкой того же персонажа (см. handleDisconnect).
      */
+    @Column(name = "session_id", nullable = false, length = 64)
+    private String sessionId;
+
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_id", nullable = false)
     private Location location;
 
-    /**
-     * Конкретная комната в которой находится персонаж.
-     * Персонаж может быть в локации, но не в конкретной комнате —
-     * например в "холле" при входе.
-     */
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "room_id")
+    @JoinColumn(name = "room_id", nullable = false) // всегда есть — "без комнаты" не бывает
     private Room room;
 
-    /**
-     * Когда персонаж вошёл в эту комнату.
-     * Нужно для статистики и мониторинга.
-     */
     @Column(name = "entered_at")
     private LocalDateTime enteredAt;
+
+    /**
+     * Обновляется каждым heartbeat от клиента (раз в 10 сек).
+     * Если не обновлялась дольше HEARTBEAT_TIMEOUT_SECONDS — считаем
+     * сессию мёртвой, даже если close-фрейм WebSocket не пришёл
+     * (обрыв сети, сон ноутбука, kill процесса).
+     */
+    @Column(name = "last_heartbeat_at", nullable = false)
+    private LocalDateTime lastHeartbeatAt;
 
     @PrePersist
     public void prePersist() {
         this.enteredAt = LocalDateTime.now();
+        this.lastHeartbeatAt = LocalDateTime.now();
     }
 }
