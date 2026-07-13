@@ -1,5 +1,6 @@
 package com.platform.chat.service;
 
+import com.platform.chat.dto.PresenceEvent;
 import com.platform.chat.entity.CharacterPresence;
 import com.platform.chat.entity.ChatUser;
 import com.platform.chat.entity.Location;
@@ -88,12 +89,12 @@ public class PresenceService {
         presence.setRoom(room);
         presence.setLastHeartbeatAt(LocalDateTime.now());
         presenceRepository.save(presence);
-        broadcastPresenceChange(locationId, characterId, roomId);
+        broadcastPresenceOnline(locationId, characterId, roomId);
 
         // сменил локацию целиком (а не просто комнату внутри той же) —
         // старую локацию тоже нужно уведомить, что персонаж у неё больше не online
         if (previousLocationId != null && !previousLocationId.equals(locationId)) {
-            broadcastPresenceLeft(previousLocationId, characterId);
+            broadcastPresenceOffline(previousLocationId, characterId);
         }
     }
 
@@ -110,7 +111,6 @@ public class PresenceService {
 
     /**
      * Быстрый путь дисконнекта — явное закрытие вкладки / разрыв соединения.
-     * Вызывается из SessionDisconnectEvent (см. WebSocketDisconnectListener).
      */
     @Transactional
     public void handleDisconnect(String sessionId) {
@@ -123,7 +123,7 @@ public class PresenceService {
             Long characterId = presence.getCharacter().getId();
 
             presenceRepository.deleteBySessionId(sessionId);
-            broadcastPresenceLeft(locationId, characterId);
+            broadcastPresenceOffline(locationId, characterId);
         });
     }
 
@@ -143,27 +143,23 @@ public class PresenceService {
             Long locationId = presence.getLocation().getId();
             Long characterId = presence.getCharacter().getId();
             presenceRepository.delete(presence);
-            broadcastPresenceLeft(locationId, characterId);
+            broadcastPresenceOffline(locationId, characterId);
         }
         log.info("Очищено {} протухших presence-сессий по heartbeat-таймауту", stale.size());
     }
 
     // ─── рассылка событий подписчикам /topic/location.{id}.presence ───────────
-
-    private void broadcastPresenceChange(Long locationId, Long characterId, Long roomId) {
+    private void broadcastPresenceOnline(Long locationId, Long characterId, Long roomId) {
         messagingTemplate.convertAndSend(
                 "/topic/location." + locationId + ".presence",
                 new PresenceEvent(characterId, true, roomId)
         );
     }
 
-    private void broadcastPresenceLeft(Long locationId, Long characterId) {
+    private void broadcastPresenceOffline(Long locationId, Long characterId) {
         messagingTemplate.convertAndSend(
                 "/topic/location." + locationId + ".presence",
                 new PresenceEvent(characterId, false, null)
         );
     }
-
-    /** DTO события, летящего в реальном времени всем, кто смотрит на локацию. */
-    public record PresenceEvent(Long characterId, boolean online, Long roomId) {}
 }
