@@ -2,7 +2,6 @@ package com.platform.chat.controller;
 
 import com.platform.chat.dto.LocationUserDto;
 import com.platform.chat.dto.PagedResponse;
-import com.platform.chat.repository.CharacterPresenceRepository;
 import com.platform.chat.service.LocationMembersService;
 import com.platform.chat.service.PresenceService;
 import com.platform.chat.service.UnreadService;

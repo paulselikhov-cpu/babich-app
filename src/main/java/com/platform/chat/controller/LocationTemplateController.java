@@ -3,7 +3,6 @@ package com.platform.chat.controller;
 import com.platform.chat.entity.LocationTemplate;
 import com.platform.chat.service.LocationTemplateService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 

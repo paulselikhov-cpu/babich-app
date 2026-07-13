@@ -1,6 +1,5 @@
 package com.platform.chat.controller;
 
-import com.platform.chat.dto.ChatMessageResponse;
 import com.platform.chat.dto.RoomHistoryResponse;
 import com.platform.chat.service.MessageService;
 import lombok.RequiredArgsConstructor;
