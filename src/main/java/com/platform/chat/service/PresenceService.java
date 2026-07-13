@@ -17,8 +17,10 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -161,5 +163,13 @@ public class PresenceService {
                 "/topic/location." + locationId + ".presence",
                 new PresenceEvent(characterId, false, null)
         );
+    }
+
+    public long getOnlineCount(@PathVariable Long locationId) {
+        return presenceRepository.countByLocationId(locationId);
+    }
+
+    public List<Long> getOnlineCharacterIds(@PathVariable Long locationId) {
+        return presenceRepository.findCharacterIdsByLocationId(locationId);
     }
 }

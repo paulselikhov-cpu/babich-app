@@ -4,6 +4,7 @@ import com.platform.chat.dto.LocationUserDto;
 import com.platform.chat.dto.PagedResponse;
 import com.platform.chat.repository.CharacterPresenceRepository;
 import com.platform.chat.service.LocationMembersService;
+import com.platform.chat.service.PresenceService;
 import com.platform.chat.service.UnreadService;
 import com.platform.chat.service.UnreadService.LocationUnreadSummary;
 import lombok.RequiredArgsConstructor;
@@ -13,13 +14,13 @@ import java.util.List;
 
 /** Всё, что касается состава/присутствия/непрочитанного одной локации — под одним ресурсом. */
 @RestController
-@RequestMapping("/api/locations")
+@RequestMapping("/api/location-members")
 @RequiredArgsConstructor
 public class LocationMembersController {
 
     private final LocationMembersService locationMembersService;
     private final UnreadService unreadService;
-    private final CharacterPresenceRepository presenceRepository;
+    private final PresenceService presenceService;
 
     @GetMapping("/{locationId}/users")
     public PagedResponse<LocationUserDto> getLocationUsers(
@@ -45,11 +46,11 @@ public class LocationMembersController {
     // в реальном времени через WS-события, этот эндпоинт нужен только один раз при открытии
     @GetMapping("/{locationId}/online-count")
     public long getOnlineCount(@PathVariable Long locationId) {
-        return presenceRepository.countByLocationId(locationId);
+        return presenceService.getOnlineCount(locationId);
     }
 
     @GetMapping("/{locationId}/online-ids")
     public List<Long> getOnlineCharacterIds(@PathVariable Long locationId) {
-        return presenceRepository.findCharacterIdsByLocationId(locationId);
+        return presenceService.getOnlineCharacterIds(locationId);
     }
 }
