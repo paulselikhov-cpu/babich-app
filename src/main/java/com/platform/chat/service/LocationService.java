@@ -287,38 +287,6 @@ public class LocationService {
         return locationMemberRepository.save(targetMember);
     }
 
-    /**
-     * Обновить настройку хранения истории для комнаты.
-     * Только владелец или модератор может менять настройки.
-     */
-    @Transactional
-    public Room updateRoomStoreHistory(Long roomId,
-                                       Long characterId,
-                                       Boolean storeHistory) {
-        Room room = roomRepository.findById(roomId)
-                .orElseThrow(() -> new RuntimeException(
-                        "Комната не найдена: " + roomId
-                ));
-
-        // проверяем права — владелец или модератор локации
-        LocationMember member = locationMemberRepository
-                .findByLocationIdAndCharacterId(
-                        room.getLocation().getId(), characterId
-                )
-                .orElseThrow(() -> new RuntimeException(
-                        "Вы не состоите в этой локации"
-                ));
-
-        if (member.getRole() == LocationMemberRole.MEMBER) {
-            throw new RuntimeException(
-                    "Недостаточно прав для изменения настроек комнаты"
-            );
-        }
-
-        room.setStoreHistory(storeHistory);
-        return roomRepository.save(room);
-    }
-
     private String generateUniqueInviteCode() {
         String code;
         do {

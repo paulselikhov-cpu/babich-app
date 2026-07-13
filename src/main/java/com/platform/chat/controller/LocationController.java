@@ -135,29 +135,6 @@ public class LocationController {
     }
 
     /**
-     * PUT /api/locations/rooms/{roomId}/history
-     * Включить/выключить хранение истории комнаты.
-     * Тугл в настройках комнаты.
-     *
-     * Тело запроса:
-     * {
-     *   "storeHistory": false,
-     *   "characterId": 1
-     * }
-     */
-    @PutMapping("/rooms/{roomId}/history")
-    public ResponseEntity<Room> updateStoreHistory(
-            @PathVariable Long roomId,
-            @Valid @RequestBody UpdateStoreHistoryRequest request) {
-        Room room = locationService.updateRoomStoreHistory(
-                roomId,
-                request.getCharacterId(),
-                request.getStoreHistory()
-        );
-        return ResponseEntity.ok(room);
-    }
-
-    /**
      * POST /api/locations/{locationId}/moderator/{targetCharacterId}
      * Назначить модератора ("прописать") в локации.
      * Только для владельца.
