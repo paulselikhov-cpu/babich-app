@@ -17,12 +17,12 @@ import com.platform.chat.entity.ChatUser;
 
 @Controller
 @RequiredArgsConstructor
-public class ChatController {
+public class ChatWebSocketController {
 
     private final SimpMessagingTemplate messagingTemplate;
     private final MessageService messageService;
     private final ChatUserService chatUserService;
-    private final PresenceService presenceService; // ← новая зависимость
+    private final PresenceService presenceService;
 
     // ─── отправить сообщение ──────────────────────────────────────────────
     @MessageMapping("/chat.history.send")
