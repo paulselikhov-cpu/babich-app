@@ -1,6 +1,6 @@
 package com.platform.chat.listener;
 
-import com.platform.chat.service.PresenceService;
+import com.platform.chat.service.onlineSessions.PresenceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
