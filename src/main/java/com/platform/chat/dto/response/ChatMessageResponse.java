@@ -68,10 +68,13 @@ public class ChatMessageResponse {
         return messageResponse;
     }
 
-    public static ChatMessageResponse getResponseByActionType(MessageActionType actionType, String characterName) {
+    public static ChatMessageResponse getResponseByActionType(MessageActionType actionType, ChatUser user) {
         ChatMessageResponse messageResponse = new ChatMessageResponse();
-        messageResponse.setCharacter(new ChatMessageResponse.CharacterInfo());
-        messageResponse.getCharacter().setCharacterName(characterName);
+        CharacterInfo info = new ChatMessageResponse.CharacterInfo();
+        info.setUserId(user.getId());
+        info.setCharacterName(user.getCharacterName());
+        info.setAvatarUrl(user.getAvatarUrl());
+        messageResponse.setCharacter(info);
         messageResponse.setActionType(actionType);
         messageResponse.setTimestamp(LocalDateTime.now());
         return messageResponse;

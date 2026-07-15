@@ -59,7 +59,7 @@ public class ChatWebSocketController {
                 Long.parseLong(messageParams.getRoomId())
         );
 
-        ChatMessageResponse messageResponse = ChatMessageResponse.getResponseByActionType(MessageActionType.JOIN, principal.getName());
+        ChatMessageResponse messageResponse = ChatMessageResponse.getResponseByActionType(MessageActionType.JOIN, chatUser);
         messagingTemplate.convertAndSend(
                 "/topic/room." + messageParams.getRoomId(),
                 messageResponse
@@ -69,10 +69,11 @@ public class ChatWebSocketController {
     // ─── индикатор печати ────────────────────────────────────────────────
     @MessageMapping("/chat.typing")
     public void typing(ChatActionMessageRequest message, Principal principal) {
-        ChatMessageResponse messageResponse = ChatMessageResponse.getResponseByActionType(MessageActionType.TYPING, principal.getName());
+        ChatUser chatUser = chatUserService.getChatUserByUserName(principal.getName());
+        ChatMessageResponse messageResponse = ChatMessageResponse.getResponseByActionType(MessageActionType.TYPING, chatUser);
 
         messagingTemplate.convertAndSend(
-                "/topic/room." + message.getRoomId(),
+                "/topic/typing." + message.getRoomId(),
                 messageResponse
         );
     }
