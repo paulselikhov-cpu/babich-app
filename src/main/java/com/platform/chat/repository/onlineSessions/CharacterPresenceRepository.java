@@ -1,6 +1,7 @@
 package com.platform.chat.repository.onlineSessions;
 
 import com.platform.chat.entity.CharacterPresence;
+import com.platform.chat.repository.onlineSessions.projection.LocationOnlineCountProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -44,4 +45,9 @@ public interface CharacterPresenceRepository extends JpaRepository<CharacterPres
 
     @Query("SELECT p.character.id FROM CharacterPresence p WHERE p.location.id = :locationId")
     List<Long> findCharacterIdsByLocationId(@Param("locationId") Long locationId);
+
+    @Query("SELECT p.location.id AS locationId, COUNT(p) AS count " +
+            "FROM CharacterPresence p WHERE p.location.id IN :locationIds " +
+            "GROUP BY p.location.id")
+    List<LocationOnlineCountProjection> countByLocationIdIn(@Param("locationIds") List<Long> locationIds);
 }

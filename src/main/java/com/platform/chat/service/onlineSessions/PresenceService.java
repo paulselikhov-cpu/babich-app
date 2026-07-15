@@ -1,5 +1,6 @@
 package com.platform.chat.service.onlineSessions;
 
+import com.platform.chat.dto.events.LocationPresenceCountEvent;
 import com.platform.chat.dto.events.PresenceEvent;
 import com.platform.chat.entity.CharacterPresence;
 import com.platform.chat.entity.ChatUser;
@@ -19,6 +20,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
+import java.util.HashMap;
+import java.util.Map;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -157,12 +160,20 @@ public class PresenceService {
                 "/topic/location." + locationId + ".presence",
                 new PresenceEvent(characterId, true, roomId)
         );
+        messagingTemplate.convertAndSend(
+                "/topic/locations.presence-counts",
+                new LocationPresenceCountEvent(locationId, true)
+        );
     }
 
     private void broadcastPresenceOffline(Long locationId, Long characterId) {
         messagingTemplate.convertAndSend(
                 "/topic/location." + locationId + ".presence",
                 new PresenceEvent(characterId, false, null)
+        );
+        messagingTemplate.convertAndSend(
+                "/topic/locations.presence-counts",
+                new LocationPresenceCountEvent(locationId, false)
         );
     }
 
@@ -173,4 +184,18 @@ public class PresenceService {
     public List<Long> getOnlineCharacterIds(@PathVariable Long locationId) {
         return presenceRepository.findCharacterIdsByLocationId(locationId);
     }
+
+    //Получение активных пользователей для списка локаций в сайдбаре
+    public Map<Long, Long> getOnlineCounts(List<Long> locationIds) {
+        if (locationIds.isEmpty()) return Map.of();
+
+        Map<Long, Long> result = new HashMap<>();
+        locationIds.forEach(id -> result.put(id, 0L)); // локации без онлайна тоже должны быть в ответе с 0
+
+        presenceRepository.countByLocationIdIn(locationIds)
+                .forEach(row -> result.put(row.getLocationId(), row.getCount()));
+
+        return result;
+    }
+
 }

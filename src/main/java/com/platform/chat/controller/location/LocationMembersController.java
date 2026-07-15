@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /** Всё, что касается состава/присутствия/непрочитанного одной локации — под одним ресурсом. */
 @RestController
@@ -51,5 +52,11 @@ public class LocationMembersController {
     @GetMapping("/{locationId}/online-ids")
     public List<Long> getOnlineCharacterIds(@PathVariable Long locationId) {
         return presenceService.getOnlineCharacterIds(locationId);
+    }
+
+    //Получение активных пользователей для списка локаций в сайдбаре
+    @GetMapping("/online-counts")
+    public Map<Long, Long> getOnlineCounts(@RequestParam List<Long> locationIds) {
+        return presenceService.getOnlineCounts(locationIds);
     }
 }
