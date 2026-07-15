@@ -72,21 +72,19 @@ public class PresenceService {
      */
     @Transactional
     public void enterRoom(String sessionId, Long characterId, Long locationId, Long roomId) {
-        ChatUser character = chatUserRepository.findById(characterId) // лишний запрос в БД, оптимизировать enterRoom(String sessionId, ChatUser character, Long locationId, Long roomId
+        ChatUser character = chatUserRepository.findById(characterId)
                 .orElseThrow(() -> new IllegalArgumentException("Персонаж не найден: " + characterId));
         Location location = locationRepository.findById(locationId)
                 .orElseThrow(() -> new IllegalArgumentException("Локация не найдена: " + locationId));
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("Комната не найдена: " + roomId));
 
-        // ищем ПО ПЕРСОНАЖУ, не по сессии — у него всегда максимум одна запись.
-        // если её нет, создаём; если есть — просто перезаписываем поля
-        // (в т.ч. если это вторая вкладка того же персонажа — она "перехватывает"
-        // presence, а первая вкладка станет немой и протухнет по heartbeat)
         CharacterPresence presence = presenceRepository.findByCharacterId(characterId)
                 .orElseGet(CharacterPresence::new);
 
         Long previousLocationId = presence.getLocation() != null ? presence.getLocation().getId() : null;
+        // ключевой момент: смена комнаты внутри той же локации — это НЕ вход в новую локацию
+        boolean enteringNewLocation = !locationId.equals(previousLocationId);
 
         presence.setSessionId(sessionId);
         presence.setCharacter(character);
@@ -95,12 +93,19 @@ public class PresenceService {
         presence.setRoom(room);
         presence.setLastHeartbeatAt(LocalDateTime.now());
         presenceRepository.save(presence);
-        broadcastPresenceOnline(locationId, characterId, roomId);
 
-        // сменил локацию целиком (а не просто комнату внутри той же) —
-        // старую локацию тоже нужно уведомить, что персонаж у неё больше не online
-        if (previousLocationId != null && !previousLocationId.equals(locationId)) {
-            broadcastPresenceOffline(previousLocationId, characterId);
+        // детальное событие — шлём ВСЕГДА, участники локации должны видеть смену комнаты
+        broadcastPresenceDetail(locationId, characterId, true, roomId);
+
+        // счётчик обновляем только при реальном входе в локацию, не при смене комнаты внутри неё
+        if (enteringNewLocation) {
+            broadcastPresenceCount(locationId, true);
+        }
+
+        // ушёл из прошлой локации целиком — гасим и там, и там
+        if (previousLocationId != null && enteringNewLocation) {
+            broadcastPresenceDetail(previousLocationId, characterId, false, null);
+            broadcastPresenceCount(previousLocationId, false);
         }
     }
 
@@ -129,7 +134,8 @@ public class PresenceService {
             Long characterId = presence.getCharacter().getId();
 
             presenceRepository.deleteBySessionId(sessionId);
-            broadcastPresenceOffline(locationId, characterId);
+            broadcastPresenceDetail(locationId, characterId, false, null);
+            broadcastPresenceCount(locationId, false);
         });
     }
 
@@ -149,31 +155,24 @@ public class PresenceService {
             Long locationId = presence.getLocation().getId();
             Long characterId = presence.getCharacter().getId();
             presenceRepository.delete(presence);
-            broadcastPresenceOffline(locationId, characterId);
+            broadcastPresenceDetail(locationId, characterId, false, null);
+            broadcastPresenceCount(locationId, false);
         }
         log.info("Очищено {} протухших presence-сессий по heartbeat-таймауту", stale.size());
     }
 
     // ─── рассылка событий подписчикам /topic/location.{id}.presence ───────────
-    private void broadcastPresenceOnline(Long locationId, Long characterId, Long roomId) {
+    private void broadcastPresenceDetail(Long locationId, Long characterId, boolean online, Long roomId) {
         messagingTemplate.convertAndSend(
                 "/topic/location." + locationId + ".presence",
-                new PresenceEvent(characterId, true, roomId)
-        );
-        messagingTemplate.convertAndSend(
-                "/topic/locations.presence-counts",
-                new LocationPresenceCountEvent(locationId, true)
+                new PresenceEvent(characterId, online, roomId)
         );
     }
 
-    private void broadcastPresenceOffline(Long locationId, Long characterId) {
-        messagingTemplate.convertAndSend(
-                "/topic/location." + locationId + ".presence",
-                new PresenceEvent(characterId, false, null)
-        );
+    private void broadcastPresenceCount(Long locationId, boolean online) {
         messagingTemplate.convertAndSend(
                 "/topic/locations.presence-counts",
-                new LocationPresenceCountEvent(locationId, false)
+                new LocationPresenceCountEvent(locationId, online)
         );
     }
 
