@@ -59,4 +59,11 @@ public class LocationMembersController {
     public Map<Long, Long> getOnlineCounts(@RequestParam List<Long> locationIds) {
         return presenceService.getOnlineCounts(locationIds);
     }
+    
+    @GetMapping("/unread-counts")
+    public Map<Long, Long> getUnreadCounts(
+            @RequestParam List<Long> locationIds, @RequestParam Long characterId
+    ) {
+        return unreadService.getUnreadTotalsForLocations(characterId, locationIds);
+    }
 }

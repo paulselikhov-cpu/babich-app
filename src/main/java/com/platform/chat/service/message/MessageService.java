@@ -43,6 +43,7 @@ public class MessageService {
     private final LocationMemberRepository locationMemberRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final RoomReadStatusRepository readStatusRepository;
+    private final UnreadService unreadService;
 
     private static final LocalDateTime EPOCH = LocalDateTime.of(1970, 1, 1, 0, 0);
     /**
@@ -115,25 +116,21 @@ public class MessageService {
                 .count();
 
         // теперь, когда посчитали разницу, обновляем метку — комната официально прочитана
-        markRead(characterId, roomId);
+        unreadService.markRead(characterId, roomId);
+
+        Room room = roomRepository.findById(roomId).orElse(null);
+        if (room != null) {
+            ChatUser character = chatUserRepository.findById(characterId).orElse(null);
+            if (character != null) {
+                unreadService.notifySelfRoomRead(room, characterId, character.getUsername());
+            }
+        }
 
         List<ChatMessageResponse> dos = messages.stream()
                 .map(ChatMessageResponse::getResponseForHistory)
                 .collect(Collectors.toList());
 
         return new RoomHistoryResponse(dos, firstUnreadMessageId, unreadCount);
-    }
-
-    private void markRead(Long characterId, Long roomId) {
-        RoomReadStatus status = readStatusRepository.findByCharacterIdAndRoomId(characterId, roomId)
-                .orElseGet(() -> {
-                    RoomReadStatus s = new RoomReadStatus();
-                    s.setCharacter(chatUserRepository.getReferenceById(characterId));
-                    s.setRoom(roomRepository.getReferenceById(roomId));
-                    return s;
-                });
-        status.setLastReadAt(LocalDateTime.now());
-        readStatusRepository.save(status);
     }
 
     /**

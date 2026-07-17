@@ -3,9 +3,12 @@ package com.platform.chat.controller.webSocket;
 import com.platform.chat.dto.request.ChatActionMessageRequest;
 import com.platform.chat.dto.request.ChatMessageRequest;
 import com.platform.chat.dto.response.ChatMessageResponse;
+import com.platform.chat.entity.Room;
 import com.platform.chat.enums.MessageActionType;
+import com.platform.chat.repository.room.RoomRepository;
 import com.platform.chat.service.chatUser.ChatUserService;
 import com.platform.chat.service.message.MessageService;
+import com.platform.chat.service.message.UnreadService;
 import com.platform.chat.service.onlineSessions.PresenceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -23,11 +26,11 @@ public class ChatWebSocketController {
     private final MessageService messageService;
     private final ChatUserService chatUserService;
     private final PresenceService presenceService;
+    private final UnreadService unreadService;
 
     // ─── отправить сообщение ──────────────────────────────────────────────
     @MessageMapping("/chat.history.send")
     public void sendMessage(ChatMessageRequest messageParams, Principal principal) {
-
         ChatUser chatUser = chatUserService.getChatUserByUserName(principal.getName());
         Long messageId = messageService.saveByUser(chatUser, messageParams.getContent(), messageParams.getRoomId());
         ChatMessageResponse messageResponse = ChatMessageResponse.getResponseWithMessageId(chatUser, messageParams.getContent(), messageId);
@@ -36,6 +39,8 @@ public class ChatWebSocketController {
                 "/topic/room." + messageParams.getRoomId(),
                 messageResponse
         );
+
+        unreadService.notifyRoomUnreadChanged(Long.parseLong(messageParams.getRoomId()), chatUser.getId());
     }
 
     // ─── вошёл в комнату ─────────────────────────────────────────────────
@@ -78,11 +83,27 @@ public class ChatWebSocketController {
         );
     }
 
+    @MessageMapping("/chat.leave")
+    public void leaveChat(ChatActionMessageRequest messageParams, Principal principal) {
+        ChatUser chatUser = chatUserService.getChatUserByUserName(principal.getName());
+        presenceService.leaveRoom(
+                chatUser.getId(),
+                Long.parseLong(messageParams.getLocationId()),
+                Long.parseLong(messageParams.getRoomId())
+        );
+    }
+
     // ─── heartbeat для presence ─────────────────────────────────────────────
     // новый обработчик — фронт шлёт это раз в 10 сек, пока WS открыт.
     // Не требует ChatMessageParams вообще — только sessionId из заголовков
     @MessageMapping("/presence.heartbeat")
     public void heartbeat(SimpMessageHeaderAccessor headerAccessor) {
         presenceService.heartbeat(headerAccessor.getSessionId());
+    }
+
+    @MessageMapping("/chat.read")
+    public void markRead(ChatActionMessageRequest messageParams, Principal principal) {
+        ChatUser chatUser = chatUserService.getChatUserByUserName(principal.getName());
+        unreadService.markRead(chatUser.getId(), Long.parseLong(messageParams.getRoomId()));
     }
 }

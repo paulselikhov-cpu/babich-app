@@ -29,6 +29,7 @@ public interface LocationMemberRepository extends JpaRepository<LocationMember, 
     );
 
     // все участники конкретной локации
+    @EntityGraph(attributePaths = {"character"})
     List<LocationMember> findByLocationId(Long locationId);
 
     // все локации конкретного персонажа

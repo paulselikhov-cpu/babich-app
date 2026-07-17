@@ -62,9 +62,9 @@ public class PresenceService {
 
     /**
      * Главный метод: персонаж вошёл в комнату.
-     * Вызывается и при явном клике по комнате, и автоматически при входе
-     * в локацию (фронт сам выбирает дефолтную комнату — "прихожую").
-     *
+     * Вызывается только по явному клику пользователя на конкретную комнату —
+     * автовыбора дефолтной комнаты при входе в локацию больше нет (см. leaveRoom
+     * для симметричного явного выхода).
      * Делает 3 вещи одним вызовом:
      *  1) обновляет/создаёт единственную presence-запись персонажа;
      *  2) отмечает комнату как прочитанную (вход = прочтение);
@@ -197,4 +197,28 @@ public class PresenceService {
         return result;
     }
 
+    /**
+     * Явный выход из комнаты — вызывается при уничтожении ChatArea на фронте
+     * (пользователь закрыл комнату/сменил локацию, не выбрав комнату в новой).
+     *
+     * Защита от гонки: если presence уже перезаписан свежим enterRoom (пользователь
+     * успел зайти в другую комнату быстрее, чем долетело уведомление о выходе из
+     * старой) — ничего не трогаем, это устаревшее событие про прошлое состояние.
+     */
+    @Transactional
+    public void leaveRoom(Long characterId, Long locationId, Long roomId) {
+        presenceRepository.findByCharacterId(characterId).ifPresent(presence -> {
+            boolean isSameRoom = presence.getRoom() != null && presence.getRoom().getId().equals(roomId);
+            boolean isSameLocation = presence.getLocation() != null && presence.getLocation().getId().equals(locationId);
+
+            if (!isSameRoom || !isSameLocation) {
+                log.debug("leaveRoom для персонажа {} проигнорирован — presence уже перезахвачен", characterId);
+                return;
+            }
+
+            presenceRepository.delete(presence);
+            broadcastPresenceDetail(locationId, characterId, false, null);
+            broadcastPresenceCount(locationId, false);
+        });
+    }
 }
