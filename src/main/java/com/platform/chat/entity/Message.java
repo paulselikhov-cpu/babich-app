@@ -77,6 +77,17 @@ public class Message {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    /**
+     * Сообщение, на которое отвечают (reply). Self-reference на ту же таблицу.
+     * null = обычное сообщение без реплая.
+     * Специально НЕ делаю @OneToMany обратную связь — она не нужна и
+     * только добавит риск случайной ленивой загрузки цепочки реплаев.
+     */
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reply_to_id")
+    private Message replyTo;
+
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();

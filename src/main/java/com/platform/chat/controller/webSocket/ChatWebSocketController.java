@@ -32,8 +32,15 @@ public class ChatWebSocketController {
     @MessageMapping("/chat.history.send")
     public void sendMessage(ChatMessageRequest messageParams, Principal principal) {
         ChatUser chatUser = chatUserService.getChatUserByUserName(principal.getName());
-        Long messageId = messageService.saveByUser(chatUser, messageParams.getContent(), messageParams.getRoomId());
-        ChatMessageResponse messageResponse = ChatMessageResponse.getResponseWithMessageId(chatUser, messageParams.getContent(), messageId);
+
+        ChatMessageResponse messageResponse = messageService.saveByUser(
+                chatUser,
+                messageParams.getContent(),
+                messageParams.getRoomId(),
+                messageParams.getReplyToId()
+        );
+
+        if (messageResponse == null) return;
 
         messagingTemplate.convertAndSend(
                 "/topic/room." + messageParams.getRoomId(),

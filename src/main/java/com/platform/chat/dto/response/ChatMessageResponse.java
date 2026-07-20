@@ -17,12 +17,13 @@ import java.time.LocalDateTime;
 @Data
 public class ChatMessageResponse {
 
-    private Long id; // null для JOIN/LEAVE/TYPING
-    private MessageActionType actionType = MessageActionType.CHAT; // null для JOIN/LEAVE/TYPING
+    private Long id;
+    private MessageActionType actionType = MessageActionType.CHAT;
     private String content;
     private LocalDateTime timestamp;
     private Boolean isDeleted = false;
-    private CharacterInfo character; // null для JOIN/LEAVE/TYPING
+    private CharacterInfo character;
+    private ReplyInfo replyTo; // ← добавлено, null если не реплай
 
     @Data
     public static class CharacterInfo {
@@ -31,46 +32,60 @@ public class ChatMessageResponse {
         private String avatarUrl;
     }
 
-    public static ChatMessageResponse getResponseForHistory(Message message) {
+    /**
+     * Компактное превью сообщения-родителя для отображения цитаты
+     * внутри бабла (как в Telegram). Если родитель удалён — content
+     * не отдаём, фронт покажет "Сообщение удалено".
+     */
+    @Data
+    public static class ReplyInfo {
+        private Long id;
+        private String content;
+        private String senderName;
+        private Boolean isDeleted;
+    }
+
+    /**
+     * Единая точка сборки DTO из entity — используется и для истории,
+     * и для realtime-рассылки через WS. ВАЖНО: вызывать только внутри
+     * активной Hibernate-сессии (т.е. из @Transactional-метода сервиса),
+     * иначе обращение к message.getReplyTo().getCharacter() упадёт
+     * с LazyInitializationException.
+     */
+    public static ChatMessageResponse fromMessage(Message message) {
         ChatMessageResponse dto = new ChatMessageResponse();
         dto.setId(message.getId());
+        dto.setActionType(MessageActionType.CHAT);
         dto.setContent(message.getContent());
-        dto.setIsDeleted(message.getIsDeleted());
         dto.setTimestamp(message.getCreatedAt());
+        dto.setIsDeleted(message.getIsDeleted());
 
         if (message.getCharacter() != null) {
-            CharacterInfo info = new ChatMessageResponse.CharacterInfo();
+            CharacterInfo info = new CharacterInfo();
             info.setUserId(message.getCharacter().getId());
             info.setCharacterName(message.getCharacter().getCharacterName());
             info.setAvatarUrl(message.getCharacter().getAvatarUrl());
             dto.setCharacter(info);
         }
 
+        if (message.getReplyTo() != null) {
+            Message rt = message.getReplyTo();
+            ReplyInfo replyInfo = new ReplyInfo();
+            replyInfo.setId(rt.getId());
+            replyInfo.setIsDeleted(rt.getIsDeleted());
+            replyInfo.setContent(Boolean.TRUE.equals(rt.getIsDeleted()) ? null : rt.getContent());
+            if (rt.getCharacter() != null) {
+                replyInfo.setSenderName(rt.getCharacter().getCharacterName());
+            }
+            dto.setReplyTo(replyInfo);
+        }
+
         return dto;
-    }
-
-    public static ChatMessageResponse getResponseWithMessageId(ChatUser user, String content, Long messageId) {
-        ChatMessageResponse messageResponse = new ChatMessageResponse();
-
-        messageResponse.setId(messageId);
-        messageResponse.setActionType(MessageActionType.CHAT);
-        messageResponse.setTimestamp(LocalDateTime.now());
-
-        messageResponse.setIsDeleted(false);
-        messageResponse.setContent(content);
-
-        ChatMessageResponse.CharacterInfo info = new ChatMessageResponse.CharacterInfo();
-        info.setUserId(user.getId());
-        info.setCharacterName(user.getCharacterName());
-        info.setAvatarUrl(user.getAvatarUrl());
-        messageResponse.setCharacter(info);
-
-        return messageResponse;
     }
 
     public static ChatMessageResponse getResponseByActionType(MessageActionType actionType, ChatUser user) {
         ChatMessageResponse messageResponse = new ChatMessageResponse();
-        CharacterInfo info = new ChatMessageResponse.CharacterInfo();
+        CharacterInfo info = new CharacterInfo();
         info.setUserId(user.getId());
         info.setCharacterName(user.getCharacterName());
         info.setAvatarUrl(user.getAvatarUrl());

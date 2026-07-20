@@ -27,11 +27,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Сервис для работы с сообщениями чата.
- * Сохраняет сообщения в БД только если Room.storeHistory = true.
- * При storeHistory = false — сообщение летит только через WebSocket.
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -46,15 +41,17 @@ public class MessageService {
     private final UnreadService unreadService;
 
     private static final LocalDateTime EPOCH = LocalDateTime.of(1970, 1, 1, 0, 0);
+
     /**
-     * Сохраняет сообщение в БД и обогащает ChatMessage:
-     * - устанавливает id из БД
-     * - устанавливает character (userId, characterName, avatarUrl)
-     *
-     * Вызывается только для MessageType.CHAT.
+     * Сохраняет сообщение и сразу возвращает готовый DTO (собранный внутри
+     * этой же транзакции — иначе лениво подгружаемый replyTo.character
+     * упадёт с LazyInitializationException после выхода из метода).
+     * replyToId — опционален. Если указан, но сообщение не найдено или
+     * принадлежит другой комнате — реплай молча игнорируется (не кидаем
+     * ошибку, чтобы не ронять отправку из-за гонки с удалением/подменой).
      */
     @Transactional
-    public Long saveByUser(ChatUser chatUser, String content, String stringRoomId) {
+    public ChatMessageResponse saveByUser(ChatUser chatUser, String content, String stringRoomId, Long replyToId) {
         Long roomId = Long.parseLong(stringRoomId);
         Room room = roomRepository.findById(roomId).orElse(null);
 
@@ -63,38 +60,46 @@ public class MessageService {
             return null;
         }
 
-        Message saved = saveMessage(room, chatUser, content);
+        Message replyTo = resolveReplyTarget(replyToId, roomId);
 
+        Message saved = saveMessage(room, chatUser, content, replyTo);
         log.debug("Сообщение {} сохранено в комнате {}", saved.getId(), roomId);
-        return saved.getId();
+
+        return ChatMessageResponse.fromMessage(saved);
     }
 
-    public Message saveMessage(Room room, ChatUser chatUser, String content) {
+    private Message resolveReplyTarget(Long replyToId, Long roomId) {
+        if (replyToId == null) return null;
+
+        Message replyTo = messageRepository.findById(replyToId).orElse(null);
+        if (replyTo == null) {
+            log.debug("Сообщение-родитель {} для реплая не найдено", replyToId);
+            return null;
+        }
+        // защита от кросс-комнатного реплая (например, id подменили на фронте)
+        if (!replyTo.getRoom().getId().equals(roomId)) {
+            log.warn("Попытка реплая на сообщение {} из другой комнаты", replyToId);
+            return null;
+        }
+        return replyTo;
+    }
+
+    public Message saveMessage(Room room, ChatUser chatUser, String content, Message replyTo) {
         Message message = new Message();
         message.setRoom(room);
         message.setCharacter(chatUser);
         message.setContent(content);
         message.setType(MessageType.CHAT);
         message.setIsDeleted(false);
+        message.setReplyTo(replyTo);
         return messageRepository.save(message);
     }
 
-    /**
-     * Загружает историю И атомарно помечает комнату прочитанной — в ОДНОЙ
-     * транзакции, чтобы не зависеть от порядка REST-запроса и WS-события
-     * входа в комнату (они сейчас гоняются гонкой на фронте).
-     *
-     * Порядок действий важен:
-     *  1) сначала читаем СТАРУЮ метку lastReadAt (что было непрочитано ДО этого визита)
-     *  2) считаем по ней firstUnreadMessageId/unreadCount
-     *  3) только теперь обновляем метку на "сейчас"
-     * Если поменять порядок — потеряем возможность узнать, что было непрочитанным.
-     */
     @Transactional
     public RoomHistoryResponse getHistoryAndMarkRead(Long roomId, Long characterId, int page, int size) {
         LocalDateTime previousReadAt = readStatusRepository.findByCharacterIdAndRoomId(characterId, roomId)
                 .map(RoomReadStatus::getLastReadAt)
-                .orElse(EPOCH); // ни разу не заходил — считаем непрочитанным всё
+                .orElse(EPOCH);
 
         Page<Message> result = messageRepository.findByRoomIdOrderByCreatedAtDesc(
                 roomId, PageRequest.of(page, size)
@@ -102,7 +107,6 @@ public class MessageService {
         List<Message> messages = new ArrayList<>(result.getContent());
         Collections.reverse(messages);
 
-        // первое сообщение НЕ от самого пользователя, написанное после его последнего визита
         Long firstUnreadMessageId = messages.stream()
                 .filter(m -> m.getCreatedAt().isAfter(previousReadAt))
                 .filter(m -> !m.getCharacter().getId().equals(characterId))
@@ -115,7 +119,6 @@ public class MessageService {
                 .filter(m -> !m.getCharacter().getId().equals(characterId))
                 .count();
 
-        // теперь, когда посчитали разницу, обновляем метку — комната официально прочитана
         unreadService.markRead(characterId, roomId);
 
         Room room = roomRepository.findById(roomId).orElse(null);
@@ -127,20 +130,13 @@ public class MessageService {
         }
 
         List<ChatMessageResponse> dos = messages.stream()
-                .map(ChatMessageResponse::getResponseForHistory)
+                .map(ChatMessageResponse::fromMessage)
                 .collect(Collectors.toList());
 
         return new RoomHistoryResponse(dos, firstUnreadMessageId, unreadCount);
     }
 
-    /**
-     * Загрузить историю сообщений комнаты с пагинацией.
-     * Возвращает последние N сообщений отсортированных по времени.
-     *
-     * @param roomId id комнаты
-     * @param page   номер страницы (0 = последние сообщения)
-     * @param size   количество сообщений на странице
-     */
+    @Transactional(readOnly = true)
     public List<ChatMessageResponse> getHistory(Long roomId, int page, int size) {
         Page<Message> result = messageRepository.findByRoomIdOrderByCreatedAtDesc(
                 roomId,
@@ -149,17 +145,11 @@ public class MessageService {
         List<Message> messages = new ArrayList<>(result.getContent());
         Collections.reverse(messages);
 
-        // конвертируем в DTO
         return messages.stream()
-                .map(ChatMessageResponse::getResponseForHistory)
-                .collect(java.util.stream.Collectors.toList());
+                .map(ChatMessageResponse::fromMessage)
+                .collect(Collectors.toList());
     }
 
-    /**
-     * Мягкое удаление одного сообщения.
-     * Только автор или модератор/владелец локации может удалять.
-     * soft delete — запись остаётся в БД, isDeleted = true.
-     */
     @Transactional
     public void deleteMessage(Long messageId, String username) {
         Message message = messageRepository.findById(messageId)
@@ -191,7 +181,6 @@ public class MessageService {
         message.setIsDeleted(true);
         messageRepository.save(message);
 
-        // уведомляем всех в комнате об удалении
         Long roomId = message.getRoom().getId();
         messagingTemplate.convertAndSend(
                 "/topic/room." + roomId,
@@ -199,10 +188,6 @@ public class MessageService {
         );
     }
 
-    /**
-     * Удалить несколько сообщений сразу.
-     * Используется при групповом удалении выделенных сообщений.
-     */
     @Transactional
     public void deleteMessages(List<Long> messageIds, String username) {
         messageIds.forEach(id -> deleteMessage(id, username));
