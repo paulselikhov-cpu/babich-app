@@ -235,81 +235,149 @@ FROM districts WHERE code = 'CENTRAL'
     );
 
 -- ===================================
--- Создать базовые комнаты для системных локаций
+-- Миграция 2026-07-25: объединение PublicLocation в Location
 -- ===================================
 
--- Комната "Холл" для Мэрии
-INSERT INTO rooms (public_location_id, name, description, store_history, is_custom, order_index)
-SELECT pl.id, 'Холл мэрии', 'Главное помещение мэрии', true, false, 1
-FROM public_locations pl
-         JOIN districts d ON pl.district_id = d.id
-WHERE d.code = 'CENTRAL' AND pl.type = 'CITY_HALL'
-  AND NOT EXISTS (
-        SELECT 1 FROM rooms r
-        WHERE r.public_location_id = pl.id AND r.name = 'Холл мэрии'
-    );
+-- Добавляем колонки в locations
+ALTER TABLE locations ADD COLUMN IF NOT EXISTS is_system BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE locations ADD COLUMN IF NOT EXISTS type VARCHAR(30);
 
--- Комната "Площадь" для Площади Ленина
-INSERT INTO rooms (public_location_id, name, description, store_history, is_custom, order_index)
-SELECT pl.id, 'Площадь', 'Открытое пространство для собраний', true, false, 1
-FROM public_locations pl
-         JOIN districts d ON pl.district_id = d.id
-WHERE d.code = 'CENTRAL' AND pl.type = 'LENIN_SQUARE'
-  AND NOT EXISTS (
-        SELECT 1 FROM rooms r
-        WHERE r.public_location_id = pl.id AND r.name = 'Площадь'
-    );
+-- Делаем district_id NOT NULL (теперь каждая локация привязана к району)
+-- Сначала для существующих пользовательских локаций без района проставляем дефолтный
+UPDATE locations SET district_id = (SELECT id FROM districts WHERE code = 'CENTRAL' LIMIT 1)
+WHERE district_id IS NULL;
+ALTER TABLE locations ALTER COLUMN district_id SET NOT NULL;
 
--- Комната "Тёплые трубы" для бомжей на Площади Ленина
-INSERT INTO rooms (public_location_id, name, description, store_history, is_custom, order_index)
-SELECT pl.id, 'Тёплые трубы', 'Место для ночлега бомжей. Здесь можно восстановить энергию сном.', true, false, 2
-FROM public_locations pl
-         JOIN districts d ON pl.district_id = d.id
-WHERE d.code = 'CENTRAL' AND pl.type = 'LENIN_SQUARE'
-  AND NOT EXISTS (
-        SELECT 1 FROM rooms r
-        WHERE r.public_location_id = pl.id AND r.name = 'Тёплые трубы'
-    );
+-- Делаем owner_id nullable (у системных локаций нет владельца)
+ALTER TABLE locations ALTER COLUMN owner_id DROP NOT NULL;
 
--- Комнаты для остальных системных локаций (по одной базовой комнате)
-INSERT INTO rooms (public_location_id, name, description, store_history, is_custom, order_index)
-SELECT pl.id, 'Дежурная часть', 'Главное помещение участка', true, false, 1
+-- Переносим данные из public_locations в locations
+INSERT INTO locations (district_id, name, description, is_system, type, is_public, created_at)
+SELECT pl.district_id, pl.name, pl.description, TRUE, pl.type, FALSE, NOW()
 FROM public_locations pl
-         JOIN districts d ON pl.district_id = d.id
-WHERE d.code = 'CENTRAL' AND pl.type = 'POLICE_STATION'
-  AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.public_location_id = pl.id);
+WHERE NOT EXISTS (
+    SELECT 1 FROM locations l 
+    WHERE l.district_id = pl.district_id AND l.type = pl.type AND l.is_system = TRUE
+);
 
-INSERT INTO rooms (public_location_id, name, description, store_history, is_custom, order_index)
-SELECT pl.id, 'Общая камера', 'Место содержания заключённых', true, false, 1
-FROM public_locations pl
-         JOIN districts d ON pl.district_id = d.id
-WHERE d.code = 'CENTRAL' AND pl.type = 'PRISON'
-  AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.public_location_id = pl.id);
+-- Обновляем rooms: переносим public_location_id → location_id
+UPDATE rooms r
+SET location_id = (
+    SELECT l.id FROM locations l 
+    JOIN public_locations pl ON pl.district_id = l.district_id AND pl.type = l.type
+    WHERE pl.id = r.public_location_id AND l.is_system = TRUE
+)
+WHERE r.public_location_id IS NOT NULL;
 
-INSERT INTO rooms (public_location_id, name, description, store_history, is_custom, order_index)
-SELECT pl.id, 'Операционный зал', 'Главный зал банка', true, false, 1
-FROM public_locations pl
-         JOIN districts d ON pl.district_id = d.id
-WHERE d.code = 'CENTRAL' AND pl.type = 'BANK'
-  AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.public_location_id = pl.id);
+-- Делаем location_id NOT NULL в rooms
+ALTER TABLE rooms ALTER COLUMN location_id SET NOT NULL;
 
-INSERT INTO rooms (public_location_id, name, description, store_history, is_custom, order_index)
-SELECT pl.id, 'Склад', 'Хранилище товаров для бизнеса', true, false, 1
-FROM public_locations pl
-         JOIN districts d ON pl.district_id = d.id
-WHERE d.code = 'CENTRAL' AND pl.type = 'WAREHOUSE'
-  AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.public_location_id = pl.id);
+-- Удаляем public_location_id из rooms (больше не нужен)
+ALTER TABLE rooms DROP COLUMN IF EXISTS public_location_id;
 
-INSERT INTO rooms (public_location_id, name, description, store_history, is_custom, order_index)
-SELECT pl.id, 'Торговые ряды', 'Общий рынок района', true, false, 1
-FROM public_locations pl
-         JOIN districts d ON pl.district_id = d.id
-WHERE d.code = 'CENTRAL' AND pl.type = 'GENERAL_MARKET'
-  AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.public_location_id = pl.id);
+-- Удаляем таблицу public_locations
+DROP TABLE IF EXISTS public_locations;
 
-INSERT INTO rooms (public_location_id, name, description, store_history, is_custom, order_index)
-SELECT pl.id, 'Офис продаж', 'Оформление сделок с недвижимостью', true, false, 1
-FROM public_locations pl
-         JOIN districts d ON pl.district_id = d.id
-WHERE d.code = 'CENTRAL' AND pl.type = 'REAL_ESTATE_MARKET'
-  AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.public_location_id = pl.id);
+-- ===================================
+-- Создаём комнаты для системных локаций (перенесено из DataInitializer)
+-- ===================================
+
+-- Мэрия: 3 комнаты
+INSERT INTO rooms (location_id, name, description, store_history, is_custom, order_index)
+SELECT l.id, 'Приёмная', 'Место ожидания приёма', true, false, 0
+FROM locations l WHERE l.is_system = TRUE AND l.type = 'CITY_HALL'
+  AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.location_id = l.id AND r.name = 'Приёмная');
+INSERT INTO rooms (location_id, name, description, store_history, is_custom, order_index)
+SELECT l.id, 'Зал заседаний', 'Зал для совещаний', true, false, 1
+FROM locations l WHERE l.is_system = TRUE AND l.type = 'CITY_HALL'
+  AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.location_id = l.id AND r.name = 'Зал заседаний');
+INSERT INTO rooms (location_id, name, description, store_history, is_custom, order_index)
+SELECT l.id, 'Кабинет мэра', 'Личный кабинет главы района', true, false, 2
+FROM locations l WHERE l.is_system = TRUE AND l.type = 'CITY_HALL'
+  AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.location_id = l.id AND r.name = 'Кабинет мэра');
+
+-- Площадь Ленина: 2 комнаты
+INSERT INTO rooms (location_id, name, description, store_history, is_custom, order_index)
+SELECT l.id, 'Площадь', 'Открытое пространство для собраний', true, false, 0
+FROM locations l WHERE l.is_system = TRUE AND l.type = 'LENIN_SQUARE'
+  AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.location_id = l.id AND r.name = 'Площадь');
+INSERT INTO rooms (location_id, name, description, store_history, is_custom, order_index)
+SELECT l.id, 'Тёплые трубы', 'Место для ночлега бомжей', true, false, 1
+FROM locations l WHERE l.is_system = TRUE AND l.type = 'LENIN_SQUARE'
+  AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.location_id = l.id AND r.name = 'Тёплые трубы');
+
+-- Полицейский участок: 3 комнаты
+INSERT INTO rooms (location_id, name, description, store_history, is_custom, order_index)
+SELECT l.id, 'Дежурная часть', 'Главное помещение участка', true, false, 0
+FROM locations l WHERE l.is_system = TRUE AND l.type = 'POLICE_STATION'
+  AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.location_id = l.id AND r.name = 'Дежурная часть');
+INSERT INTO rooms (location_id, name, description, store_history, is_custom, order_index)
+SELECT l.id, 'Кабинет следователя', 'Место допросов', true, false, 1
+FROM locations l WHERE l.is_system = TRUE AND l.type = 'POLICE_STATION'
+  AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.location_id = l.id AND r.name = 'Кабинет следователя');
+INSERT INTO rooms (location_id, name, description, store_history, is_custom, order_index)
+SELECT l.id, 'Обходной лист', 'Помещение для оформления', true, false, 2
+FROM locations l WHERE l.is_system = TRUE AND l.type = 'POLICE_STATION'
+  AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.location_id = l.id AND r.name = 'Обходной лист');
+
+-- Тюрьма: 3 комнаты
+INSERT INTO rooms (location_id, name, description, store_history, is_custom, order_index)
+SELECT l.id, 'Приёмный изолятор', 'Первичное размещение', true, false, 0
+FROM locations l WHERE l.is_system = TRUE AND l.type = 'PRISON'
+  AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.location_id = l.id AND r.name = 'Приёмный изолятор');
+INSERT INTO rooms (location_id, name, description, store_history, is_custom, order_index)
+SELECT l.id, 'Камера', 'Общая камера', true, false, 1
+FROM locations l WHERE l.is_system = TRUE AND l.type = 'PRISON'
+  AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.location_id = l.id AND r.name = 'Камера');
+INSERT INTO rooms (location_id, name, description, store_history, is_custom, order_index)
+SELECT l.id, 'Комната свиданий', 'Место для встреч', true, false, 2
+FROM locations l WHERE l.is_system = TRUE AND l.type = 'PRISON'
+  AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.location_id = l.id AND r.name = 'Комната свиданий');
+
+-- Банк: 3 комнаты
+INSERT INTO rooms (location_id, name, description, store_history, is_custom, order_index)
+SELECT l.id, 'Операционный зал', 'Главный зал банка', true, false, 0
+FROM locations l WHERE l.is_system = TRUE AND l.type = 'BANK'
+  AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.location_id = l.id AND r.name = 'Операционный зал');
+INSERT INTO rooms (location_id, name, description, store_history, is_custom, order_index)
+SELECT l.id, 'Хранилище', 'Место хранения ценностей', true, false, 1
+FROM locations l WHERE l.is_system = TRUE AND l.type = 'BANK'
+  AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.location_id = l.id AND r.name = 'Хранилище');
+INSERT INTO rooms (location_id, name, description, store_history, is_custom, order_index)
+SELECT l.id, 'Кабинет директора', 'Кабинет управляющего банком', true, false, 2
+FROM locations l WHERE l.is_system = TRUE AND l.type = 'BANK'
+  AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.location_id = l.id AND r.name = 'Кабинет директора');
+
+-- Склад: 3 комнаты
+INSERT INTO rooms (location_id, name, description, store_history, is_custom, order_index)
+SELECT l.id, 'Приёмка', 'Зона приёма товара', true, false, 0
+FROM locations l WHERE l.is_system = TRUE AND l.type = 'WAREHOUSE'
+  AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.location_id = l.id AND r.name = 'Приёмка');
+INSERT INTO rooms (location_id, name, description, store_history, is_custom, order_index)
+SELECT l.id, 'Стеллажи', 'Основное хранилище', true, false, 1
+FROM locations l WHERE l.is_system = TRUE AND l.type = 'WAREHOUSE'
+  AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.location_id = l.id AND r.name = 'Стеллажи');
+INSERT INTO rooms (location_id, name, description, store_history, is_custom, order_index)
+SELECT l.id, 'Офис', 'Административное помещение', true, false, 2
+FROM locations l WHERE l.is_system = TRUE AND l.type = 'WAREHOUSE'
+  AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.location_id = l.id AND r.name = 'Офис');
+
+-- Рынок: 2 комнаты
+INSERT INTO rooms (location_id, name, description, store_history, is_custom, order_index)
+SELECT l.id, 'Торговый зал', 'Основная торговая площадь', true, false, 0
+FROM locations l WHERE l.is_system = TRUE AND l.type = 'GENERAL_MARKET'
+  AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.location_id = l.id AND r.name = 'Торговый зал');
+INSERT INTO rooms (location_id, name, description, store_history, is_custom, order_index)
+SELECT l.id, 'Подсобка', 'Подсобное помещение', true, false, 1
+FROM locations l WHERE l.is_system = TRUE AND l.type = 'GENERAL_MARKET'
+  AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.location_id = l.id AND r.name = 'Подсобка');
+
+-- Рынок недвижимости: 2 комнаты
+INSERT INTO rooms (location_id, name, description, store_history, is_custom, order_index)
+SELECT l.id, 'Зал ожидания', 'Зона ожидания для клиентов', true, false, 0
+FROM locations l WHERE l.is_system = TRUE AND l.type = 'REAL_ESTATE_MARKET'
+  AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.location_id = l.id AND r.name = 'Зал ожидания');
+INSERT INTO rooms (location_id, name, description, store_history, is_custom, order_index)
+SELECT l.id, 'Кабинет риелтора', 'Офис для сделок с недвижимостью', true, false, 1
+FROM locations l WHERE l.is_system = TRUE AND l.type = 'REAL_ESTATE_MARKET'
+  AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.location_id = l.id AND r.name = 'Кабинет риелтора');

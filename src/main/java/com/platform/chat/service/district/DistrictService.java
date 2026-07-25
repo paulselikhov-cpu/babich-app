@@ -1,10 +1,10 @@
 package com.platform.chat.service.district;
 
 import com.platform.chat.entity.District;
-import com.platform.chat.entity.PublicLocation;
+import com.platform.chat.entity.Location;
 import com.platform.chat.enums.PublicLocationType;
 import com.platform.chat.repository.district.DistrictRepository;
-import com.platform.chat.repository.district.PublicLocationRepository;
+import com.platform.chat.repository.location.LocationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,22 +19,22 @@ import java.util.List;
 public class DistrictService {
 
     private final DistrictRepository districtRepository;
-    private final PublicLocationRepository publicLocationRepository;
+    private final LocationRepository locationRepository;
 
     /**
-     * Получить все районы вместе с их публичными локациями
+     * Получить все районы вместе с их системными локациями
      */
     @Transactional(readOnly = true)
     public List<District> getAllDistricts() {
-        return districtRepository.findAllWithPublicLocations();
+        return districtRepository.findAllWithSystemLocations();
     }
 
     /**
-     * Получить район по ID вместе с его публичными локациями
+     * Получить район по ID вместе с его системными локациями
      */
     @Transactional(readOnly = true)
     public District getDistrictById(Long id) {
-        return districtRepository.findByIdWithPublicLocations(id)
+        return districtRepository.findByIdWithSystemLocations(id)
                 .orElseThrow(() -> new RuntimeException("Район с id=" + id + " не найден"));
     }
 
@@ -51,8 +51,8 @@ public class DistrictService {
      * Получить все системные локации района
      */
     @Transactional(readOnly = true)
-    public List<PublicLocation> getPublicLocationsByDistrict(Long districtId) {
-        return publicLocationRepository.findByDistrictId(districtId);
+    public List<Location> getSystemLocationsByDistrict(Long districtId) {
+        return locationRepository.findByDistrictIdAndIsSystemTrue(districtId);
     }
 
     /**
@@ -60,8 +60,8 @@ public class DistrictService {
      * (например, мэрию или полицейский участок конкретного района)
      */
     @Transactional(readOnly = true)
-    public PublicLocation getPublicLocationByType(Long districtId, PublicLocationType type) {
-        return publicLocationRepository.findByDistrictIdAndType(districtId, type)
+    public Location getSystemLocationByType(Long districtId, PublicLocationType type) {
+        return locationRepository.findByDistrictIdAndIsSystemTrueAndType(districtId, type)
                 .orElseThrow(() -> new RuntimeException(
                         "Системная локация типа " + type + " в районе " + districtId + " не найдена"
                 ));

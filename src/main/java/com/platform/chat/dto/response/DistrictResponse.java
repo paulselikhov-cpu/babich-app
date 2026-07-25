@@ -19,7 +19,7 @@ public class DistrictResponse {
     private String code;
     private String name;
     private String description;
-    private List<PublicLocationResponse> publicLocations;
+    private List<LocationResponse> systemLocations;
 
     public static DistrictResponse fromEntity(District district) {
         DistrictResponse response = new DistrictResponse();
@@ -28,10 +28,10 @@ public class DistrictResponse {
         response.setName(district.getName());
         response.setDescription(district.getDescription());
         
-        if (district.getPublicLocations() != null) {
-            response.setPublicLocations(
-                district.getPublicLocations().stream()
-                    .map(PublicLocationResponse::fromEntity)
+        if (district.getSystemLocations() != null) {
+            response.setSystemLocations(
+                district.getSystemLocations().stream()
+                    .map(LocationResponse::fromEntity)
                     .collect(Collectors.toList())
             );
         }

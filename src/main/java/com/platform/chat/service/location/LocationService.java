@@ -4,6 +4,7 @@ import com.platform.chat.dto.response.LocationResponse;
 import com.platform.chat.entity.*;
 import com.platform.chat.enums.LocationMemberRole;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
+import com.platform.chat.repository.district.DistrictRepository;
 import com.platform.chat.repository.location.LocationMemberRepository;
 import com.platform.chat.repository.location.LocationRepository;
 import com.platform.chat.repository.location.LocationTemplateRepository;
@@ -33,13 +34,21 @@ public class LocationService {
     private final LocationMemberRepository locationMemberRepository;
     private final RoomRepository roomRepository;
     private final ChatUserRepository chatUserRepository;
+    private final DistrictRepository districtRepository;
 
     /**
-     * Получить все публичные локации.
+     * Получить все публичные пользовательские локации.
      * Показываем в общем списке — "найти локацию".
      */
     public List<Location> getPublicLocations() {
         return locationRepository.findByIsPublicTrue();
+    }
+
+    /**
+     * Получить все системные локации.
+     */
+    public List<Location> getSystemLocations() {
+        return locationRepository.findByIsSystemTrue();
     }
 
     /**
@@ -116,10 +125,15 @@ public class LocationService {
             chatUserRepository.save(character);
         }
 
-        // шаг 4: создаём локацию
+        // шаг 4: получаем дефолтный район (персонаж всегда живёт в каком-то районе)
+        District defaultDistrict = districtRepository.findByCode("CENTRAL")
+                .orElseThrow(() -> new RuntimeException("Дефолтный район не найден"));
+
+        // шаг 5: создаём локацию
         Location location = new Location();
         location.setTemplate(template);
         location.setOwner(character);
+        location.setDistrict(defaultDistrict);
         location.setName(name);
         location.setDescription(description);
         location.setIsPublic(isPublic);

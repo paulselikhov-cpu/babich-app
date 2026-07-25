@@ -1,9 +1,9 @@
 package com.platform.chat.controller.district;
 
 import com.platform.chat.dto.response.DistrictResponse;
-import com.platform.chat.dto.response.PublicLocationResponse;
+import com.platform.chat.dto.response.LocationResponse;
 import com.platform.chat.entity.District;
-import com.platform.chat.entity.PublicLocation;
+import com.platform.chat.entity.Location;
 import com.platform.chat.service.district.DistrictService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,11 +50,11 @@ public class DistrictController {
     /**
      * Получить все системные локации конкретного района
      */
-    @GetMapping("/{id}/public-locations")
-    public List<PublicLocationResponse> getPublicLocations(@PathVariable Long id) {
-        List<PublicLocation> locations = districtService.getPublicLocationsByDistrict(id);
+    @GetMapping("/{id}/system-locations")
+    public List<LocationResponse> getSystemLocations(@PathVariable Long id) {
+        List<Location> locations = districtService.getSystemLocationsByDistrict(id);
         return locations.stream()
-                .map(PublicLocationResponse::fromEntity)
+                .map(LocationResponse::fromEntity)
                 .collect(Collectors.toList());
     }
 }

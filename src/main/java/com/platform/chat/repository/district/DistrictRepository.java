@@ -17,14 +17,14 @@ public interface DistrictRepository extends JpaRepository<District, Long> {
     Optional<District> findByCode(String code);
     
     /**
-     * Получить все районы с их publicLocations (JOIN FETCH для избежания LazyInitializationException)
+     * Получить все районы с их системными локациями (JOIN FETCH для избежания LazyInitializationException)
      */
-    @Query("SELECT DISTINCT d FROM District d LEFT JOIN FETCH d.publicLocations")
-    List<District> findAllWithPublicLocations();
+    @Query("SELECT DISTINCT d FROM District d LEFT JOIN FETCH d.systemLocations")
+    List<District> findAllWithSystemLocations();
     
     /**
-     * Получить район по ID с его publicLocations
+     * Получить район по ID с его системными локациями
      */
-    @Query("SELECT d FROM District d LEFT JOIN FETCH d.publicLocations WHERE d.id = :id")
-    Optional<District> findByIdWithPublicLocations(Long id);
+    @Query("SELECT d FROM District d LEFT JOIN FETCH d.systemLocations WHERE d.id = :id")
+    Optional<District> findByIdWithSystemLocations(Long id);
 }

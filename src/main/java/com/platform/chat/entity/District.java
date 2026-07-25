@@ -6,9 +6,10 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * Район города — географическая зона с общественными локациями.
+ * Район города — географическая зона с системными и пользовательскими локациями.
  * Каждый персонаж живет в определенном районе.
- * В районе есть дефолтные общественные места (магазины, парки, бары).
+ * В районе есть системные места (мэрия, банк, полиция и т.д.) и
+ * пользовательские локации (жильё, созданное игроками).
  */
 @Data
 @Entity
@@ -39,15 +40,15 @@ public class District {
     private String code;
 
     /**
-     * Общественные локации района (магазины, парки, бары и т.д.)
-     * CascadeType.ALL = при удалении района удаляются его локации
+     * Системные локации района (мэрия, банк, полиция и т.д.)
+     * Создаются автоматически при инициализации района.
      */
     @JsonIgnore
     @OneToMany(mappedBy = "district", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<PublicLocation> publicLocations;
+    private List<Location> systemLocations;
 
     /**
-     * Приватные локации пользователей в этом районе
+     * Пользовательские локации в этом районе (жильё игроков)
      */
     @JsonIgnore
     @OneToMany(mappedBy = "district", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

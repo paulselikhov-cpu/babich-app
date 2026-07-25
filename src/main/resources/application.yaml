@@ -13,6 +13,7 @@ spring:
     properties:
       hibernate:
         default_schema: public   # пока одна схема, потом разделим
+    defer-datasource-initialization: true # чтобы сначала создались entity, потом запустился уже data.sql
   sql:
     init:
       mode: always   # ← добавь это
