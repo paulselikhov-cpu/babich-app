@@ -1,4 +1,4 @@
-package com.platform.chat.entity;
+ package com.platform.chat.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -42,6 +42,15 @@ public class Location {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
     private ChatUser owner;
+
+    /**
+     * Район, в котором находится эта локация.
+     * ManyToOne = в одном районе много приватных локаций.
+     */
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "district_id")
+    private District district;
 
     /**
      * Кастомное название локации — владелец сам придумывает.

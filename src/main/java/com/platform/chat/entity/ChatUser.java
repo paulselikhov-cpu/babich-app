@@ -3,6 +3,7 @@ package com.platform.chat.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.platform.auth.entity.User;
 import com.platform.chat.enums.ChatRole;
+import com.platform.economy.enums.Profession;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -75,6 +76,44 @@ public class ChatUser extends User {
      */
     @Column(name = "last_seen")
     private LocalDateTime lastSeen;
+
+    /**
+     * Накопительный XP персонажа (личный прогресс).
+     * Растёт от работы, активности, выполнения действий.
+     */
+    @Column(name = "xp_user", nullable = false)
+    private Long xpUser = 0L;
+
+    /**
+     * Текущая энергия персонажа (0–100).
+     * Тратится на действия (работа, кражи, эскорт и т.д.).
+     * Восстанавливается пассивно со временем.
+     */
+    @Column(name = "energy", nullable = false)
+    private Integer energy = 100;
+
+    /**
+     * Время последнего обновления энергии.
+     * Используется EnergyService для расчёта пассивного восстановления.
+     */
+    @Column(name = "energy_last_updated")
+    private LocalDateTime energyLastUpdated;
+
+    /**
+     * Игровой статус персонажа.
+     * HOMELESS = бомж (начальный статус, нет своей локации).
+     * RESIDENT = житель (есть хотя бы одна своя локация).
+     */
+    @Column(name = "game_status", nullable = false, length = 20)
+    private String gameStatus = "HOMELESS";
+
+    /**
+     * Профессия персонажа — определяет доступные механики тап-фарма.
+     * По умолчанию DVORNIK для новых персонажей (бомжи метут улицы).
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "profession", nullable = false, length = 30)
+    private Profession profession = Profession.DVORNIK;
 
     /**
      * Локации которыми владеет персонаж (создал сам).

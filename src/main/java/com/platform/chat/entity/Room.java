@@ -22,13 +22,24 @@ public class Room {
     private Long id;
 
     /**
-     * Локация которой принадлежит комната.
-     * ManyToOne = много комнат в одной локации.
+     * Приватная локация, которой принадлежит комната (жилье пользователя).
+     * ManyToOne = много комнат в одной приватной локации.
+     * Либо location, либо publicLocation должно быть заполнено, но не оба одновременно.
      */
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "location_id", nullable = false)
+    @JoinColumn(name = "location_id")
     private Location location;
+
+    /**
+     * Общественная локация района, которой принадлежит комната (мэрия, банк, склад и т.д.).
+     * ManyToOne = много комнат в одной общественной локации.
+     * Либо location, либо publicLocation должно быть заполнено, но не оба одновременно.
+     */
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "public_location_id")
+    private PublicLocation publicLocation;
 
     /**
      * Название комнаты.
