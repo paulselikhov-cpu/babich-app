@@ -29,7 +29,7 @@ public class ApplicationController {
             return ResponseEntity.badRequest().build();
         }
         Application application = applicationService.submit(
-                chatUser.getId(), ApplicationType.BUY_FIRST_LOCATION, null);
+                chatUser.getUserId(), ApplicationType.BUY_FIRST_LOCATION, null);
         return ResponseEntity.ok(application);
     }
 
@@ -39,6 +39,6 @@ public class ApplicationController {
         if (chatUser == null) {
             return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok(applicationService.getMyApplications(chatUser.getId()));
+        return ResponseEntity.ok(applicationService.getMyApplications(chatUser.getUserId()));
     }
 }

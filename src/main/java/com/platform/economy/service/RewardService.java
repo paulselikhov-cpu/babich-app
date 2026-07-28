@@ -50,7 +50,7 @@ public class RewardService {
     }
 
     private ChatUser getUser(Long userId) {
-        return chatUserRepository.findByUserId(userId)
+        return chatUserRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Персонаж не найден: " + userId));
     }
 

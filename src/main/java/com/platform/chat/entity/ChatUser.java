@@ -1,59 +1,77 @@
 package com.platform.chat.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.platform.auth.entity.User;
 import com.platform.chat.enums.ChatRole;
 import com.platform.economy.enums.Profession;
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Персонаж чата — расширяет базового User из модуля auth.
- * Один User = один ChatUser (персонаж).
- * Таблица chat_users связана с таблицей users через user_id (JOINED inheritance).
- * Это значит что при запросе Hibernate делает JOIN двух таблиц автоматически.
+ * Персонаж чата — независимая сущность, не наследующая User.
+ * Один User может иметь несколько ChatUser (по одному на район).
+ * Связь с User — через поле userId.
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "chat_users")
-@PrimaryKeyJoinColumn(name = "user_id") // user_id = FK и PK одновременно
-public class ChatUser extends User {
+@Table(name = "chat_users", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"character_name", "district_id"},
+        name = "uq_chat_user_character_name_district"),
+    @UniqueConstraint(columnNames = {"user_id", "district_id"},
+        name = "uq_chat_user_user_district")
+})
+public class ChatUser {
+
+    /**
+     * Первичный ключ — автоинкремент, не связан с User.id.
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    /**
+     * Ссылка на владельца (User).
+     */
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
     /**
      * Имя персонажа в игре — отличается от username.
-     * Username = логин для входа, characterName = имя в ролевой игре.
-     * Например username="ivan123", characterName="Иван Петрович"
+     * Уникально в рамках района (в разных районах могут быть одинаковые имена).
      */
-    @Column(name = "character_name", nullable = false, unique = true)
+    @Column(name = "character_name", nullable = false)
     private String characterName;
 
     /**
-     * Глобальная роль персонажа на всей платформе.
-     * ADMIN — полный доступ ко всему
-     * MODERATOR — может модерировать любую локацию
-     * USER — обычный персонаж
-     * GUEST — ограниченный доступ
-     * Не путать с ролью внутри локации (location_members.role)
+     * Username владельца (из User) — продублировано для WS-уведомлений,
+     * чтобы не делать JOIN каждый раз при отправке сообщения.
      */
-    @Enumerated(EnumType.STRING) // хранить как строку "USER", не как число
+    @Column(nullable = false)
+    private String username;
+
+    /**
+     * Район к которому привязан персонаж.
+     * Один User = максимум один персонаж в одном районе.
+     */
+    @Column(name = "district_id", nullable = false)
+    private Long districtId;
+
+    /**
+     * Глобальная роль персонажа на всей платформе.
+     */
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ChatRole role = ChatRole.USER;
 
     /**
-     * Рейтинг персонажа — растёт от активности и оценок других игроков.
-     * В будущем будет влиять на получение Coin и доступные возможности.
+     * Рейтинг персонажа.
      */
     @Column(nullable = false)
     private Integer rating = 0;
 
     /**
      * Баланс внутренней валюты Coin.
-     * Зарабатывается за активность в чате.
-     * Тратится на покупку локаций, комнат, функций персонажа.
      */
     @Column(name = "coin_balance", nullable = false)
     private Long coinBalance = 0L;
@@ -71,30 +89,24 @@ public class ChatUser extends User {
 
     /**
      * Когда персонаж последний раз был онлайн.
-     * Обновляется при каждом WebSocket подключении/отключении.
-     * Используется модулем мониторинга.
      */
     @Column(name = "last_seen")
     private LocalDateTime lastSeen;
 
     /**
      * Накопительный XP персонажа (личный прогресс).
-     * Растёт от работы, активности, выполнения действий.
      */
     @Column(name = "xp_user", nullable = false)
     private Long xpUser = 0L;
 
     /**
      * Текущая энергия персонажа (0–100).
-     * Тратится на действия (работа, кражи, эскорт и т.д.).
-     * Восстанавливается пассивно со временем.
      */
     @Column(name = "energy", nullable = false)
     private Integer energy = 100;
 
     /**
      * Время последнего обновления энергии.
-     * Используется EnergyService для расчёта пассивного восстановления.
      */
     @Column(name = "energy_last_updated")
     private LocalDateTime energyLastUpdated;
@@ -108,27 +120,23 @@ public class ChatUser extends User {
     private String gameStatus = "HOMELESS";
 
     /**
-     * Профессия персонажа — определяет доступные механики тап-фарма.
-     * По умолчанию DVORNIK для новых персонажей (бомжи метут улицы).
+     * Профессия персонажа.
      */
     @Enumerated(EnumType.STRING)
     @Column(name = "profession", nullable = false, length = 30)
     private Profession profession = Profession.DVORNIK;
 
     /**
-     * Локации которыми владеет персонаж (создал сам).
-     * mappedBy = "owner" означает что связь описана в классе Location
-     * через поле owner.
-     * FetchType.LAZY = локации не загружаются пока явно не запросишь —
-     * это важно для производительности.
+     * Локации которыми владеет персонаж.
+     * mappedBy указывает на поле owner в Location — @JoinColumn только на той стороне.
      */
     @JsonIgnore
     @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
     private List<Location> ownedLocations;
 
     /**
-     * Локации в которых состоит персонаж (вступил по ссылке).
-     * Связь многие-ко-многим через таблицу location_members.
+     * Локации в которых состоит персонаж.
+     * mappedBy указывает на поле character в LocationMember — @JoinColumn только на той стороне.
      */
     @JsonIgnore
     @OneToMany(mappedBy = "character", fetch = FetchType.LAZY)

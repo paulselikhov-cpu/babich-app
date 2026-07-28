@@ -7,7 +7,7 @@ spring:
     password: chatpass
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
     open-in-view: false  # отключаем — предотвращает случайные запросы к БД при рендеринге
     properties:

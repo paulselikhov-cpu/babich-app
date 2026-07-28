@@ -33,7 +33,7 @@ public class WorkService {
 
     @Transactional
     public WorkResultResponse workAsDvornik(Long userId) {
-        ChatUser user = chatUserRepository.findByUserId(userId)
+        ChatUser user = chatUserRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Персонаж не найден: " + userId));
 
         if (user.getProfession() != Profession.DVORNIK) {
@@ -48,7 +48,7 @@ public class WorkService {
 
         lastWorkAt.put(userId, Instant.now());
 
-        ChatUser refreshed = chatUserRepository.findByUserId(userId).orElseThrow();
+        ChatUser refreshed = chatUserRepository.findById(userId).orElseThrow();
         return new WorkResultResponse(
                 COINS_PER_SHIFT,
                 XP_PER_SHIFT,

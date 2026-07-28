@@ -8,6 +8,7 @@ import com.platform.chat.repository.location.LocationRepository;
 import com.platform.chat.repository.location.LocationTemplateRepository;
 import com.platform.chat.service.location.LocationService;
 import com.platform.civic.entity.Application;
+import java.util.List;
 import com.platform.civic.enums.ApplicationStatus;
 import com.platform.civic.enums.ApplicationType;
 import lombok.RequiredArgsConstructor;
@@ -40,8 +41,13 @@ public class BuyFirstLocationHandler implements ApplicationHandler {
 
     @Override
     public void handle(Application application) {
-        ChatUser user = chatUserRepository.findByUserId(application.getUserId())
-                .orElseThrow(() -> new RuntimeException("Персонаж не найден: " + application.getUserId()));
+        // application.getUserId() — это User.id, ищем персонажа пользователя
+        // TODO: districtId брать из payload/application, когда появится выбор района
+        List<ChatUser> users = chatUserRepository.findAllByUserId(application.getUserId());
+        if (users.isEmpty()) {
+            throw new RuntimeException("Персонаж не найден для userId: " + application.getUserId());
+        }
+        ChatUser user = users.get(0);
 
         if (!"HOMELESS".equals(user.getGameStatus())) {
             application.setStatus(ApplicationStatus.REJECTED);
