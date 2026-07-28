@@ -8,6 +8,7 @@ import com.platform.chat.repository.district.DistrictRepository;
 import com.platform.chat.repository.location.LocationMemberRepository;
 import com.platform.chat.repository.location.LocationRepository;
 import com.platform.chat.repository.location.LocationTemplateRepository;
+import com.platform.chat.repository.room.RoomReadStatusRepository;
 import com.platform.chat.repository.room.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,7 @@ public class LocationService {
     private final LocationRepository locationRepository;
     private final LocationTemplateRepository locationTemplateRepository;
     private final LocationMemberRepository locationMemberRepository;
+    private final RoomReadStatusRepository roomReadStatusRepository;
     private final RoomRepository roomRepository;
     private final ChatUserRepository chatUserRepository;
     private final DistrictRepository districtRepository;
@@ -346,6 +348,25 @@ public class LocationService {
             throw new RuntimeException("Только владелец может удалить локацию");
         }
 
+        // 1. Получаем все комнаты локации
+        List<Room> rooms = roomRepository.findByLocationIdOrderByOrderIndex(locationId);
+        List<Long> roomIds = rooms.stream().map(Room::getId).toList();
+
+        // 2. Удаляем room_read_status для всех комнат (иначе FK нарушается)
+        if (!roomIds.isEmpty()) {
+            roomReadStatusRepository.deleteByRoomIdIn(roomIds);
+        }
+
+        // 3. Удаляем сообщения комнат (у них cascade = ALL на Room)
+        roomRepository.deleteAll(rooms);
+
+        // 4. Удаляем участников локации
+        List<LocationMember> members = locationMemberRepository.findByLocationId(locationId);
+        if (!members.isEmpty()) {
+            locationMemberRepository.deleteAll(members);
+        }
+
+        // 5. Удаляем саму локацию
         locationRepository.deleteById(locationId);
     }
 }
