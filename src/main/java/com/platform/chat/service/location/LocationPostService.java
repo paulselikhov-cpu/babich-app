@@ -1,0 +1,102 @@
+package com.platform.chat.service.location;
+
+import com.platform.chat.entity.ChatUser;
+import com.platform.chat.entity.Location;
+import com.platform.chat.entity.LocationPost;
+import com.platform.chat.entity.LocationMember;
+import com.platform.chat.enums.LocationPostType;
+import com.platform.chat.enums.LocationMemberRole;
+import com.platform.chat.repository.chatUser.ChatUserRepository;
+import com.platform.chat.repository.location.LocationPostRepository;
+import com.platform.chat.repository.location.LocationRepository;
+import com.platform.chat.repository.location.LocationMemberRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+/**
+ * Сервис для управления должностями в системных локациях.
+ */
+@Service
+@RequiredArgsConstructor
+public class LocationPostService {
+
+    private final LocationPostRepository locationPostRepository;
+    private final LocationRepository locationRepository;
+    private final ChatUserRepository chatUserRepository;
+    private final LocationMemberRepository locationMemberRepository;
+
+    /**
+     * Назначить персонажа на должность в системной локации.
+     */
+    @Transactional
+    public LocationPost appoint(Long locationId, Long characterId, LocationPostType post) {
+        Location location = locationRepository.findById(locationId)
+                .orElseThrow(() -> new RuntimeException("Локация не найдена: " + locationId));
+
+        if (!location.getIsSystem()) {
+            throw new RuntimeException("Должности можно назначать только в системных локациях");
+        }
+
+        ChatUser character = chatUserRepository.findById(characterId)
+                .orElseThrow(() -> new RuntimeException("Персонаж не найден: " + characterId));
+
+        // Проверяем, что персонаж уже состоит в локации (авто-членство или вступление)
+        locationMemberRepository.findByLocationIdAndCharacterId(locationId, characterId)
+                .orElseThrow(() -> new RuntimeException(
+                        "Персонаж " + characterId + " не состоит в локации " + locationId));
+
+        // Проверяем уникальность для единоличных должностей
+        if (isSingleSlotPost(post)) {
+            locationPostRepository.findByLocationIdAndPost(locationId, post)
+                    .ifPresent(existing -> {
+                        throw new RuntimeException(
+                                "Должность " + post + " в локации " + locationId + " уже занята");
+                    });
+        }
+
+        LocationPost locationPost = new LocationPost();
+        locationPost.setLocation(location);
+        locationPost.setCharacter(character);
+        locationPost.setPost(post);
+
+        return locationPostRepository.save(locationPost);
+    }
+
+    /**
+     * Снять персонажа с должности.
+     */
+    @Transactional
+    public void dismiss(Long postId) {
+        LocationPost locationPost = locationPostRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Должность не найдена: " + postId));
+        locationPostRepository.delete(locationPost);
+    }
+
+    /**
+     * Получить все должности в системной локации.
+     */
+    @Transactional(readOnly = true)
+    public List<LocationPost> getPostsByLocation(Long locationId) {
+        return locationPostRepository.findByLocationId(locationId);
+    }
+
+    /**
+     * Получить все должности персонажа.
+     */
+    @Transactional(readOnly = true)
+    public List<LocationPost> getPostsByCharacter(Long characterId) {
+        return locationPostRepository.findByCharacterId(characterId);
+    }
+
+    /**
+     * Проверить, является ли персонаж единоличной должностью (GOVERNOR, BANK_DIRECTOR, REAL_ESTATE_DIRECTOR).
+     */
+    private boolean isSingleSlotPost(LocationPostType post) {
+        return post == LocationPostType.GOVERNOR
+                || post == LocationPostType.BANK_DIRECTOR
+                || post == LocationPostType.REAL_ESTATE_DIRECTOR;
+    }
+}

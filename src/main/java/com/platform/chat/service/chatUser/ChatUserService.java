@@ -3,8 +3,13 @@ package com.platform.chat.service.chatUser;
 import com.platform.auth.repository.UserRepository;
 import com.platform.chat.dto.request.CreateChatUserRequest;
 import com.platform.chat.entity.ChatUser;
+import com.platform.chat.entity.Location;
+import com.platform.chat.entity.LocationMember;
 import com.platform.chat.enums.ChatRole;
+import com.platform.chat.enums.LocationMemberRole;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
+import com.platform.chat.repository.location.LocationMemberRepository;
+import com.platform.chat.repository.location.LocationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -12,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -20,6 +27,8 @@ public class ChatUserService {
 
     private final ChatUserRepository chatUserRepository;
     private final UserRepository userRepository;
+    private final LocationRepository locationRepository;
+    private final LocationMemberRepository locationMemberRepository;
 
     // получить всех персонажей
     public List<ChatUser> getAllChatUsers() {
@@ -118,7 +127,42 @@ public class ChatUserService {
         chatUser.setLastSeen(LocalDateTime.now());
         chatUser.setEnergyLastUpdated(LocalDateTime.now());
 
-        return chatUserRepository.save(chatUser);
+        ChatUser saved = chatUserRepository.save(chatUser);
+
+        // Автоматически добавляем персонажа во все системные локации района
+        autoJoinSystemLocations(saved);
+
+        return saved;
+    }
+
+    /**
+     * Автоматически добавить персонажа во все системные локации района.
+     * Вызывается при создании персонажа или при первом входе в район.
+     * Если записи уже существуют — пропускает (идемпотентность).
+     */
+    private void autoJoinSystemLocations(ChatUser character) {
+        List<Location> systemLocations = locationRepository
+                .findByDistrictIdAndIsSystemTrue(character.getDistrictId());
+
+        // Получаем ID системных локаций, в которых персонаж уже состоит
+        Set<Long> existingLocationIds = locationMemberRepository
+                .findByCharacterId(character.getId())
+                .stream()
+                .map(m -> m.getLocation().getId())
+                .collect(Collectors.toSet());
+
+        for (Location location : systemLocations) {
+            if (!existingLocationIds.contains(location.getId())) {
+                LocationMember member = new LocationMember();
+                member.setLocation(location);
+                member.setCharacter(character);
+                member.setRole(LocationMemberRole.MEMBER);
+                member.setIsRegistered(false);
+                locationMemberRepository.save(member);
+                log.info("Персонаж {} ({}) автоматически добавлен в системную локацию {}",
+                        character.getCharacterName(), character.getId(), location.getName());
+            }
+        }
     }
 
     // обновить last_seen для персонажа в районе
