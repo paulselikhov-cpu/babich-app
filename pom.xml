@@ -85,6 +85,31 @@
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 
+		<!-- Event-Driven (Этап 1 дополнение): Spring Modulith — персистентный
+		     event registry (event_publication) + @ApplicationModuleListener.
+		     Версия 2.1.0 — Spring Boot 4.0.7 не включает Modulith в свой BOM,
+		     поэтому версия задана явно. -->
+		<dependency>
+			<groupId>org.springframework.modulith</groupId>
+			<artifactId>spring-modulith-events-jpa</artifactId>
+			<version>2.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.modulith</groupId>
+			<artifactId>spring-modulith-events-api</artifactId>
+			<version>2.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.modulith</groupId>
+			<artifactId>spring-modulith-api</artifactId>
+			<version>2.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.modulith</groupId>
+			<artifactId>spring-modulith-events-jackson</artifactId>
+			<version>2.1.0</version>
+		</dependency>
+
 		<!-- тесты — оставляем -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -94,6 +119,13 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webmvc-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<!-- DoD-тесты событий: @RecordApplicationEvents + Scenario API (Этап 2 дополнение) -->
+		<dependency>
+			<groupId>org.springframework.modulith</groupId>
+			<artifactId>spring-modulith-starter-test</artifactId>
+			<version>2.1.0</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

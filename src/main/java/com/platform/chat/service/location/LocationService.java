@@ -4,10 +4,14 @@ import com.platform.chat.dto.response.LocationResponse;
 import com.platform.chat.entity.*;
 import com.platform.chat.enums.LocationMemberRole;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
+import com.platform.chat.repository.district.DistrictRepository;
 import com.platform.chat.repository.location.LocationMemberRepository;
 import com.platform.chat.repository.location.LocationRepository;
 import com.platform.chat.repository.location.LocationTemplateRepository;
+import com.platform.chat.repository.room.RoomReadStatusRepository;
 import com.platform.chat.repository.room.RoomRepository;
+import com.platform.economy.enums.RewardReason;
+import com.platform.economy.service.RewardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,15 +35,25 @@ public class LocationService {
     private final LocationRepository locationRepository;
     private final LocationTemplateRepository locationTemplateRepository;
     private final LocationMemberRepository locationMemberRepository;
+    private final RoomReadStatusRepository roomReadStatusRepository;
     private final RoomRepository roomRepository;
     private final ChatUserRepository chatUserRepository;
+    private final DistrictRepository districtRepository;
+    private final RewardService rewardService;
 
     /**
-     * Получить все публичные локации.
+     * Получить все публичные пользовательские локации.
      * Показываем в общем списке — "найти локацию".
      */
     public List<Location> getPublicLocations() {
         return locationRepository.findByIsPublicTrue();
+    }
+
+    /**
+     * Получить все системные локации.
+     */
+    public List<Location> getSystemLocations() {
+        return locationRepository.findByIsSystemTrue();
     }
 
     /**
@@ -109,23 +123,29 @@ public class LocationService {
                                 ", есть: " + character.getCoinBalance()
                 );
             }
-            // списываем Coin
-            character.setCoinBalance(
-                    character.getCoinBalance() - template.getPriceCoin()
-            );
-            chatUserRepository.save(character);
         }
 
-        // шаг 4: создаём локацию
+        // шаг 4: получаем дефолтный район (персонаж всегда живёт в каком-то районе)
+        District defaultDistrict = districtRepository.findByCode("CENTRAL")
+                .orElseThrow(() -> new RuntimeException("Дефолтный район не найден"));
+
+        // шаг 5: создаём локацию
         Location location = new Location();
         location.setTemplate(template);
         location.setOwner(character);
+        location.setDistrict(defaultDistrict);
         location.setName(name);
         location.setDescription(description);
         location.setIsPublic(isPublic);
         location.setInviteCode(generateUniqueInviteCode());
 
         Location savedLocation = locationRepository.save(location);
+
+        // шаг 3b: списываем Coin за создание (аудит — через доменное событие)
+        if (template.getPriceCoin() > 0) {
+            rewardService.takeCoins(characterId, template.getPriceCoin(),
+                    RewardReason.LOCATION_CREATE, savedLocation.getId());
+        }
 
         // шаг 5: копируем базовые комнаты из шаблона
         // каждая TemplateRoom → новая Room в этой локации
@@ -223,22 +243,22 @@ public class LocationService {
             );
         }
 
-        // проверяем баланс и списываем Coin
-        ChatUser character = chatUserRepository.findById(characterId)
-                .orElseThrow(() -> new RuntimeException(
-                        "Персонаж не найден"
-                ));
-
+        // проверяем баланс и списываем Coin через RewardService
         Long price = template.getExtendPriceCoin();
         if (price != null && price > 0) {
+            ChatUser character = chatUserRepository.findById(characterId)
+                    .orElseThrow(() -> new RuntimeException(
+                            "Персонаж не найден"
+                    ));
+
             if (character.getCoinBalance() < price) {
                 throw new RuntimeException(
                         "Недостаточно Coin. Нужно: " + price +
                                 ", есть: " + character.getCoinBalance()
                 );
             }
-            character.setCoinBalance(character.getCoinBalance() - price);
-            chatUserRepository.save(character);
+            rewardService.takeCoins(characterId, price,
+                    RewardReason.LOCATION_EXTEND_ROOM, locationId);
         }
 
         // определяем порядковый номер новой комнаты
@@ -332,6 +352,25 @@ public class LocationService {
             throw new RuntimeException("Только владелец может удалить локацию");
         }
 
+        // 1. Получаем все комнаты локации
+        List<Room> rooms = roomRepository.findByLocationIdOrderByOrderIndex(locationId);
+        List<Long> roomIds = rooms.stream().map(Room::getId).toList();
+
+        // 2. Удаляем room_read_status для всех комнат (иначе FK нарушается)
+        if (!roomIds.isEmpty()) {
+            roomReadStatusRepository.deleteByRoomIdIn(roomIds);
+        }
+
+        // 3. Удаляем сообщения комнат (у них cascade = ALL на Room)
+        roomRepository.deleteAll(rooms);
+
+        // 4. Удаляем участников локации
+        List<LocationMember> members = locationMemberRepository.findByLocationId(locationId);
+        if (!members.isEmpty()) {
+            locationMemberRepository.deleteAll(members);
+        }
+
+        // 5. Удаляем саму локацию
         locationRepository.deleteById(locationId);
     }
 }

@@ -1,0 +1,93 @@
+package com.platform.civic.handler;
+
+import com.platform.chat.entity.ChatUser;
+import com.platform.chat.entity.Location;
+import com.platform.chat.entity.LocationTemplate;
+import com.platform.chat.repository.chatUser.ChatUserRepository;
+import com.platform.chat.repository.location.LocationRepository;
+import com.platform.chat.repository.location.LocationTemplateRepository;
+import com.platform.chat.service.location.LocationService;
+import com.platform.civic.entity.Application;
+import java.util.List;
+import com.platform.civic.enums.ApplicationStatus;
+import com.platform.civic.enums.ApplicationType;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
+/**
+ * Обрабатывает заявку "купить первую квартиру".
+ * Условия одобрения:
+ * - у персонажа статус HOMELESS (ещё нет своей локации);
+ * - у персонажа хватает монет на выбранный шаблон.
+ * При одобрении: списываются монеты (через LocationService.createLocation),
+ * создаётся Location, персонаж переводится в статус RESIDENT.
+ */
+@Component
+@RequiredArgsConstructor
+public class BuyFirstLocationHandler implements ApplicationHandler {
+
+    /** Код шаблона локации по умолчанию для первого жилья. */
+    private static final String DEFAULT_TEMPLATE_CODE = "KHRUSHCHEVKA";
+
+    private final ChatUserRepository chatUserRepository;
+    private final LocationTemplateRepository locationTemplateRepository;
+    private final LocationRepository locationRepository;
+    private final LocationService locationService;
+
+    @Override
+    public ApplicationType getType() {
+        return ApplicationType.BUY_FIRST_LOCATION;
+    }
+
+    @Override
+    public void handle(Application application) {
+        // application.getUserId() — это User.id, ищем персонажа пользователя
+        // TODO: districtId брать из payload/application, когда появится выбор района
+        List<ChatUser> users = chatUserRepository.findAllByUserId(application.getUserId());
+        if (users.isEmpty()) {
+            throw new RuntimeException("Персонаж не найден для userId: " + application.getUserId());
+        }
+        ChatUser user = users.get(0);
+
+        if (!"HOMELESS".equals(user.getGameStatus())) {
+            application.setStatus(ApplicationStatus.REJECTED);
+            application.setResultMessage("У вас уже есть жильё");
+            return;
+        }
+
+        if (!locationRepository.findByOwnerId(user.getId()).isEmpty()) {
+            application.setStatus(ApplicationStatus.REJECTED);
+            application.setResultMessage("У вас уже есть локация");
+            return;
+        }
+
+        String templateCode = application.getPayload() != null && !application.getPayload().isBlank()
+                ? application.getPayload()
+                : DEFAULT_TEMPLATE_CODE;
+
+        LocationTemplate template = locationTemplateRepository.findByCode(templateCode)
+                .orElseThrow(() -> new RuntimeException("Шаблон локации не найден: " + templateCode));
+
+        if (user.getCoinBalance() < template.getPriceCoin()) {
+            application.setStatus(ApplicationStatus.REJECTED);
+            application.setResultMessage(
+                    "Недостаточно монет. Нужно: " + template.getPriceCoin() +
+                            ", есть: " + user.getCoinBalance());
+            return;
+        }
+
+        Location location = locationService.createLocation(
+                template.getId(),
+                user.getId(),
+                user.getCharacterName() + " — " + template.getName(),
+                "Первое жильё персонажа",
+                false
+        );
+
+        user.setGameStatus("RESIDENT");
+        chatUserRepository.save(user);
+
+        application.setStatus(ApplicationStatus.APPROVED);
+        application.setResultMessage("Локация создана: " + location.getName());
+    }
+}

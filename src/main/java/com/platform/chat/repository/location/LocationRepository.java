@@ -1,6 +1,7 @@
 package com.platform.chat.repository.location;
 
 import com.platform.chat.entity.Location;
+import com.platform.chat.enums.PublicLocationType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,13 +11,22 @@ import java.util.Optional;
 
 /**
  * Репозиторий для работы с локациями.
- * Локация = экземпляр созданный пользователем из шаблона.
+ * Локация может быть как пользовательской (созданной из шаблона), так и системной.
  */
 @Repository
 public interface LocationRepository extends JpaRepository<Location, Long> {
 
-    // все публичные локации — показываем в общем списке
+    // все публичные пользовательские локации — показываем в общем списке
     List<Location> findByIsPublicTrue();
+
+    // все системные локации
+    List<Location> findByIsSystemTrue();
+
+    // все системные локации района
+    List<Location> findByDistrictIdAndIsSystemTrue(Long districtId);
+
+    // найти системную локацию района по типу (например, мэрию)
+    Optional<Location> findByDistrictIdAndIsSystemTrueAndType(Long districtId, PublicLocationType type);
 
     // все локации конкретного владельца
     // используется в профиле персонажа — "мои локации"

@@ -26,22 +26,70 @@ public class ChatUserController {
         return chatUserService.getChatUserById(id);
     }
 
+    /**
+     * Получить персонажа пользователя в конкретном районе.
+     * GET /api/chat/users/{userId}/characters?districtId={districtId}
+     */
+    @GetMapping("/{userId}/characters")
+    public ResponseEntity<ChatUser> getChatUserByUserIdAndDistrict(
+            @PathVariable Long userId,
+            @RequestParam Long districtId) {
+        return chatUserService.findChatUserByUserIdAndDistrictId(userId, districtId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
+     * Получить всех персонажей пользователя.
+     * GET /api/chat/users/{userId}/characters/all
+     */
+    @GetMapping("/{userId}/characters/all")
+    public List<ChatUser> getAllChatUsersByUserId(@PathVariable Long userId) {
+        return chatUserService.getAllChatUsersByUserId(userId);
+    }
+
+    /**
+     * Получить персонажа по userId (первый найденный) — для обратной совместимости.
+     * GET /api/chat/users/by-user/{userId}
+     */
+    @GetMapping("/by-user/{userId}")
+    public ResponseEntity<ChatUser> getChatUserByUserId(@PathVariable Long userId) {
+        return chatUserService.findChatUserByUserId(userId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @GetMapping("/top")
     public List<ChatUser> getTopChatUsers() {
         return chatUserService.getTopChatUsers();
     }
 
-    // создать персонажа для авторизованного пользователя
-    @PostMapping("/{userId}")
+    /**
+     * Создать персонажа для авторизованного пользователя в указанном районе.
+     * POST /api/chat/users/{userId}/characters
+     */
+    @PostMapping("/{userId}/characters")
     public ResponseEntity<ChatUser> createChatUser(
             @PathVariable Long userId,
             @Valid @RequestBody CreateChatUserRequest request) {
         return ResponseEntity.ok(chatUserService.createChatUser(userId, request));
     }
 
-    // обновить рейтинг
-    @PatchMapping("/{userId}/rating")
+    /**
+     * Обновить рейтинг персонажа в районе.
+     * PATCH /api/chat/users/{userId}/characters/rating?districtId={districtId}&delta={delta}
+     */
+    @PatchMapping("/{userId}/characters/rating")
     public ResponseEntity<ChatUser> updateRating(
+            @PathVariable Long userId,
+            @RequestParam Long districtId,
+            @RequestParam Integer delta) {
+        return ResponseEntity.ok(chatUserService.updateRating(userId, districtId, delta));
+    }
+
+    // Для обратной совместимости — старый эндпоинт
+    @PatchMapping("/{userId}/rating")
+    public ResponseEntity<ChatUser> updateRatingLegacy(
             @PathVariable Long userId,
             @RequestParam Integer delta) {
         return ResponseEntity.ok(chatUserService.updateRating(userId, delta));

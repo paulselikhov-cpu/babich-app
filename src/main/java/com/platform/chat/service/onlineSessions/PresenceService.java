@@ -11,12 +11,12 @@ import com.platform.chat.repository.chatUser.ChatUserRepository;
 import com.platform.chat.repository.location.LocationRepository;
 import com.platform.chat.repository.room.RoomRepository;
 import com.platform.chat.service.message.UnreadService;
+import com.platform.core.scheduler.TickHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,7 +29,7 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class PresenceService {
+public class PresenceService implements TickHandler {
 
     private final CharacterPresenceRepository presenceRepository;
     private final ChatUserRepository chatUserRepository;
@@ -141,12 +141,17 @@ public class PresenceService {
 
     /**
      * Backstop для "тихого" обрыва: сеть упала, процесс убит, ноутбук уснул —
-     * close-фрейм в этих случаях никогда не приходит. Раз в 15 сек ищем
+     * close-фрейм в этих случаях никогда не приходит. TickHandler: ищем
      * сессии без heartbeat дольше таймаута и чистим их.
+     *
+     * Диспетчеризуется единым SchedulerGateway (контракт: fixedDelay, а не
+     * fixedRate — fixedRate планирует следующий запуск от начала предыдущего
+     * и при скачке системных часов (NTP/clock leap) компенсирует
+     * "накопившиеся" запуски лавиной вызовов).
      */
-    @Scheduled(fixedRate = 15_000)
+    @Override
     @Transactional
-    public void cleanupStalePresences() {
+    public void onTick() {
         LocalDateTime threshold = LocalDateTime.now().minusSeconds(HEARTBEAT_TIMEOUT_SECONDS);
         var stale = presenceRepository.findByLastHeartbeatAtBefore(threshold);
         if (stale.isEmpty()) return;
@@ -159,6 +164,14 @@ public class PresenceService {
             broadcastPresenceCount(locationId, false);
         }
         log.info("Очищено {} протухших presence-сессий по heartbeat-таймауту", stale.size());
+    }
+
+    /**
+     * Интервал срабатывания — 15 секунд (было @Scheduled(fixedDelay = 15_000)).
+     */
+    @Override
+    public long intervalMillis() {
+        return 15_000L;
     }
 
     // ─── рассылка событий подписчикам /topic/location.{id}.presence ───────────
