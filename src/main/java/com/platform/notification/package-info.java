@@ -1,0 +1,14 @@
+/**
+ * Модуль «notification»: уведомления (SQL/WS push).
+ *
+ * <p>Легализованный предсуществующий технический долг границ (см.
+ * {@code documentation/architecture/event/event-migration-plan.md}, Этап 1.5):
+ * прямые зависимости на {@code chat} (ChatUser и связанные типы) и на
+ * {@code core} (DomainEvent/EventType). Обе разрешены БЕЗ named interface —
+ * это осознанная запись существующих связей, чтобы тест
+ * {@code ModuleBoundaryTest} ловил только НОВЫЕ нарушения границ.</p>
+ */
+@ApplicationModule(allowedDependencies = { "chat", "core" })
+package com.platform.notification;
+
+import org.springframework.modulith.ApplicationModule;

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,4 +42,10 @@ public interface ChatUserRepository extends JpaRepository<ChatUser, Long> {
 
     // найти персонажа по username (дублируется из User для WS-уведомлений)
     Optional<ChatUser> findByUsername(String username);
+
+    // все персонажи района
+    List<ChatUser> findByDistrictId(Long districtId);
+
+    // количество живых персонажей в районе (были онлайн последние 2 суток)
+    long countByDistrictIdAndLastSeenAfter(Long districtId, LocalDateTime since);
 }

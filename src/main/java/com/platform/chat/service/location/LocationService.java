@@ -10,6 +10,8 @@ import com.platform.chat.repository.location.LocationRepository;
 import com.platform.chat.repository.location.LocationTemplateRepository;
 import com.platform.chat.repository.room.RoomReadStatusRepository;
 import com.platform.chat.repository.room.RoomRepository;
+import com.platform.economy.enums.RewardReason;
+import com.platform.economy.service.RewardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +39,7 @@ public class LocationService {
     private final RoomRepository roomRepository;
     private final ChatUserRepository chatUserRepository;
     private final DistrictRepository districtRepository;
+    private final RewardService rewardService;
 
     /**
      * Получить все публичные пользовательские локации.
@@ -120,11 +123,6 @@ public class LocationService {
                                 ", есть: " + character.getCoinBalance()
                 );
             }
-            // списываем Coin
-            character.setCoinBalance(
-                    character.getCoinBalance() - template.getPriceCoin()
-            );
-            chatUserRepository.save(character);
         }
 
         // шаг 4: получаем дефолтный район (персонаж всегда живёт в каком-то районе)
@@ -142,6 +140,12 @@ public class LocationService {
         location.setInviteCode(generateUniqueInviteCode());
 
         Location savedLocation = locationRepository.save(location);
+
+        // шаг 3b: списываем Coin за создание (аудит — через доменное событие)
+        if (template.getPriceCoin() > 0) {
+            rewardService.takeCoins(characterId, template.getPriceCoin(),
+                    RewardReason.LOCATION_CREATE, savedLocation.getId());
+        }
 
         // шаг 5: копируем базовые комнаты из шаблона
         // каждая TemplateRoom → новая Room в этой локации
@@ -239,22 +243,22 @@ public class LocationService {
             );
         }
 
-        // проверяем баланс и списываем Coin
-        ChatUser character = chatUserRepository.findById(characterId)
-                .orElseThrow(() -> new RuntimeException(
-                        "Персонаж не найден"
-                ));
-
+        // проверяем баланс и списываем Coin через RewardService
         Long price = template.getExtendPriceCoin();
         if (price != null && price > 0) {
+            ChatUser character = chatUserRepository.findById(characterId)
+                    .orElseThrow(() -> new RuntimeException(
+                            "Персонаж не найден"
+                    ));
+
             if (character.getCoinBalance() < price) {
                 throw new RuntimeException(
                         "Недостаточно Coin. Нужно: " + price +
                                 ", есть: " + character.getCoinBalance()
                 );
             }
-            character.setCoinBalance(character.getCoinBalance() - price);
-            chatUserRepository.save(character);
+            rewardService.takeCoins(characterId, price,
+                    RewardReason.LOCATION_EXTEND_ROOM, locationId);
         }
 
         // определяем порядковый номер новой комнаты

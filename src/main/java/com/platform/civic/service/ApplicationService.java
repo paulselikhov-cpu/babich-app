@@ -4,6 +4,8 @@ import com.platform.civic.entity.Application;
 import com.platform.civic.enums.ApplicationType;
 import com.platform.civic.handler.ApplicationHandler;
 import com.platform.civic.repository.ApplicationRepository;
+import com.platform.core.event.ApplicationResolvedEvent;
+import com.platform.core.event.DomainEventPublisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,7 @@ public class ApplicationService {
 
     private final ApplicationRepository applicationRepository;
     private final List<ApplicationHandler> handlers;
+    private final DomainEventPublisher eventPublisher;
 
     private Map<ApplicationType, ApplicationHandler> handlerMap;
 
@@ -50,7 +53,15 @@ public class ApplicationService {
 
         handler.handle(application);
         application.setProcessedAt(LocalDateTime.now());
-        return applicationRepository.save(application);
+        Application resolved = applicationRepository.save(application);
+
+        eventPublisher.publish(new ApplicationResolvedEvent(
+                resolved.getUserId(),
+                resolved.getId(),
+                resolved.getStatus() != null ? resolved.getStatus().name() : null
+        ));
+
+        return resolved;
     }
 
     public List<Application> getMyApplications(Long userId) {

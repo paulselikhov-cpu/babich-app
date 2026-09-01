@@ -9,6 +9,8 @@ package com.platform.economy.enums;
 public enum RewardReason {
     WORK_SHIFT,             // заработок за смену/тап-фарм (профессия)
     BUY_FIRST_LOCATION,     // списание за покупку первой локации
+    LOCATION_CREATE,        // списание за создание платной локации через REST
+    LOCATION_EXTEND_ROOM,   // списание за добавление кастомной комнаты
     GANG_TRIBUTE,           // зарплата участнику группировки из общака
     GANG_TREASURY_INCOME,   // пополнение общака группировки (кража, эскорт и т.д.)
     POLICE_FINE,            // штраф от полицейского
