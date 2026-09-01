@@ -26,6 +26,11 @@ public class ChatUserController {
         return chatUserService.getChatUserById(id);
     }
 
+    @GetMapping("/{id}/level")
+    public Long getChatUserLevelById(@PathVariable Long id) { 
+        return chatUserService.getChatUserLevelById(id);
+    }
+
     /**
      * Получить персонажа пользователя в конкретном районе.
      * GET /api/chat/users/{userId}/characters?districtId={districtId}

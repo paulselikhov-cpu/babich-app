@@ -18,6 +18,10 @@ public class PersonLevelService {
         return PersonLevel.fromXp(character.getXpUser());
     }
 
+    public long getLevelNumber(ChatUser character) {
+        return getLevel(character).getLevelNumber();
+    }
+
     /**
      * Проверить, достиг ли персонаж указанного уровня (включительно).
      */

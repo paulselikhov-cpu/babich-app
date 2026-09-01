@@ -11,6 +11,8 @@ import com.platform.chat.modules.economy.enums.Profession;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
 import com.platform.chat.repository.location.LocationMemberRepository;
 import com.platform.chat.repository.location.LocationRepository;
+import com.platform.chat.enums.PersonLevel;
+import com.platform.chat.service.level.PersonLevelService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,7 @@ public class ChatUserService {
     private final UserRepository userRepository;
     private final LocationRepository locationRepository;
     private final LocationMemberRepository locationMemberRepository;
+    private final PersonLevelService personLevelService;
 
     // получить всех персонажей
     public List<ChatUser> getAllChatUsers() {
@@ -40,6 +43,12 @@ public class ChatUserService {
     public ChatUser getChatUserById(Long id) {
         return chatUserRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Персонаж не найден: " + id));
+    }
+
+    public Long getChatUserLevelById(Long id) {
+        ChatUser chatUser = chatUserRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Персонаж не найден: " + id));
+        return personLevelService.getLevelNumber(chatUser);
     }
 
     // получить всех персонажей пользователя
