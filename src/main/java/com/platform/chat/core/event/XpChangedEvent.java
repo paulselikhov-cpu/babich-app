@@ -1,7 +1,7 @@
 package com.platform.core.event;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.platform.economy.enums.RewardReason;
+import com.platform.chat.modules.economy.enums.RewardReason;
 
 import java.util.HashMap;
 import java.util.Map;
