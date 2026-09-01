@@ -1,4 +1,4 @@
-package com.platform.poll.entity;
+package com.platform.chat.modules.poll.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;

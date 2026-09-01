@@ -11,7 +11,7 @@ import com.platform.chat.repository.chatUser.ChatUserRepository;
 import com.platform.chat.repository.location.LocationRepository;
 import com.platform.chat.repository.room.RoomRepository;
 import com.platform.chat.service.message.UnreadService;
-import com.platform.core.scheduler.TickHandler;
+import com.platform.chat.core.scheduler.TickHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;

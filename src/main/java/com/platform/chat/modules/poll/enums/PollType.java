@@ -1,4 +1,4 @@
-package com.platform.poll.enums;
+package com.platform.chat.modules.poll.enums;
 
 /**
  * Тип голосования (Poll).

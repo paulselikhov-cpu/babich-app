@@ -1,4 +1,4 @@
-package com.platform.economy.dto;
+package com.platform.chat.modules.economy.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

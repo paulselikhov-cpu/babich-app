@@ -1,4 +1,4 @@
-package com.platform.civic.enums;
+package com.platform.chat.modules.civic.enums;
 
 public enum ApplicationStatus {
     PENDING,

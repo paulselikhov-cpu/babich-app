@@ -1,6 +1,6 @@
-package com.platform.notification.repository;
+package com.platform.chat.modules.notification.repository;
 
-import com.platform.notification.entity.Notification;
+import com.platform.chat.modules.notification.entity.Notification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

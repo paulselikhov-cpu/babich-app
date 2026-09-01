@@ -1,8 +1,7 @@
-package com.platform.poll.repository;
+package com.platform.chat.modules.poll.repository;
 
-import com.platform.poll.entity.Campaign;
-import com.platform.poll.enums.CampaignType;
-import com.platform.poll.enums.ScopeType;
+import com.platform.chat.modules.poll.entity.Campaign;
+import com.platform.chat.modules.poll.enums.CampaignType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,4 +1,4 @@
-package com.platform.notification.entity;
+package com.platform.chat.modules.notification.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;

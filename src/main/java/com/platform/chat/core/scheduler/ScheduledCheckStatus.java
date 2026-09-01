@@ -1,4 +1,4 @@
-package com.platform.core.scheduler;
+package com.platform.chat.core.scheduler;
 
 /**
  * Статус отложенной проверки {@link ScheduledCheck}.

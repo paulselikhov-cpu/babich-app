@@ -1,4 +1,4 @@
-package com.platform.economy.enums;
+package com.platform.chat.modules.economy.enums;
 
 /**
  * Причина начисления/списания монет или XP.

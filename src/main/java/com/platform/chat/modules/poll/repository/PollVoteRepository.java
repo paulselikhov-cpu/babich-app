@@ -1,6 +1,6 @@
-package com.platform.poll.repository;
+package com.platform.chat.modules.poll.repository;
 
-import com.platform.poll.entity.PollVote;
+import com.platform.chat.modules.poll.entity.PollVote;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

@@ -1,9 +1,10 @@
-package com.platform.poll.handler;
+package com.platform.chat.modules.poll.handler;
 
-import com.platform.core.event.DomainEventPublisher;
-import com.platform.core.event.PollClosedEvent;
-import com.platform.poll.entity.Poll;
-import com.platform.poll.enums.PollType;
+import com.platform.chat.core.event.DomainEventPublisher;
+import com.platform.chat.core.event.ElectionClosedEvent;
+import com.platform.chat.core.event.PollClosedEvent;
+import com.platform.chat.modules.poll.entity.Poll;
+import com.platform.chat.modules.poll.enums.PollType;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -28,7 +29,7 @@ import java.util.Map;
  * После обработки результата диспетчер публикует {@link PollClosedEvent} — это
  * общее событие «голосование закрыто и обработано» для любого типа голосования.
  * Для выборов губернатора {@code ElectionFacade} дополнительно публикует
- * {@link com.platform.core.event.ElectionClosedEvent} с именем победителя — оба
+ * {@link ElectionClosedEvent} с именем победителя — оба
  * события независимы, подписчики выбирают нужное.
  */
 @Service

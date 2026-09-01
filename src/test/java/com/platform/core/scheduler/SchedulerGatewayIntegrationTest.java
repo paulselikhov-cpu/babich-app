@@ -1,12 +1,16 @@
 package com.platform.core.scheduler;
 
+import com.platform.chat.core.scheduler.ScheduledCheck;
+import com.platform.chat.core.scheduler.ScheduledCheckRepository;
+import com.platform.chat.core.scheduler.ScheduledCheckStatus;
+import com.platform.chat.core.scheduler.SchedulerGateway;
 import com.platform.chat.entity.ChatUser;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
-import com.platform.notification.entity.Notification;
-import com.platform.notification.repository.NotificationRepository;
-import com.platform.poll.entity.Poll;
-import com.platform.poll.scheduler.PollCloseCheckHandler;
-import com.platform.poll.service.ElectionFacade;
+import com.platform.chat.modules.notification.entity.Notification;
+import com.platform.chat.modules.notification.repository.NotificationRepository;
+import com.platform.chat.modules.poll.entity.Poll;
+import com.platform.chat.modules.poll.scheduler.PollCloseCheckHandler;
+import com.platform.chat.modules.poll.service.ElectionFacade;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

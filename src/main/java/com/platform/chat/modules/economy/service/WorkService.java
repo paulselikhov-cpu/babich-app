@@ -1,10 +1,10 @@
-package com.platform.economy.service;
+package com.platform.chat.modules.economy.service;
 
 import com.platform.chat.entity.ChatUser;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
-import com.platform.economy.dto.WorkResultResponse;
-import com.platform.economy.enums.Profession;
-import com.platform.economy.enums.RewardReason;
+import com.platform.chat.modules.economy.dto.WorkResultResponse;
+import com.platform.chat.modules.economy.enums.Profession;
+import com.platform.chat.modules.economy.enums.RewardReason;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

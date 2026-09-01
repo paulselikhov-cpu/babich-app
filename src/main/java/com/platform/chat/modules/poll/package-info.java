@@ -9,6 +9,6 @@
  * {@code ModuleBoundaryTest} ловил только НОВЫЕ нарушения границ.</p>
  */
 @ApplicationModule(allowedDependencies = { "chat", "core" })
-package com.platform.poll;
+package com.platform.chat.modules.poll;
 
 import org.springframework.modulith.ApplicationModule;

@@ -7,6 +7,7 @@ import com.platform.chat.entity.Location;
 import com.platform.chat.entity.LocationMember;
 import com.platform.chat.enums.ChatRole;
 import com.platform.chat.enums.LocationMemberRole;
+import com.platform.chat.modules.economy.enums.Profession;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
 import com.platform.chat.repository.location.LocationMemberRepository;
 import com.platform.chat.repository.location.LocationRepository;
@@ -123,7 +124,7 @@ public class ChatUserService {
         chatUser.setXpUser(0L);
         chatUser.setEnergy(100);
         chatUser.setGameStatus("HOMELESS");
-        chatUser.setProfession(com.platform.economy.enums.Profession.DVORNIK);
+        chatUser.setProfession(Profession.DVORNIK);
         chatUser.setLastSeen(LocalDateTime.now());
         chatUser.setEnergyLastUpdated(LocalDateTime.now());
 

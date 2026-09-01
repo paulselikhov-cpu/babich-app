@@ -1,4 +1,4 @@
-package com.platform.core.scheduler;
+package com.platform.chat.core.scheduler;
 
 /**
  * Периодическая задача единого планировщика {@link SchedulerGateway}.

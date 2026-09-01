@@ -1,4 +1,4 @@
-package com.platform.core.event;
+package com.platform.chat.core.event;
 
 /**
  * Реестр всех событий. Подумай: что произошло — одно именованное событие. Не «что я хочу сделать

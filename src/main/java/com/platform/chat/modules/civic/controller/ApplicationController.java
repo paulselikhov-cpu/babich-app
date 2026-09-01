@@ -1,10 +1,10 @@
-package com.platform.civic.controller;
+package com.platform.chat.modules.civic.controller;
 
 import com.platform.chat.entity.ChatUser;
 import com.platform.chat.service.chatUser.ChatUserService;
-import com.platform.civic.entity.Application;
-import com.platform.civic.enums.ApplicationType;
-import com.platform.civic.service.ApplicationService;
+import com.platform.chat.modules.civic.entity.Application;
+import com.platform.chat.modules.civic.enums.ApplicationType;
+import com.platform.chat.modules.civic.service.ApplicationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

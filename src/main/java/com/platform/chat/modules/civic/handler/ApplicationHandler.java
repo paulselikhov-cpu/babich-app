@@ -1,7 +1,7 @@
-package com.platform.civic.handler;
+package com.platform.chat.modules.civic.handler;
 
-import com.platform.civic.entity.Application;
-import com.platform.civic.enums.ApplicationType;
+import com.platform.chat.modules.civic.entity.Application;
+import com.platform.chat.modules.civic.enums.ApplicationType;
 
 /**
  * Стратегия обработки заявки конкретного типа.

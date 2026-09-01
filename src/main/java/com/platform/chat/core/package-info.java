@@ -10,6 +10,6 @@
  * {@code OPEN} и перейти на named interface для точек входа.</p>
  */
 @ApplicationModule(type = ApplicationModule.Type.OPEN)
-package com.platform.core;
+package com.platform.chat.core;
 
 import org.springframework.modulith.ApplicationModule;

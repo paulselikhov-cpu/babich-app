@@ -1,10 +1,10 @@
-package com.platform.economy.event;
+package com.platform.chat.modules.economy.event;
 
-import com.platform.core.event.CoinsChangedEvent;
-import com.platform.core.event.XpChangedEvent;
-import com.platform.economy.entity.TransactionLog;
-import com.platform.economy.enums.RewardReason;
-import com.platform.economy.repository.TransactionLogRepository;
+import com.platform.chat.modules.economy.repository.TransactionLogRepository;
+import com.platform.chat.core.event.CoinsChangedEvent;
+import com.platform.chat.core.event.XpChangedEvent;
+import com.platform.chat.modules.economy.entity.TransactionLog;
+import com.platform.chat.modules.economy.enums.RewardReason;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

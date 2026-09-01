@@ -1,7 +1,7 @@
-package com.platform.poll.handler;
+package com.platform.chat.modules.poll.handler;
 
-import com.platform.poll.entity.Poll;
-import com.platform.poll.enums.PollType;
+import com.platform.chat.modules.poll.entity.Poll;
+import com.platform.chat.modules.poll.enums.PollType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

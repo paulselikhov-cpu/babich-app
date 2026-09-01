@@ -1,9 +1,9 @@
-package com.platform.notification.service;
+package com.platform.chat.modules.notification.service;
 
 import com.platform.chat.entity.ChatUser;
+import com.platform.chat.modules.notification.repository.NotificationRepository;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
-import com.platform.notification.entity.Notification;
-import com.platform.notification.repository.NotificationRepository;
+import com.platform.chat.modules.notification.entity.Notification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

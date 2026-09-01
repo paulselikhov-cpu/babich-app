@@ -1,4 +1,4 @@
-package com.platform.core.scheduler;
+package com.platform.chat.core.scheduler;
 
 /**
  * Обработчик отложенных проверок ({@link ScheduledCheck}) единого планировщика.

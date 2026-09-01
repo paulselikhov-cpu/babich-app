@@ -1,6 +1,6 @@
-package com.platform.notification.dto;
+package com.platform.chat.modules.notification.dto;
 
-import com.platform.notification.entity.Notification;
+import com.platform.chat.modules.notification.entity.Notification;
 import java.time.Instant;
 
 /** DTO для WS-пуша в /user/{username}/queue/notifications. */

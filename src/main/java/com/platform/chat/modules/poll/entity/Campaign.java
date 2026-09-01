@@ -1,7 +1,7 @@
-package com.platform.poll.entity;
+package com.platform.chat.modules.poll.entity;
 
-import com.platform.poll.enums.CampaignType;
-import com.platform.poll.enums.ScopeType;
+import com.platform.chat.modules.poll.enums.CampaignType;
+import com.platform.chat.modules.poll.enums.ScopeType;
 import jakarta.persistence.*;
 import lombok.Data;
 

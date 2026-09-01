@@ -1,4 +1,4 @@
-package com.platform.core.event;
+package com.platform.chat.core.event;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.platform.chat.modules.economy.enums.RewardReason;

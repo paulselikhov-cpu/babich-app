@@ -1,4 +1,4 @@
-package com.platform.core.scheduler;
+package com.platform.chat.core.scheduler;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

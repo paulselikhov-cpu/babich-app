@@ -1,11 +1,11 @@
-package com.platform.civic.service;
+package com.platform.chat.modules.civic.service;
 
-import com.platform.civic.entity.Application;
-import com.platform.civic.enums.ApplicationType;
-import com.platform.civic.handler.ApplicationHandler;
-import com.platform.civic.repository.ApplicationRepository;
-import com.platform.core.event.ApplicationResolvedEvent;
-import com.platform.core.event.DomainEventPublisher;
+import com.platform.chat.modules.civic.entity.Application;
+import com.platform.chat.modules.civic.enums.ApplicationType;
+import com.platform.chat.modules.civic.handler.ApplicationHandler;
+import com.platform.chat.modules.civic.repository.ApplicationRepository;
+import com.platform.chat.core.event.ApplicationResolvedEvent;
+import com.platform.chat.core.event.DomainEventPublisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

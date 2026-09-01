@@ -1,10 +1,12 @@
 package com.platform.civic.service;
 
 import com.platform.chat.entity.ChatUser;
+import com.platform.chat.modules.civic.entity.Application;
+import com.platform.chat.modules.civic.service.ApplicationService;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
-import com.platform.civic.enums.ApplicationType;
-import com.platform.notification.entity.Notification;
-import com.platform.notification.repository.NotificationRepository;
+import com.platform.chat.modules.civic.enums.ApplicationType;
+import com.platform.chat.modules.notification.entity.Notification;
+import com.platform.chat.modules.notification.repository.NotificationRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -114,7 +116,7 @@ class ApplicationResolvedIntegrationTest {
     void buyFirstPaidLocation_resolvesApplication_andNotifiesOwner() {
         // PRIVATE_HOUSE — платный шаблон (100 Coin) из data.sql.
         // Обработчик ищет персонажа по внешнему User.id (userId).
-        com.platform.civic.entity.Application result = applicationService.submit(
+        Application result = applicationService.submit(
                 externalUserId,
                 ApplicationType.BUY_FIRST_LOCATION,
                 "PRIVATE_HOUSE"

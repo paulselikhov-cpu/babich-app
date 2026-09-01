@@ -15,6 +15,6 @@
  * убран — снять {@code OPEN} и оставить {@code allowedDependencies}.</p>
  */
 @ApplicationModule(allowedDependencies = { "chat", "core" }, type = ApplicationModule.Type.OPEN)
-package com.platform.economy;
+package com.platform.chat.modules.economy;
 
 import org.springframework.modulith.ApplicationModule;

@@ -1,12 +1,12 @@
-package com.platform.poll.service;
+package com.platform.chat.modules.poll.service;
 
+import com.platform.chat.modules.poll.entity.Poll;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
-import com.platform.core.event.DomainEventPublisher;
-import com.platform.core.event.ElectionClosedEvent;
-import com.platform.poll.entity.Poll;
-import com.platform.poll.entity.PollCandidate;
-import com.platform.poll.entity.PollVote;
-import com.platform.poll.handler.PollResultDispatcher;
+import com.platform.chat.core.event.DomainEventPublisher;
+import com.platform.chat.core.event.ElectionClosedEvent;
+import com.platform.chat.modules.poll.entity.PollCandidate;
+import com.platform.chat.modules.poll.entity.PollVote;
+import com.platform.chat.modules.poll.handler.PollResultDispatcher;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Слой 2 (Сценарии / Workflows).

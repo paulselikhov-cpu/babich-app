@@ -1,13 +1,13 @@
-package com.platform.poll.controller;
+package com.platform.chat.modules.poll.controller;
 
 import com.platform.chat.entity.ChatUser;
 import com.platform.chat.enums.PersonLevel;
 import com.platform.chat.service.chatUser.ChatUserService;
 import com.platform.chat.service.level.PersonLevelService;
-import com.platform.poll.entity.Poll;
-import com.platform.poll.entity.PollCandidate;
-import com.platform.poll.entity.PollVote;
-import com.platform.poll.service.ElectionFacade;
+import com.platform.chat.modules.poll.entity.Poll;
+import com.platform.chat.modules.poll.entity.PollCandidate;
+import com.platform.chat.modules.poll.entity.PollVote;
+import com.platform.chat.modules.poll.service.ElectionFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

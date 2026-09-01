@@ -1,10 +1,8 @@
-package com.platform.poll.repository;
+package com.platform.chat.modules.poll.repository;
 
-import com.platform.poll.entity.CampaignContribution;
+import com.platform.chat.modules.poll.entity.CampaignContribution;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import java.util.Optional;
 
 @Repository
 public interface CampaignContributionRepository extends JpaRepository<CampaignContribution, Long> {

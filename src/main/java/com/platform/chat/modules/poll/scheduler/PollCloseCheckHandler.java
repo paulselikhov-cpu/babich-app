@@ -1,8 +1,8 @@
-package com.platform.poll.scheduler;
+package com.platform.chat.modules.poll.scheduler;
 
-import com.platform.core.scheduler.ScheduledCheck;
-import com.platform.core.scheduler.ScheduledCheckHandler;
-import com.platform.poll.service.ElectionFacade;
+import com.platform.chat.core.scheduler.ScheduledCheck;
+import com.platform.chat.core.scheduler.ScheduledCheckHandler;
+import com.platform.chat.modules.poll.service.ElectionFacade;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

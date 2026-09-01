@@ -1,6 +1,6 @@
-package com.platform.economy.entity;
+package com.platform.chat.modules.economy.entity;
 
-import com.platform.economy.enums.RewardReason;
+import com.platform.chat.modules.economy.enums.RewardReason;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;

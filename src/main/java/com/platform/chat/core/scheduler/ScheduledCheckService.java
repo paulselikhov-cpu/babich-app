@@ -1,4 +1,4 @@
-package com.platform.core.scheduler;
+package com.platform.chat.core.scheduler;
 
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

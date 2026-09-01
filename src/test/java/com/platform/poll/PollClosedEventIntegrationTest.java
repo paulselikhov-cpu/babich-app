@@ -2,11 +2,11 @@ package com.platform.poll;
 
 import com.platform.chat.entity.ChatUser;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
-import com.platform.core.event.EventType;
-import com.platform.core.event.PollClosedEvent;
-import com.platform.poll.entity.Poll;
-import com.platform.poll.enums.PollType;
-import com.platform.poll.service.ElectionFacade;
+import com.platform.chat.core.event.EventType;
+import com.platform.chat.core.event.PollClosedEvent;
+import com.platform.chat.modules.poll.entity.Poll;
+import com.platform.chat.modules.poll.enums.PollType;
+import com.platform.chat.modules.poll.service.ElectionFacade;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

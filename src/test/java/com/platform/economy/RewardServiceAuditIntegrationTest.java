@@ -1,13 +1,14 @@
 package com.platform.economy;
 
 import com.platform.chat.entity.ChatUser;
+import com.platform.chat.modules.civic.entity.Application;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
-import com.platform.civic.enums.ApplicationType;
-import com.platform.civic.service.ApplicationService;
-import com.platform.economy.entity.TransactionLog;
-import com.platform.economy.enums.RewardReason;
-import com.platform.economy.repository.TransactionLogRepository;
-import com.platform.economy.service.RewardService;
+import com.platform.chat.modules.civic.enums.ApplicationType;
+import com.platform.chat.modules.civic.service.ApplicationService;
+import com.platform.chat.modules.economy.entity.TransactionLog;
+import com.platform.chat.modules.economy.enums.RewardReason;
+import com.platform.chat.modules.economy.repository.TransactionLogRepository;
+import com.platform.chat.modules.economy.service.RewardService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -203,7 +204,7 @@ class RewardServiceAuditIntegrationTest {
     void buyFirstPaidLocation_debitsCoins_andWritesAudit() {
         // PRIVATE_HOUSE — платный шаблон (100 Coin) из data.sql.
         // Обработчик ищет персонажа по внешнему User.id (userId).
-        com.platform.civic.entity.Application result = applicationService.submit(
+        Application result = applicationService.submit(
                 externalUserId,
                 ApplicationType.BUY_FIRST_LOCATION,
                 "PRIVATE_HOUSE"

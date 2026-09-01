@@ -1,4 +1,4 @@
-package com.platform.poll.enums;
+package com.platform.chat.modules.poll.enums;
 
 /**
  * Стратегия расчёта веса голоса участника.

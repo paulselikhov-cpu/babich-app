@@ -1,4 +1,4 @@
-package com.platform.core.event;
+package com.platform.chat.core.event;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -59,10 +59,10 @@ public class PollClosedEvent extends DomainEvent {
      * Значения enum совпадают (DISTRICT, PARLIAMENT, GANG) — core держит
      * собственный enum, чтобы не зависеть от poll.
      */
-    private static com.platform.core.event.ScopeType coreScopeType(String pollScopeTypeName) {
+    private static ScopeType coreScopeType(String pollScopeTypeName) {
         if (pollScopeTypeName == null) {
             return null;
         }
-        return com.platform.core.event.ScopeType.valueOf(pollScopeTypeName);
+        return ScopeType.valueOf(pollScopeTypeName);
     }
 }

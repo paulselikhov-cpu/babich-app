@@ -1,13 +1,13 @@
-package com.platform.poll.service;
+package com.platform.chat.modules.poll.service;
 
 import com.platform.chat.entity.ChatUser;
+import com.platform.chat.modules.poll.entity.Campaign;
+import com.platform.chat.modules.poll.entity.CampaignContribution;
+import com.platform.chat.modules.poll.enums.CampaignType;
+import com.platform.chat.modules.poll.enums.ScopeType;
+import com.platform.chat.modules.poll.repository.CampaignContributionRepository;
+import com.platform.chat.modules.poll.repository.CampaignRepository;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
-import com.platform.poll.entity.Campaign;
-import com.platform.poll.entity.CampaignContribution;
-import com.platform.poll.enums.CampaignType;
-import com.platform.poll.enums.ScopeType;
-import com.platform.poll.repository.CampaignContributionRepository;
-import com.platform.poll.repository.CampaignRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

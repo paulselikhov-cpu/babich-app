@@ -1,11 +1,11 @@
-package com.platform.economy.service;
+package com.platform.chat.modules.economy.service;
 
 import com.platform.chat.entity.ChatUser;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
-import com.platform.core.event.CoinsChangedEvent;
-import com.platform.core.event.DomainEventPublisher;
-import com.platform.core.event.XpChangedEvent;
-import com.platform.economy.enums.RewardReason;
+import com.platform.chat.core.event.CoinsChangedEvent;
+import com.platform.chat.core.event.DomainEventPublisher;
+import com.platform.chat.core.event.XpChangedEvent;
+import com.platform.chat.modules.economy.enums.RewardReason;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
