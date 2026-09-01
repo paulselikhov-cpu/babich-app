@@ -7,7 +7,7 @@ package com.platform.chat.enums;
 public enum LocationPostType {
     // === Мэрия (CITY_HALL) ===
     GOVERNOR,           // Глава администрации района — 1 слот
-    MAYOR,              // Мэр — N слотов
+    MAYOR,              // Мэр — 1 слот
     DEPUTY,             // Депутат — N слотов
 
     // === Полицейский участок (POLICE_STATION) ===

@@ -193,7 +193,7 @@ SELECT l.id, 'Зал заседаний', 'Зал для совещаний', tr
 FROM locations l WHERE l.is_system = TRUE AND l.type = 'CITY_HALL'
                    AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.location_id = l.id AND r.name = 'Зал заседаний');
 INSERT INTO rooms (location_id, name, description, store_history, is_custom, order_index)
-SELECT l.id, 'Кабинет мэра', 'Личный кабинет главы района', true, false, 2
+SELECT l.id, 'Кабинет губернатора', 'Личный кабинет главы района', true, false, 2
 FROM locations l WHERE l.is_system = TRUE AND l.type = 'CITY_HALL'
                    AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.location_id = l.id AND r.name = 'Кабинет мэра');
 

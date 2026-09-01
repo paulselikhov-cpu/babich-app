@@ -48,7 +48,7 @@ public class DataInitializer {
 
         // Создаём 8 системных локаций
         createSystemLocation(central, PublicLocationType.CITY_HALL, "Мэрия",
-                "Здание городской администрации", List.of("Приёмная", "Зал заседаний", "Кабинет мэра"));
+                "Здание городской администрации", List.of("Приёмная", "Зал заседаний", "Кабинет губернатора"));
         createSystemLocation(central, PublicLocationType.LENIN_SQUARE, "Площадь Ленина",
                 "Центральная площадь города, место народных собраний", List.of("Площадь", "Тёплые трубы"));
         createSystemLocation(central, PublicLocationType.POLICE_STATION, "Полицейский участок",
