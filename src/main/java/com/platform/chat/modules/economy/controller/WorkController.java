@@ -6,10 +6,12 @@ import com.platform.chat.service.chatUser.ChatUserService;
 import com.platform.chat.modules.economy.dto.WorkResultResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.security.Principal;
+import java.util.Map;
 
 /**
  * Тап-фарм работы для персонажа.
@@ -30,5 +32,14 @@ public class WorkController {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok(workService.workAsDvornik(chatUser.getId()));
+    }
+
+    /**
+     * Доменные ошибки работы (нет профессии, кулдаун, нехватка энергии) —
+     * как 400 с человекочитаемым сообщением для UI.
+     */
+    @ExceptionHandler({IllegalStateException.class, IllegalArgumentException.class})
+    public ResponseEntity<Map<String, String>> handleDomainErrors(RuntimeException e) {
+        return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
     }
 }

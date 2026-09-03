@@ -1,6 +1,7 @@
 package com.platform.chat.modules.poll.service;
 
 import com.platform.chat.entity.Location;
+import com.platform.chat.enums.LocationPostType;
 import com.platform.chat.enums.PublicLocationType;
 import com.platform.chat.modules.poll.repository.PollCandidateRepository;
 import com.platform.chat.modules.poll.repository.PollRepository;
@@ -8,8 +9,11 @@ import com.platform.chat.modules.poll.repository.PollVoteRepository;
 import com.platform.chat.modules.poll.scheduler.PollCloseCheckHandler;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
 import com.platform.chat.repository.district.DistrictRepository;
+import com.platform.chat.repository.location.LocationPostRepository;
 import com.platform.chat.repository.location.LocationRepository;
 import com.platform.chat.core.scheduler.ScheduledCheckService;
+import com.platform.chat.dto.settings.PollSettings;
+import com.platform.chat.service.district.DistrictSettingsService;
 import com.platform.chat.modules.poll.entity.Poll;
 import com.platform.chat.modules.poll.entity.PollCandidate;
 import com.platform.chat.modules.poll.entity.PollVote;
@@ -23,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -37,16 +42,15 @@ public class PollService {
 
     private static final Logger log = LoggerFactory.getLogger(PollService.class);
 
-    public static final int MAX_CANDIDATES = 5;
-    public static final int DEFAULT_QUORUM = 50; // %
-
     private final PollRepository pollRepository;
     private final PollCandidateRepository candidateRepository;
     private final PollVoteRepository voteRepository;
     private final DistrictRepository districtRepository;
     private final LocationRepository locationRepository;
+    private final LocationPostRepository locationPostRepository;
     private final ChatUserRepository chatUserRepository;
     private final ScheduledCheckService scheduledCheckService;
+    private final DistrictSettingsService districtSettingsService;
 
     // ===== Создание голосования =====
 
@@ -60,14 +64,39 @@ public class PollService {
         districtRepository.findById(districtId)
                 .orElseThrow(() -> new IllegalArgumentException("Район не найден: " + districtId));
 
+        // Гейт-условие (сценарий №2): выборы доступны только если в районе нет
+        // действующего губернатора (LocationPost с ролью GOVERNOR в мэрии).
+        boolean hasGovernor = locationRepository
+                .findByDistrictIdAndIsSystemTrueAndType(districtId, PublicLocationType.CITY_HALL)
+                .map(cityHall -> locationPostRepository
+                        .findByLocationIdAndPost(cityHall.getId(), LocationPostType.GOVERNOR)
+                        .isPresent())
+                .orElse(false);
+        if (hasGovernor) {
+            throw new IllegalStateException("В районе уже есть губернатор, выборы недоступны");
+        }
+
+        // Не запускаем параллельные выборы в одном районе.
+        boolean hasActiveElection = pollRepository.findByScopeTypeAndScopeId(
+                        ScopeType.DISTRICT, districtId).stream()
+                .anyMatch(p -> p.getPollType() == PollType.ELECTION
+                        && (p.getStatus() == PollStatus.ACTIVE || p.getStatus() == PollStatus.PENDING));
+        if (hasActiveElection) {
+            throw new IllegalStateException("В районе уже идут выборы губернатора");
+        }
+
         Location leninSquare = locationRepository
                 .findByDistrictIdAndIsSystemTrueAndType(districtId, PublicLocationType.LENIN_SQUARE)
                 .orElseThrow(() -> new IllegalStateException("Площадь Ленина не найдена в районе: " + districtId));
 
-        // Кворум = 50% от живых участников района
+        // Настройки района (длительность, окно «живого», кворум, число слотов)
+        PollSettings settings = districtSettingsService.getElectionSettings(districtId);
+        int maxCandidates = Math.max(1, settings.maxCandidates());
+
+        // Кворум = X% от живых участников района (за последние N суток по настройкам)
         long aliveCount = chatUserRepository.countByDistrictIdAndLastSeenAfter(
-                districtId, LocalDateTime.now().minusDays(2));
-        int quorumThreshold = Math.max(1, (int) Math.ceil(aliveCount * 0.5));
+                districtId, LocalDateTime.now().minusDays(settings.aliveWindowDays()));
+        int quorumThreshold = Math.max(1, (int) Math.ceil(aliveCount * settings.quorumPercent() / 100.0));
 
         Instant now = Instant.now();
         Poll poll = new Poll();
@@ -78,7 +107,7 @@ public class PollService {
         poll.setHasCandidates(true);
         poll.setWeightStrategy(WeightStrategy.ONE_VOTE);
         poll.setStartsAt(now);
-        poll.setEndsAt(now.plusSeconds(24 * 60 * 60));
+        poll.setEndsAt(now.plusSeconds(Duration.ofHours(settings.durationHours()).getSeconds()));
         poll.setQuorumThreshold(quorumThreshold);
         poll.setStatus(PollStatus.ACTIVE);
         poll.setSourceApplicationId(initiatorCharacterId);
@@ -101,8 +130,8 @@ public class PollService {
         first.setSlotNumber(1);
         candidateRepository.save(first);
 
-        // Создать пустые слоты 2-5
-        for (int i = 2; i <= MAX_CANDIDATES; i++) {
+        // Создать пустые слоты со 2-го по maxCandidates
+        for (int i = 2; i <= maxCandidates; i++) {
             PollCandidate slot = new PollCandidate();
             slot.setPollId(poll.getId());
             slot.setCharacterId(null);
@@ -252,7 +281,7 @@ public class PollService {
     }
 
     public List<Poll> findByDistrict(Long districtId) {
-        return pollRepository.findByScopeTypeAndScopeId(ScopeType.DISTRICT.name(), districtId);
+        return pollRepository.findByScopeTypeAndScopeId(ScopeType.DISTRICT, districtId);
     }
 
     public boolean hasVoted(Long pollId, Long characterId) {

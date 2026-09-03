@@ -2,6 +2,7 @@ package com.platform.chat.service.chatUser;
 
 import com.platform.auth.repository.UserRepository;
 import com.platform.chat.dto.request.CreateChatUserRequest;
+import com.platform.chat.dto.request.CharacterUpdateRequest;
 import com.platform.chat.entity.ChatUser;
 import com.platform.chat.entity.Location;
 import com.platform.chat.entity.LocationMember;
@@ -51,6 +52,15 @@ public class ChatUserService {
         return personLevelService.getLevelNumber(chatUser);
     }
 
+    /**
+     * Порог XP следующего уровня персонажа (для прогресс-бара на UI).
+     */
+    public Long getChatUserXpThresholdById(Long id) {
+        ChatUser chatUser = chatUserRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Персонаж не найден: " + id));
+        return personLevelService.nextLevelXpThreshold(chatUser);
+    }
+
     // получить всех персонажей пользователя
     public List<ChatUser> getAllChatUsersByUserId(Long userId) {
         return chatUserRepository.findAllByUserId(userId);
@@ -92,6 +102,80 @@ public class ChatUserService {
         return chatUser;
     }
 
+    /** Все персонажи района (для админской таблицы). */
+    public List<ChatUser> listByDistrict(Long districtId) {
+        return chatUserRepository.findByDistrictId(districtId);
+    }
+
+    /** Сменить роль персонажа (админская панель). Свою роль можно менять,
+     *  но нельзя снять последнего администратора района. */
+    @Transactional
+    public ChatUser updateRole(Long characterId, ChatRole role) {
+        return updateCharacterSettings(characterId, new CharacterUpdateRequest(role, null, null, null, null, null, null));
+    }
+
+    /**
+     * Обновить поля персонажа из админской таблицы «Персонажи района».
+     * null в запросе означает «не менять».
+     * Роль меняется с защитой: нельзя снять последнего администратора района.
+     */
+    @Transactional
+    public ChatUser updateCharacterSettings(Long characterId, CharacterUpdateRequest request) {
+        ChatUser character = chatUserRepository.findById(characterId)
+                .orElseThrow(() -> new RuntimeException("Персонаж не найден: " + characterId));
+
+        if (request.role() != null) {
+            boolean downgrade = character.getRole() == ChatRole.ADMIN && request.role() != ChatRole.ADMIN;
+            if (downgrade) {
+                long otherAdmins = chatUserRepository.findByDistrictId(character.getDistrictId()).stream()
+                        .filter(u -> u.getRole() == ChatRole.ADMIN && !u.getId().equals(characterId))
+                        .count();
+                if (otherAdmins == 0) {
+                    throw new IllegalStateException("Нельзя снять последнего администратора района");
+                }
+            }
+            character.setRole(request.role());
+        }
+        if (request.profession() != null) {
+            character.setProfession(request.profession());
+        }
+        if (request.gameStatus() != null) {
+            character.setGameStatus(request.gameStatus());
+        }
+        if (request.coinBalance() != null) {
+            character.setCoinBalance(request.coinBalance());
+        }
+        if (request.energy() != null) {
+            character.setEnergy(request.energy());
+        }
+        if (request.rating() != null) {
+            character.setRating(request.rating());
+        }
+        if (request.xpUser() != null) {
+            character.setXpUser(request.xpUser());
+        }
+        return chatUserRepository.save(character);
+    }
+
+    /** Является ли персонаж (по username аккаунта) администратором. */
+    public boolean isAdmin(String username) {
+        return chatUserRepository.findByUsername(username)
+                .map(u -> u.getRole() == ChatRole.ADMIN)
+                .orElse(false);
+    }
+
+    /** Является ли персонаж администратором или модератором. */
+    public boolean isStaff(String username) {
+        return chatUserRepository.findByUsername(username)
+                .map(u -> u.getRole() == ChatRole.ADMIN || u.getRole() == ChatRole.MODERATOR)
+                .orElse(false);
+    }
+
+    /** Аккаунт с «боевым» именем администратора автоматически получает роль ADMIN. */
+    private boolean isAdminOwnerAccount(String username) {
+        return username != null && username.equalsIgnoreCase("joks");
+    }
+
     // создать персонажа для уже существующего User в указанном районе
     @Transactional
     public ChatUser createChatUser(Long userId, CreateChatUserRequest request) {
@@ -127,7 +211,7 @@ public class ChatUserService {
         chatUser.setHeight(request.getHeight());
         chatUser.setBadHabits(request.getBadHabits());
         chatUser.setAvatarUrl(request.getAvatarUrl());
-        chatUser.setRole(ChatRole.USER);            // по умолчанию USER
+        chatUser.setRole(isAdminOwnerAccount(username) ? ChatRole.ADMIN : ChatRole.USER);  // по умолчанию USER, кроме аккаунта-админа
         chatUser.setRating(0);
         chatUser.setCoinBalance(0L);
         chatUser.setXpUser(0L);

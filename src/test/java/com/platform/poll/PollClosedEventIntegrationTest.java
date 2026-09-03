@@ -1,7 +1,12 @@
 package com.platform.poll;
 
 import com.platform.chat.entity.ChatUser;
+import com.platform.chat.entity.Location;
+import com.platform.chat.enums.LocationPostType;
+import com.platform.chat.enums.PublicLocationType;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
+import com.platform.chat.repository.location.LocationPostRepository;
+import com.platform.chat.repository.location.LocationRepository;
 import com.platform.chat.core.event.EventType;
 import com.platform.chat.core.event.PollClosedEvent;
 import com.platform.chat.modules.poll.entity.Poll;
@@ -41,12 +46,17 @@ class PollClosedEventIntegrationTest {
     private ChatUserRepository chatUserRepository;
     @Autowired
     private PollClosedEventCaptor eventCaptor;
+    @Autowired
+    private LocationRepository locationRepository;
+    @Autowired
+    private LocationPostRepository locationPostRepository;
 
     private Long initiatorId;
 
     @BeforeEach
     void setUp() {
         eventCaptor.clear();
+        clearGovernor(1L);
         ChatUser user = new ChatUser();
         long unique = System.nanoTime();
         user.setUserId(90_000L + unique % 1_000_000L);
@@ -84,6 +94,17 @@ class PollClosedEventIntegrationTest {
 
         // 6. Poll is closed - result processing ran
         assertThat(electionFacade.getStatus(pollId).getStatus().name()).isEqualTo("CLOSED");
+    }
+
+    /** Убирает действующего губернатора района, чтобы гейт «нет губернатора» не блокировал повторный прогон теста. */
+    private void clearGovernor(Long districtId) {
+        List<Location> systemLocations = locationRepository.findByDistrictIdAndIsSystemTrue(districtId);
+        for (Location loc : systemLocations) {
+            if (loc.getType() == PublicLocationType.CITY_HALL) {
+                locationPostRepository.findByLocationIdAndPost(loc.getId(), LocationPostType.GOVERNOR)
+                        .ifPresent(locationPostRepository::delete);
+            }
+        }
     }
 
     @TestConfiguration

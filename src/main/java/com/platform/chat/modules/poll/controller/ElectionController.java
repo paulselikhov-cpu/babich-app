@@ -4,11 +4,13 @@ import com.platform.chat.entity.ChatUser;
 import com.platform.chat.enums.PersonLevel;
 import com.platform.chat.service.chatUser.ChatUserService;
 import com.platform.chat.service.level.PersonLevelService;
+import com.platform.chat.modules.poll.dto.DistrictElectionView;
 import com.platform.chat.modules.poll.entity.Poll;
 import com.platform.chat.modules.poll.entity.PollCandidate;
 import com.platform.chat.modules.poll.entity.PollVote;
 import com.platform.chat.modules.poll.service.ElectionFacade;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Слой 1 (Интерфейсы). REST-контроллер выборов губернатора.
+ * Слой 1. REST-контроллер выборов губернатора.
  * Принимает запросы от клиента (Angular), делегирует в ElectionFacade.
  */
 @RestController
@@ -34,36 +36,41 @@ public class ElectionController {
      * Инициатор автоматически становится первым кандидатом.
      */
     @PostMapping("/initiate")
-    public ResponseEntity<Poll> initiate(
+    public ResponseEntity<?> initiate(
             @RequestParam Long districtId,
             Principal principal) {
         ChatUser user = chatUserService.getChatUserByUserName(principal.getName());
         if (user == null) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(Map.of("message", "Персонаж не найден"));
         }
         // Гейт 3-го уровня: только персонажи с LV3+ могут инициировать выборы
         if (!personLevelService.hasMinLevel(user, PersonLevel.LEVEL_3)) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body(Map.of("message", "Требуется 3-й уровень персонажа"));
         }
-        Poll poll = electionFacade.initiateElection(districtId, user.getUserId());
-        return ResponseEntity.ok(poll);
+        try {
+            Poll poll = electionFacade.initiateElection(districtId, user.getId());
+            return ResponseEntity.ok(poll);
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            // Гейт-условие сценария №2: нет губернатора / нет параллельных выборов
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
     }
     /**
      * Шаг 2: Присоединиться к выборам как кандидат.
      */
     @PostMapping("/{pollId}/join")
-    public ResponseEntity<PollCandidate> join(
+    public ResponseEntity<?> join(
             @PathVariable Long pollId,
             Principal principal) {
         ChatUser user = chatUserService.getChatUserByUserName(principal.getName());
         if (user == null) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(Map.of("message", "Персонаж не найден"));
         }
         try {
-            PollCandidate candidate = electionFacade.joinAsCandidate(pollId, user.getUserId());
+            PollCandidate candidate = electionFacade.joinAsCandidate(pollId, user.getId());
             return ResponseEntity.ok(candidate);
-        } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest().body(null);
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
     }
 
@@ -71,19 +78,19 @@ public class ElectionController {
      * Шаг 3: Проголосовать за кандидата.
      */
     @PostMapping("/{pollId}/vote")
-    public ResponseEntity<PollVote> vote(
+    public ResponseEntity<?> vote(
             @PathVariable Long pollId,
             @RequestParam Long candidateId,
             Principal principal) {
         ChatUser user = chatUserService.getChatUserByUserName(principal.getName());
         if (user == null) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(Map.of("message", "Персонаж не найден"));
         }
         try {
-            PollVote vote = electionFacade.castVote(pollId, user.getUserId(), candidateId);
+            PollVote vote = electionFacade.castVote(pollId, user.getId(), candidateId);
             return ResponseEntity.ok(vote);
         } catch (IllegalStateException | IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
     }
 
@@ -91,12 +98,12 @@ public class ElectionController {
      * Шаг 4: Закрыть выборы и обработать результат (вручную).
      */
     @PostMapping("/{pollId}/close")
-    public ResponseEntity<Poll> close(@PathVariable Long pollId) {
+    public ResponseEntity<?> close(@PathVariable Long pollId) {
         try {
             Poll closed = electionFacade.closeElection(pollId);
             return ResponseEntity.ok(closed);
         } catch (IllegalStateException | IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
     }
 
@@ -135,5 +142,26 @@ public class ElectionController {
     @GetMapping("/district/{districtId}")
     public ResponseEntity<List<Poll>> getByDistrict(@PathVariable Long districtId) {
         return ResponseEntity.ok(electionFacade.getElectionsInDistrict(districtId));
+    }
+
+    /**
+     * Состояние выборов района для мини-таблицы на Площади Ленина
+     * (активное голосование либо результат последнего).
+     */
+    @GetMapping("/district/{districtId}/overview")
+    public ResponseEntity<DistrictElectionView> getOverview(
+            @PathVariable Long districtId,
+            Principal principal) {
+        ChatUser user = principal == null ? null
+                : chatUserService.getChatUserByUserName(principal.getName());
+        Long characterId = user == null ? null : user.getId();
+        return ResponseEntity.ok(electionFacade.getDistrictOverview(districtId, characterId));
+    }
+
+    /** Единый ответ 400 для гейтов и недопустимых состояний. */
+    @ExceptionHandler({IllegalStateException.class, IllegalArgumentException.class})
+    public ResponseEntity<Map<String, String>> handleBadState(RuntimeException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("message", e.getMessage()));
     }
 }

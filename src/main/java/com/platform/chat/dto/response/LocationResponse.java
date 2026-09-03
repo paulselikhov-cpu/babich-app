@@ -2,6 +2,7 @@ package com.platform.chat.dto.response;
 
 import com.platform.chat.entity.Location;
 import com.platform.chat.enums.LocationMemberRole;
+import com.platform.chat.enums.PublicLocationType;
 import lombok.Data;
 import java.time.LocalDateTime;
 
@@ -20,6 +21,7 @@ public class LocationResponse {
     private String inviteCode;
     private Boolean isPublic;
     private Boolean isSystem;
+    private PublicLocationType type;
     private LocalDateTime createdAt;
     private String templateName;
 
@@ -34,6 +36,7 @@ public class LocationResponse {
         dto.setInviteCode(location.getInviteCode());
         dto.setIsPublic(location.getIsPublic());
         dto.setIsSystem(location.getIsSystem());
+        dto.setType(location.getType());
         dto.setCreatedAt(location.getCreatedAt());
         dto.setTemplateName(location.getTemplate() != null
                 ? location.getTemplate().getName() : null);
@@ -51,6 +54,7 @@ public class LocationResponse {
         dto.setName(location.getName());
         dto.setDescription(location.getDescription());
         dto.setIsSystem(location.getIsSystem());
+        dto.setType(location.getType());
         dto.setCreatedAt(location.getCreatedAt());
         dto.setMemberRole("SYSTEM");
         return dto;

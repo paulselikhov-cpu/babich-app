@@ -4,22 +4,29 @@ import com.platform.chat.modules.poll.entity.Poll;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
 import com.platform.chat.core.event.DomainEventPublisher;
 import com.platform.chat.core.event.ElectionClosedEvent;
+import com.platform.chat.core.event.ElectionStartedEvent;
+import com.platform.chat.modules.poll.dto.DistrictElectionView;
 import com.platform.chat.modules.poll.entity.PollCandidate;
 import com.platform.chat.modules.poll.entity.PollVote;
+import com.platform.chat.modules.poll.enums.PollStatus;
+import com.platform.chat.modules.poll.enums.PollType;
 import com.platform.chat.modules.poll.handler.PollResultDispatcher;
+import com.platform.chat.service.district.DistrictSettingsService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Слой 2 (Сценарии / Workflows).
  * ElectionFacade — оркестратор выборов губернатора.
- * Собирает шаги сценария №2 в один вызов, понятный клиенту.
+ * Собирает шаги сценария "Выборы губернатора" в один вызов, понятный клиенту.
  * Не содержит бизнес-логики — делегирует в Слой 3 (PollService).
  * После закрытия голосования результат обрабатывает PollResultDispatcher
  * (Слой 4, выбирает реализацию по PollType) и публикует ElectionClosedEvent —
@@ -36,16 +43,23 @@ public class ElectionFacade {
     private final PollResultDispatcher pollResultDispatcher;
     private final DomainEventPublisher eventPublisher;
     private final ChatUserRepository chatUserRepository;
+    private final DistrictSettingsService districtSettingsService;
 
     /**
      * Шаг 1: Инициировать выборы.
      * Персонаж initiatorCharacterId начинает выборы губернатора в районе.
      * Он автоматически становится первым кандидатом (слот 1).
      * Остальные 4 слота пустые — ждут кандидатов.
+     *
+     * <p>Публикует ElectionStartedEvent — жителей района уведомляет
+     * NotificationEventListener (Слой 4) через Notification + WS-пуш.</p>
      */
+    @Transactional
     public Poll initiateElection(Long districtId, Long initiatorCharacterId) {
         log.info("===== Election initiated: districtId={}, initiator={} =====", districtId, initiatorCharacterId);
-        return pollService.createGovernorElection(districtId, initiatorCharacterId);
+        Poll poll = pollService.createGovernorElection(districtId, initiatorCharacterId);
+        eventPublisher.publish(new ElectionStartedEvent(districtId, poll.getId(), initiatorCharacterId));
+        return poll;
     }
 
     /**
@@ -136,5 +150,68 @@ public class ElectionFacade {
 
     public Map<Long, Integer> getResults(Long pollId) {
         return pollService.countVotes(pollId);
+    }
+
+    /**
+     * Собрать состояние выборов района для фронтовой мини-таблицы.
+     * Выбирает релевантное голосование: активное (ACTIVE/PENDING), иначе —
+     * последнее завершённое (для показа результата). Пусто, если выборов не было.
+     *
+     * @param districtId  район
+     * @param characterId текущий персонаж (внутренний ChatUser.id) или null
+     */
+    public DistrictElectionView getDistrictOverview(Long districtId, Long characterId) {
+        List<Poll> elections = pollService.findByDistrict(districtId).stream()
+                .filter(p -> p.getPollType() == PollType.ELECTION)
+                .sorted(Comparator.comparing(Poll::getCreatedAt,
+                        Comparator.nullsLast(Comparator.naturalOrder())).reversed())
+                .toList();
+
+        Poll relevant = elections.stream()
+                .filter(p -> p.getStatus() == PollStatus.ACTIVE || p.getStatus() == PollStatus.PENDING)
+                .findFirst()
+                .orElseGet(() -> elections.stream()
+                        .filter(p -> p.getStatus() == PollStatus.CLOSED)
+                        .findFirst()
+                        .orElse(null));
+
+        if (relevant == null) {
+            return DistrictElectionView.EMPTY;
+        }
+
+        Map<Long, Integer> votes = pollService.countVotes(relevant.getId());
+        List<PollCandidate> candidates = pollService.getCandidates(relevant.getId()).stream()
+                .sorted(Comparator.comparingInt(PollCandidate::getSlotNumber))
+                .toList();
+
+        List<DistrictElectionView.CandidateView> views = candidates.stream().map(c -> {
+            Long charId = c.getCharacterId();
+            String name = charId == null ? null
+                    : chatUserRepository.findById(charId).map(u -> u.getCharacterName()).orElse(null);
+            long count = charId == null ? 0L : (long) votes.getOrDefault(c.getId(), 0);
+            return new DistrictElectionView.CandidateView(c.getSlotNumber(), c.getId(), charId, name, count);
+        }).toList();
+
+        int totalVoted = pollService.totalVoteCount(relevant.getId());
+        int aliveWindowDays = districtSettingsService.getElectionSettings(districtId).aliveWindowDays();
+        long alive = chatUserRepository.countByDistrictIdAndLastSeenAfter(
+                districtId, LocalDateTime.now().minusDays(aliveWindowDays));
+        int quorum = relevant.getQuorumThreshold();
+        String winnerName = relevant.getStatus() == PollStatus.CLOSED ? resolveWinnerName(relevant.getId()) : null;
+
+        return new DistrictElectionView(
+                true,
+                relevant.getId(),
+                relevant.getStatus().name(),
+                relevant.getEndsAt() != null ? relevant.getEndsAt().toEpochMilli() : null,
+                totalVoted,
+                (int) alive,
+                quorum,
+                totalVoted >= quorum,
+                characterId != null && pollService.hasVoted(relevant.getId(), characterId),
+                characterId != null && candidates.stream().anyMatch(c -> characterId.equals(c.getCharacterId())),
+                winnerName,
+                views
+        );
     }
 }

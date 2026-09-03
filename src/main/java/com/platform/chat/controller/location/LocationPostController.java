@@ -1,5 +1,6 @@
 package com.platform.chat.controller.location;
 
+import com.platform.chat.dto.LocationPostView;
 import com.platform.chat.entity.LocationPost;
 import com.platform.chat.enums.LocationPostType;
 import com.platform.chat.service.location.LocationPostService;
@@ -41,11 +42,11 @@ public class LocationPostController {
     }
 
     /**
-     * Получить все должности в системной локации.
+     * Получить все должности в системной локации (с именем занимающего).
      */
     @GetMapping("/by-location/{locationId}")
-    public ResponseEntity<List<LocationPost>> getPostsByLocation(@PathVariable Long locationId) {
-        return ResponseEntity.ok(locationPostService.getPostsByLocation(locationId));
+    public ResponseEntity<List<LocationPostView>> getPostsByLocation(@PathVariable Long locationId) {
+        return ResponseEntity.ok(locationPostService.getPostViewsByLocation(locationId));
     }
 
     /**

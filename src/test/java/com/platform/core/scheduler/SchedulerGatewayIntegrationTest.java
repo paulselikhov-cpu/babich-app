@@ -5,7 +5,12 @@ import com.platform.chat.core.scheduler.ScheduledCheckRepository;
 import com.platform.chat.core.scheduler.ScheduledCheckStatus;
 import com.platform.chat.core.scheduler.SchedulerGateway;
 import com.platform.chat.entity.ChatUser;
+import com.platform.chat.entity.Location;
+import com.platform.chat.enums.LocationPostType;
+import com.platform.chat.enums.PublicLocationType;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
+import com.platform.chat.repository.location.LocationPostRepository;
+import com.platform.chat.repository.location.LocationRepository;
 import com.platform.chat.modules.notification.entity.Notification;
 import com.platform.chat.modules.notification.repository.NotificationRepository;
 import com.platform.chat.modules.poll.entity.Poll;
@@ -37,11 +42,14 @@ class SchedulerGatewayIntegrationTest {
     @Autowired private NotificationRepository notificationRepository;
     @Autowired private ScheduledCheckRepository scheduledCheckRepository;
     @Autowired private SchedulerGateway schedulerGateway;
+    @Autowired private LocationRepository locationRepository;
+    @Autowired private LocationPostRepository locationPostRepository;
 
     private Long characterId;
 
     @BeforeEach
     void setUp() {
+        clearGovernor(1L);
         long unique = System.nanoTime();
         Long userId = 90_000L + unique % 1_000_000L;
         String uniqueName = "SchedGatewayTest_" + unique;
@@ -109,5 +117,16 @@ class SchedulerGatewayIntegrationTest {
 
         // 6. Poll реально закрыт
         assertThat(electionFacade.getStatus(pollId).getStatus().name()).isEqualTo("CLOSED");
+    }
+
+    /** Убирает действующего губернатора района, чтобы гейт «нет губернатора» не блокировал повторный прогон теста. */
+    private void clearGovernor(Long districtId) {
+        List<Location> systemLocations = locationRepository.findByDistrictIdAndIsSystemTrue(districtId);
+        for (Location loc : systemLocations) {
+            if (loc.getType() == PublicLocationType.CITY_HALL) {
+                locationPostRepository.findByLocationIdAndPost(loc.getId(), LocationPostType.GOVERNOR)
+                        .ifPresent(locationPostRepository::delete);
+            }
+        }
     }
 }

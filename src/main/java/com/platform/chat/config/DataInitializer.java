@@ -7,6 +7,7 @@ import com.platform.chat.enums.PublicLocationType;
 import com.platform.chat.repository.district.DistrictRepository;
 import com.platform.chat.repository.location.LocationRepository;
 import com.platform.chat.repository.room.RoomRepository;
+import com.platform.chat.service.district.DistrictSettingsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -28,6 +29,7 @@ public class DataInitializer {
     private final DistrictRepository districtRepository;
     private final LocationRepository locationRepository;
     private final RoomRepository roomRepository;
+    private final DistrictSettingsService districtSettingsService;
 
     @EventListener(ApplicationReadyEvent.class)
     @Transactional
@@ -45,6 +47,9 @@ public class DataInitializer {
         central.setName("Центральный");
         central.setDescription("Центральный район города — сердце деловой и культурной жизни");
         central = districtRepository.save(central);
+
+        // Настройки района (дефолты для админской панели)
+        districtSettingsService.getOrCreate(central.getId());
 
         // Создаём 8 системных локаций
         createSystemLocation(central, PublicLocationType.CITY_HALL, "Мэрия",

@@ -29,6 +29,7 @@ import java.util.UUID;
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "eventType")
 @JsonSubTypes({
+        @JsonSubTypes.Type(value = ElectionStartedEvent.class, name = "ElectionStartedEvent"),
         @JsonSubTypes.Type(value = ElectionClosedEvent.class, name = "ElectionClosedEvent"),
         @JsonSubTypes.Type(value = CoinsChangedEvent.class, name = "CoinsChangedEvent"),
         @JsonSubTypes.Type(value = XpChangedEvent.class, name = "XpChangedEvent"),

@@ -72,15 +72,24 @@ public class NotificationService {
     }
 
     /**
-     * Отметить как прочитанное.
+     * Количество непрочитанных уведомлений персонажа.
+     */
+    public long countUnread(Long characterId) {
+        return notificationRepository.countByRecipientCharacterIdAndReadFalse(characterId);
+    }
+
+    /**
+     * Отметить как прочитанное. Возвращает обновлённое уведомление
+     * (null — если не найдено).
      */
     @Transactional
-    public void markRead(Long notificationId) {
-        notificationRepository.findById(notificationId)
-                .ifPresent(n -> {
+    public Notification markRead(Long notificationId) {
+        return notificationRepository.findById(notificationId)
+                .map(n -> {
                     n.setRead(true);
-                    notificationRepository.save(n);
-                });
+                    return notificationRepository.save(n);
+                })
+                .orElse(null);
     }
 
     /**

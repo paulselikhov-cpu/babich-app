@@ -6,6 +6,7 @@ package com.platform.chat.core.event;
  */
 public enum EventType {
     APPLICATION_RESOLVED,
+    ELECTION_STARTED,
     ELECTION_CLOSED,
     COINS_CHANGED,
     XP_CHANGED,

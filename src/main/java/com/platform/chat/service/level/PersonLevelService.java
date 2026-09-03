@@ -30,6 +30,21 @@ public class PersonLevelService {
     }
 
     /**
+     * Порог XP следующего уровня (для прогресс-бара на UI).
+     * Если персонаж на максимальном уровне — возвращает порог текущего уровня
+     * (прогресс считается заполненным).
+     */
+    public long nextLevelXpThreshold(ChatUser character) {
+        PersonLevel current = getLevel(character);
+        PersonLevel[] levels = PersonLevel.values();
+        int nextIndex = current.ordinal() + 1;
+        if (nextIndex >= levels.length) {
+            return current.getXpThreshold();
+        }
+        return levels[nextIndex].getXpThreshold();
+    }
+
+    /**
      * Получить XP, необходимый для следующего уровня.
      * Возвращает 0, если персонаж уже на максимальном уровне.
      */

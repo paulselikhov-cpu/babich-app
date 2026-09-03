@@ -4,6 +4,7 @@ import com.platform.chat.entity.ChatUser;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
 import com.platform.chat.core.event.ApplicationResolvedEvent;
 import com.platform.chat.core.event.ElectionClosedEvent;
+import com.platform.chat.core.event.ElectionStartedEvent;
 import com.platform.chat.modules.notification.dto.NotificationResponse;
 import com.platform.chat.modules.notification.entity.Notification;
 import com.platform.chat.modules.notification.service.NotificationService;
@@ -31,6 +32,47 @@ public class NotificationEventListener {
     private final NotificationService notificationService;
     private final ChatUserRepository chatUserRepository;
     private final SimpMessagingTemplate messagingTemplate;
+
+    /**
+     * Старт выборов губернатора — уведомить всех жителей района.
+     * Срабатывает по ElectionStartedEvent после коммита транзакции инициации
+     * (аналогично {@link #onElectionClosed}).
+     */
+    @ApplicationModuleListener
+    public void onElectionStarted(ElectionStartedEvent event) {
+        Long districtId = event.getScopeId();
+        List<ChatUser> residents = chatUserRepository.findByDistrictId(districtId);
+        if (residents.isEmpty()) {
+            log.info("No residents in district {}, skip election-start notifications", districtId);
+            return;
+        }
+
+        String initiatorName = event.getInitiatorCharacterId() == null ? null
+                : chatUserRepository.findById(event.getInitiatorCharacterId())
+                        .map(ChatUser::getCharacterName)
+                        .orElse(null);
+        Long pollId = event.getPollId();
+
+        String title = "Выборы губернатора начались";
+        String body = (initiatorName != null
+                ? "Выборы губернатора начались! Кандидатуру выдвинул " + initiatorName + ". "
+                : "Выборы губернатора начались! ")
+                + "Придите на Площадь Ленина, чтобы проголосовать или выдвинуть свою кандидатуру.";
+
+        for (ChatUser resident : residents) {
+            Notification notification = notificationService.notify(
+                    resident.getId(), title, body, "ELECTION_STARTED", pollId);
+
+            messagingTemplate.convertAndSendToUser(
+                    resident.getUsername(),
+                    "/queue/notifications",
+                    NotificationResponse.from(notification)
+            );
+        }
+
+        log.info("Election start delivered: districtId={}, recipients={}, pollId={}",
+                districtId, residents.size(), pollId);
+    }
 
     /**
      * Закрытие выборов губернатора — уведомить всех жителей района.

@@ -1,7 +1,6 @@
 package com.platform.chat.modules.poll.handler;
 
 import com.platform.chat.entity.ChatUser;
-import com.platform.chat.entity.Location;
 import com.platform.chat.entity.LocationPost;
 import com.platform.chat.enums.LocationPostType;
 import com.platform.chat.enums.PublicLocationType;
@@ -80,39 +79,28 @@ public class ElectionResultHandlerAdapter implements PollResultHandler {
 
             Optional<ChatUser> winnerCharacter = chatUserRepository.findById(winner.getCharacterId());
 
+            // Выборы губернатора назначают победителя ТОЛЬКО на должность GOVERNOR в мэрии района.
+            // (Ранее цикл шёл по всем системным локациям, из-за чего победитель получал ещё
+            //  POLICE_OFFICER/BANK_DIRECTOR/REAL_ESTATE_DIRECTOR — это баг сценария №2.)
             if (winnerCharacter.isPresent() && "DISTRICT".equals(scopeType)) {
-                List<Location> locations = locationRepository.findByDistrictIdAndIsSystemTrue(scopeId);
-                for (Location loc : locations) {
-                    if (loc.getType() != null) {
-                        LocationPostType postType = mapPublicLocationTypeToPost(loc.getType());
-                        if (postType != null) {
+                locationRepository
+                        .findByDistrictIdAndIsSystemTrueAndType(scopeId, PublicLocationType.CITY_HALL)
+                        .ifPresent(cityHall -> {
                             Optional<LocationPost> existing = locationPostRepository
-                                    .findByLocationIdAndPost(loc.getId(), postType);
+                                    .findByLocationIdAndPost(cityHall.getId(), LocationPostType.GOVERNOR);
                             if (existing.isEmpty()) {
                                 LocationPost locationPost = new LocationPost();
-                                locationPost.setLocation(loc);
+                                locationPost.setLocation(cityHall);
                                 locationPost.setCharacter(winnerCharacter.get());
-                                locationPost.setPost(postType);
+                                locationPost.setPost(LocationPostType.GOVERNOR);
                                 locationPost.setAppointedAt(LocalDateTime.now());
                                 locationPostRepository.save(locationPost);
                             }
-                        }
-                    }
-                }
+                        });
             }
         }
 
         poll.setStatus(PollStatus.CLOSED);
         pollRepository.save(poll);
-    }
-
-    private LocationPostType mapPublicLocationTypeToPost(PublicLocationType type) {
-        switch (type) {
-            case CITY_HALL: return LocationPostType.GOVERNOR;
-            case POLICE_STATION: return LocationPostType.POLICE_OFFICER;
-            case BANK: return LocationPostType.BANK_DIRECTOR;
-            case REAL_ESTATE_MARKET: return LocationPostType.REAL_ESTATE_DIRECTOR;
-            default: return null;
-        }
     }
 }
