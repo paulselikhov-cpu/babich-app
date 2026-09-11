@@ -1,6 +1,7 @@
 package com.platform.chat.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.platform.chat.enums.RoomCode;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -24,6 +25,10 @@ public class TemplateRoom {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private RoomCode code = RoomCode.DEFAULT;
 
     /**
      * Шаблон которому принадлежит эта комната.

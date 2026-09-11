@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Сервис для управления должностями в системных локациях.
@@ -31,6 +32,12 @@ public class LocationPostService {
 
     /**
      * Назначить персонажа на должность в системной локации.
+     * Семантика согласована с ограничениями таблицы location_posts:
+     * - unique(location_id, character_id) — персонаж занимает одну должность
+     *   в локации; повторный вызов для той же должности идемпотентен
+     *   (возвращает существующую запись);
+     * - unique(location_id, post) — в локации каждый тип должности
+     *   одноместный; если должность занята другим — бизнес-ошибка 400.
      */
     @Transactional
     public LocationPost appoint(Long locationId, Long characterId, LocationPostType post) {
@@ -49,14 +56,24 @@ public class LocationPostService {
                 .orElseThrow(() -> new RuntimeException(
                         "Персонаж " + characterId + " не состоит в локации " + locationId));
 
-        // Проверяем уникальность для единоличных должностей
-        if (isSingleSlotPost(post)) {
-            locationPostRepository.findByLocationIdAndPost(locationId, post)
-                    .ifPresent(existing -> {
-                        throw new RuntimeException(
-                                "Должность " + post + " в локации " + locationId + " уже занята");
-                    });
+        // Персонаж уже занимает должность в этой локации?
+        Optional<LocationPost> mine =
+                locationPostRepository.findByLocationIdAndCharacterId(locationId, characterId);
+        if (mine.isPresent()) {
+            if (mine.get().getPost() == post) {
+                return mine.get(); // уже назначен на эту же должность — идемпотентно
+            }
+            throw new RuntimeException(
+                    "Персонаж уже занимает должность " + mine.get().getPost()
+                            + " в этой локации — нельзя занять ещё и " + post);
         }
+
+        // Должность уже занята другим персонажем? (все должности одноместные)
+        locationPostRepository.findByLocationIdAndPost(locationId, post)
+                .ifPresent(existing -> {
+                    throw new RuntimeException(
+                            "Должность " + post + " в локации " + locationId + " уже занята");
+                });
 
         LocationPost locationPost = new LocationPost();
         locationPost.setLocation(location);
@@ -105,14 +122,5 @@ public class LocationPostService {
     @Transactional(readOnly = true)
     public List<LocationPost> getPostsByCharacter(Long characterId) {
         return locationPostRepository.findByCharacterId(characterId);
-    }
-
-    /**
-     * Проверить, является ли персонаж единоличной должностью (GOVERNOR, BANK_DIRECTOR, REAL_ESTATE_DIRECTOR).
-     */
-    private boolean isSingleSlotPost(LocationPostType post) {
-        return post == LocationPostType.GOVERNOR
-                || post == LocationPostType.BANK_DIRECTOR
-                || post == LocationPostType.REAL_ESTATE_DIRECTOR;
     }
 }

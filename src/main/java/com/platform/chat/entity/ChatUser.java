@@ -50,6 +50,9 @@ public class ChatUser {
     @Column(nullable = false)
     private String username;
 
+    @Column(name = "passport_id")
+    private String passportId;
+
     /**
      * Район к которому привязан персонаж.
      * Один User = максимум один персонаж в одном районе.

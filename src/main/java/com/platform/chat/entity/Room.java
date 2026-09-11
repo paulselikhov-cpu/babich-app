@@ -1,6 +1,8 @@
 package com.platform.chat.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.platform.chat.enums.ChatRole;
+import com.platform.chat.enums.RoomCode;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -20,6 +22,11 @@ public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private RoomCode code = RoomCode.DEFAULT;
 
     /**
      * Локация, которой принадлежит комната.

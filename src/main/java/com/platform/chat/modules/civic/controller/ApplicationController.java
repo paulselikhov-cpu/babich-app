@@ -33,6 +33,17 @@ public class ApplicationController {
         return ResponseEntity.ok(application);
     }
 
+    @PostMapping("/register-passport")
+    public ResponseEntity<Application> registerPassport(Principal principal) {
+        ChatUser chatUser = chatUserService.getChatUserByUserName(principal.getName());
+        if (chatUser == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        Application application = applicationService.submit(
+                chatUser.getUserId(), ApplicationType.REGISTER_PASSPORT, null);
+        return ResponseEntity.ok(application);
+    }
+
     @GetMapping("/my")
     public ResponseEntity<List<Application>> getMyApplications(Principal principal) {
         ChatUser chatUser = chatUserService.getChatUserByUserName(principal.getName());

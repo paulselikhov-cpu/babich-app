@@ -7,5 +7,6 @@ package com.platform.chat.modules.civic.enums;
  * (вступление в группировку, покупка бизнеса, назначение на роль и т.д.).
  */
 public enum ApplicationType {
-    BUY_FIRST_LOCATION
+    BUY_FIRST_LOCATION,
+    REGISTER_PASSPORT,
 }
