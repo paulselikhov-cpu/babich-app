@@ -67,4 +67,9 @@ public class ApplicationService {
     public List<Application> getMyApplications(Long userId) {
         return applicationRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }
+
+    /** Все заявки платформы (свежие сверху) — для модерации. */
+    public List<Application> getAllApplications() {
+        return applicationRepository.findAllByOrderByCreatedAtDesc();
+    }
 }

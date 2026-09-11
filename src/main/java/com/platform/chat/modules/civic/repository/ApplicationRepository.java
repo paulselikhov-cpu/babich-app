@@ -11,5 +11,8 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
 
     List<Application> findByUserIdOrderByCreatedAtDesc(Long userId);
 
+    /** Все заявки, свежие сверху — для модерации («Гражданские заявки»). */
+    List<Application> findAllByOrderByCreatedAtDesc();
+
     boolean existsByUserIdAndType(Long userId, ApplicationType type);
 }
