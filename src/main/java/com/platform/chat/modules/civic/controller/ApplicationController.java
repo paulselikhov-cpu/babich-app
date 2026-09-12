@@ -45,8 +45,51 @@ public class ApplicationController {
         if (chatUser == null) {
             return ResponseEntity.badRequest().build();
         }
-        Application application = applicationService.submit(
+        // Создаём заявку в PENDING — обработка будет при одобрении сотрудником мэрии
+        Application application = applicationService.createPendingApplication(
                 chatUser.getUserId(), ApplicationType.REGISTER_PASSPORT, null);
+        return ResponseEntity.ok(application);
+    }
+
+    /** Список заявок на получение паспорта (для модерации сотрудником мэрии). */
+    @GetMapping("/register-passport")
+    public ResponseEntity<List<ApplicationView>> getRegisterPassportApplications() {
+        return ResponseEntity.ok(
+                applicationService.getRegisterPassportApplications().stream()
+                        .map(this::toView)
+                        .toList());
+    }
+
+    /** Одобрить заявку (только для сотрудника мэрии — ADMIN/MODERATOR). */
+    @PostMapping("/{id}/approve")
+    public ResponseEntity<Application> approveApplication(
+            @PathVariable Long id,
+            Principal principal) {
+        ChatUser chatUser = chatUserService.getChatUserByUserName(principal.getName());
+        if (chatUser == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        if (!chatUserService.isStaff(principal.getName())) {
+            return ResponseEntity.status(403).build();
+        }
+        Application application = applicationService.approveApplication(id);
+        return ResponseEntity.ok(application);
+    }
+
+    /** Отклонить заявку (только для сотрудника мэрии — ADMIN/MODERATOR). */
+    @PostMapping("/{id}/reject")
+    public ResponseEntity<Application> rejectApplication(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "Отклонено по решению сотрудника мэрии") String reason,
+            Principal principal) {
+        ChatUser chatUser = chatUserService.getChatUserByUserName(principal.getName());
+        if (chatUser == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        if (!chatUserService.isStaff(principal.getName())) {
+            return ResponseEntity.status(403).build();
+        }
+        Application application = applicationService.rejectApplication(id, reason);
         return ResponseEntity.ok(application);
     }
 

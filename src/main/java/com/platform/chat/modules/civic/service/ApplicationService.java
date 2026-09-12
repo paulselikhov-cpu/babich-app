@@ -1,6 +1,7 @@
 package com.platform.chat.modules.civic.service;
 
 import com.platform.chat.modules.civic.entity.Application;
+import com.platform.chat.modules.civic.enums.ApplicationStatus;
 import com.platform.chat.modules.civic.enums.ApplicationType;
 import com.platform.chat.modules.civic.handler.ApplicationHandler;
 import com.platform.chat.modules.civic.repository.ApplicationRepository;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -68,8 +70,86 @@ public class ApplicationService {
         return applicationRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }
 
+    /** Отклонить заявку (только PENDING). Вызывается сотрудником мэрии. */
+    @Transactional
+    public Application rejectApplication(Long applicationId, String reason) {
+        Application application = applicationRepository.findById(applicationId)
+                .orElseThrow(() -> new RuntimeException("Заявка не найдена: " + applicationId));
+
+        if (application.getStatus() != null && !application.getStatus().equals(ApplicationStatus.PENDING)) {
+            throw new RuntimeException("Заявка уже обработана, статус: " + application.getStatus());
+        }
+
+        application.setStatus(ApplicationStatus.REJECTED);
+        application.setResultMessage(reason);
+        application.setProcessedAt(LocalDateTime.now());
+        Application rejected = applicationRepository.save(application);
+
+        eventPublisher.publish(new ApplicationResolvedEvent(
+                rejected.getUserId(),
+                rejected.getId(),
+                rejected.getStatus() != null ? rejected.getStatus().name() : null
+        ));
+
+        return rejected;
+    }
+
     /** Все заявки платформы (свежие сверху) — для модерации. */
     public List<Application> getAllApplications() {
         return applicationRepository.findAllByOrderByCreatedAtDesc();
+    }
+
+    /** Создать заявку в статусе PENDING без вызова handler-а.
+     *  Подходит для заявок, которые будут рассмотрены вручную сотрудником мэрии
+     *  через {@link #approveApplication(Long)}.
+     */
+    @Transactional
+    public Application createPendingApplication(Long userId, ApplicationType type, String payload) {
+        Application application = new Application();
+        application.setUserId(userId);
+        application.setType(type);
+        application.setPayload(payload);
+        // status остаётся PENDING (значение по умолчанию в entity)
+        return applicationRepository.save(application);
+    }
+
+    /** Одобрить заявку (передать handler-у для обработки).
+     *  Handler сам решает — одобрить или отклонить, и выставляет resultMessage.
+     *  Используется сотрудником мэрии для ручной модерации заявок.
+     */
+    @Transactional
+    public Application approveApplication(Long applicationId) {
+        Application application = applicationRepository.findById(applicationId)
+                .orElseThrow(() -> new RuntimeException("Заявка не найдена: " + applicationId));
+
+        if (application.getStatus() != null && !application.getStatus().equals(ApplicationStatus.PENDING)) {
+            throw new RuntimeException("Заявка уже обработана, статус: " + application.getStatus());
+        }
+
+        ApplicationHandler handler = getHandlerMap().get(application.getType());
+        if (handler == null) {
+            throw new RuntimeException("Нет обработчика для типа заявки: " + application.getType());
+        }
+
+        handler.handle(application);
+        application.setProcessedAt(LocalDateTime.now());
+        Application resolved = applicationRepository.save(application);
+
+        eventPublisher.publish(new ApplicationResolvedEvent(
+                resolved.getUserId(),
+                resolved.getId(),
+                resolved.getStatus() != null ? resolved.getStatus().name() : null
+        ));
+
+        return resolved;
+    }
+
+    /** Все заявки на получение паспорта (PENDING + обработанные). */
+    public List<Application> getRegisterPassportApplications() {
+        return applicationRepository.findByTypeOrderByCreatedAtDesc(ApplicationType.REGISTER_PASSPORT);
+    }
+
+    public Optional<Application> findById(Long id) {
+        return applicationRepository.findById(id);
     }
 }
