@@ -9,7 +9,8 @@ public enum ApplicationMessageKey {
     PASSPORT_ISSUED("application.passport.issued"),
     WORK_LICENCE_ALREADY_EXISTS("application.work-licence.already-exists"),
     WORK_LICENCE_ISSUED("application.work-licence.issued"),
-    CANCELED("application.canceled");
+    CANCELED("application.canceled"),
+    APPLICATION_ALREADY_PENDING("application.already-pending");
 
     private final String code;
 

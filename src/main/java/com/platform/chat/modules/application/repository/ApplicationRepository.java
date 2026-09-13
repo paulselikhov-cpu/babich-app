@@ -1,6 +1,7 @@
 package com.platform.chat.modules.application.repository;
 
 import com.platform.chat.modules.application.entity.Application;
+import com.platform.chat.modules.application.enums.ApplicationStatus;
 import com.platform.chat.modules.application.enums.ApplicationType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -17,5 +18,5 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
     /** Заявки на получение паспорта, свежие сверху. */
     List<Application> findByTypeOrderByCreatedAtDesc(ApplicationType type);
 
-    boolean existsByUserIdAndType(Long userId, ApplicationType type);
+    boolean existsByUserIdAndTypeAndStatus(Long userId, ApplicationType type, ApplicationStatus status);
 }

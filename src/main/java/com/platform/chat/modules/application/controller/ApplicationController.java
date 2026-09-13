@@ -56,6 +56,11 @@ public class ApplicationController {
                             + messages.resolve(ApplicationMessageKey.PASSPORT_ALREADY_EXISTS)
             );
         }
+
+        if (applicationService.existsPendingApplication(chatUser.getUserId(), ApplicationType.REGISTER_PASSPORT)) {
+            throw new RuntimeException(messages.resolve(ApplicationMessageKey.APPLICATION_ALREADY_PENDING));
+        }
+
         // Создаём заявку в PENDING — обработка будет при одобрении сотрудником мэрии
         Application application = applicationService.createPendingApplication(
                 chatUser.getUserId(), ApplicationType.REGISTER_PASSPORT, null);
@@ -76,6 +81,11 @@ public class ApplicationController {
                             + messages.resolve(ApplicationMessageKey.WORK_LICENCE_ALREADY_EXISTS)
             );
         }
+
+        if (applicationService.existsPendingApplication(chatUser.getUserId(), ApplicationType.REGISTER_WORK_LICENCE)) {
+            throw new RuntimeException(messages.resolve(ApplicationMessageKey.APPLICATION_ALREADY_PENDING));
+        }
+
         // Создаём заявку в PENDING — обработка будет при одобрении сотрудником мэрии
         Application application = applicationService.createPendingApplication(
                 chatUser.getUserId(), ApplicationType.REGISTER_WORK_LICENCE, null);

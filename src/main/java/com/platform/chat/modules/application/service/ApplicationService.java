@@ -153,4 +153,9 @@ public class ApplicationService {
     public Optional<Application> findById(Long id) {
         return applicationRepository.findById(id);
     }
+
+    public boolean existsPendingApplication(Long userId, ApplicationType type) {
+        return applicationRepository.existsByUserIdAndTypeAndStatus(
+                userId, type, ApplicationStatus.PENDING);
+    }
 }
