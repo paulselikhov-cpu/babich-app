@@ -4,6 +4,7 @@ import com.platform.chat.entity.ChatUser;
 import com.platform.chat.modules.application.entity.Application;
 import com.platform.chat.modules.application.enums.ApplicationStatus;
 import com.platform.chat.modules.application.enums.ApplicationType;
+import com.platform.chat.modules.application.utils.ApplicationIdGenerator;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -35,18 +36,11 @@ public class RegisterPassport implements ApplicationHandler {
             return;
         }
 
-        String passportId = generatePassportId();
+        String passportId = ApplicationIdGenerator.generate(application.getType());
         user.setPassportId(passportId);
         user.setGameStatus("RESIDENT");
 
         application.setStatus(ApplicationStatus.APPROVED);
         application.setResultMessage("Паспорт выдан: " + passportId);
-    }
-
-    private static String generatePassportId() {
-        SecureRandom random = new SecureRandom();
-        int first = random.nextInt(9000) + 1000; // 1000..9999
-        int second = random.nextInt(9000) + 1000; // 1000..9999
-        return String.format("PP-%04d-%04d", first, second);
     }
 }

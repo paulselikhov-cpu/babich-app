@@ -4,6 +4,7 @@ import com.platform.chat.entity.ChatUser;
 import com.platform.chat.modules.application.entity.Application;
 import com.platform.chat.modules.application.enums.ApplicationStatus;
 import com.platform.chat.modules.application.enums.ApplicationType;
+import com.platform.chat.modules.application.utils.ApplicationIdGenerator;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -35,17 +36,23 @@ public class RegisterWorkLicence implements ApplicationHandler {
             return;
         }
 
-        String workLicenceId = generateWorkLicenceId();
+        String workLicenceId = ApplicationIdGenerator.generate(application.getType());
         user.setWorkLicenceId(workLicenceId);
 
         application.setStatus(ApplicationStatus.APPROVED);
         application.setResultMessage("Лицензия для работу выдана");
     }
 
-    private static String generateWorkLicenceId() {
+    private static String generateId(ApplicationType type) {
         SecureRandom random = new SecureRandom();
         int first = random.nextInt(9000) + 1000; // 1000..9999
         int second = random.nextInt(9000) + 1000; // 1000..9999
-        return String.format("WRK-%04d-%04d", first, second);
+
+        return switch (type) {
+            case REGISTER_WORK_LICENCE -> String.format("WRK-%04d-%04d", first, second);
+            case REGISTER_PASSPORT -> String.format("PP-%04d-%04d", first, second);
+            case null, default -> String.format("DF-%04d-%04d", first, second);
+        };
+
     }
 }
