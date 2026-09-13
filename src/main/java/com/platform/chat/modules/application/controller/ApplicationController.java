@@ -1,13 +1,13 @@
-package com.platform.chat.modules.civic.controller;
+package com.platform.chat.modules.application.controller;
 
 import com.platform.auth.entity.User;
 import com.platform.auth.repository.UserRepository;
 import com.platform.chat.entity.ChatUser;
 import com.platform.chat.service.chatUser.ChatUserService;
-import com.platform.chat.modules.civic.dto.ApplicationView;
-import com.platform.chat.modules.civic.entity.Application;
-import com.platform.chat.modules.civic.enums.ApplicationType;
-import com.platform.chat.modules.civic.service.ApplicationService;
+import com.platform.chat.modules.application.dto.ApplicationView;
+import com.platform.chat.modules.application.entity.Application;
+import com.platform.chat.modules.application.enums.ApplicationType;
+import com.platform.chat.modules.application.service.ApplicationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -48,6 +48,18 @@ public class ApplicationController {
         // Создаём заявку в PENDING — обработка будет при одобрении сотрудником мэрии
         Application application = applicationService.createPendingApplication(
                 chatUser.getUserId(), ApplicationType.REGISTER_PASSPORT, null);
+        return ResponseEntity.ok(application);
+    }
+
+    @PostMapping("/register-work-licence")
+    public ResponseEntity<Application> registerWorkLicence(Principal principal) {
+        ChatUser chatUser = chatUserService.getChatUserByUserName(principal.getName());
+        if (chatUser == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        // Создаём заявку в PENDING — обработка будет при одобрении сотрудником мэрии
+        Application application = applicationService.createPendingApplication(
+                chatUser.getUserId(), ApplicationType.REGISTER_WORK_LICENCE, null);
         return ResponseEntity.ok(application);
     }
 

@@ -1,10 +1,10 @@
 package com.platform.economy;
 
 import com.platform.chat.entity.ChatUser;
-import com.platform.chat.modules.civic.entity.Application;
+import com.platform.chat.modules.application.entity.Application;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
-import com.platform.chat.modules.civic.enums.ApplicationType;
-import com.platform.chat.modules.civic.service.ApplicationService;
+import com.platform.chat.modules.application.enums.ApplicationType;
+import com.platform.chat.modules.application.service.ApplicationService;
 import com.platform.chat.modules.economy.entity.TransactionLog;
 import com.platform.chat.modules.economy.enums.RewardReason;
 import com.platform.chat.modules.economy.repository.TransactionLogRepository;

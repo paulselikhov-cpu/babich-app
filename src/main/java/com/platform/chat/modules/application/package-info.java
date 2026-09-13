@@ -16,6 +16,6 @@
  * это тот же паттерн, что у существующего цикла economy ⇄ core.</p>
  */
 @ApplicationModule(allowedDependencies = { "chat", "core" })
-package com.platform.chat.modules.civic;
+package com.platform.chat.modules.application;
 
 import org.springframework.modulith.ApplicationModule;

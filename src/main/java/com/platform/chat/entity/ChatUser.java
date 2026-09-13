@@ -53,6 +53,9 @@ public class ChatUser {
     @Column(name = "passport_id")
     private String passportId;
 
+    @Column(name = "work_licence_id")
+    private String workLicenceId;
+
     /**
      * Район к которому привязан персонаж.
      * Один User = максимум один персонаж в одном районе.

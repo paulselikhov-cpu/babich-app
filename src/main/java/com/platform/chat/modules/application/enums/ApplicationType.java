@@ -1,4 +1,4 @@
-package com.platform.chat.modules.civic.enums;
+package com.platform.chat.modules.application.enums;
 
 /**
  * Тип гражданской заявки. Каждый тип обрабатывается своим
@@ -9,4 +9,5 @@ package com.platform.chat.modules.civic.enums;
 public enum ApplicationType {
     BUY_FIRST_LOCATION,
     REGISTER_PASSPORT,
+    REGISTER_WORK_LICENCE,
 }

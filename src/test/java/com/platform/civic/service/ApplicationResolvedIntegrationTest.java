@@ -1,10 +1,10 @@
 package com.platform.civic.service;
 
 import com.platform.chat.entity.ChatUser;
-import com.platform.chat.modules.civic.entity.Application;
-import com.platform.chat.modules.civic.service.ApplicationService;
+import com.platform.chat.modules.application.entity.Application;
+import com.platform.chat.modules.application.service.ApplicationService;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
-import com.platform.chat.modules.civic.enums.ApplicationType;
+import com.platform.chat.modules.application.enums.ApplicationType;
 import com.platform.chat.modules.notification.entity.Notification;
 import com.platform.chat.modules.notification.repository.NotificationRepository;
 import org.junit.jupiter.api.BeforeEach;

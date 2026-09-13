@@ -1,17 +1,17 @@
-package com.platform.chat.modules.civic.handler;
+package com.platform.chat.modules.application.handler;
 
 import com.platform.chat.entity.ChatUser;
 import com.platform.chat.entity.Location;
 import com.platform.chat.entity.LocationTemplate;
-import com.platform.chat.modules.civic.entity.Application;
-import com.platform.chat.modules.civic.enums.ApplicationType;
+import com.platform.chat.modules.application.entity.Application;
+import com.platform.chat.modules.application.enums.ApplicationType;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
 import com.platform.chat.repository.location.LocationRepository;
 import com.platform.chat.repository.location.LocationTemplateRepository;
 import com.platform.chat.service.location.LocationService;
 
 import java.util.List;
-import com.platform.chat.modules.civic.enums.ApplicationStatus;
+import com.platform.chat.modules.application.enums.ApplicationStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

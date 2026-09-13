@@ -1,7 +1,7 @@
-package com.platform.chat.modules.civic.repository;
+package com.platform.chat.modules.application.repository;
 
-import com.platform.chat.modules.civic.entity.Application;
-import com.platform.chat.modules.civic.enums.ApplicationType;
+import com.platform.chat.modules.application.entity.Application;
+import com.platform.chat.modules.application.enums.ApplicationType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.List;

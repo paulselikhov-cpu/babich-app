@@ -1,10 +1,10 @@
-package com.platform.chat.modules.civic.service;
+package com.platform.chat.modules.application.service;
 
-import com.platform.chat.modules.civic.entity.Application;
-import com.platform.chat.modules.civic.enums.ApplicationStatus;
-import com.platform.chat.modules.civic.enums.ApplicationType;
-import com.platform.chat.modules.civic.handler.ApplicationHandler;
-import com.platform.chat.modules.civic.repository.ApplicationRepository;
+import com.platform.chat.modules.application.entity.Application;
+import com.platform.chat.modules.application.enums.ApplicationStatus;
+import com.platform.chat.modules.application.enums.ApplicationType;
+import com.platform.chat.modules.application.handler.ApplicationHandler;
+import com.platform.chat.modules.application.repository.ApplicationRepository;
 import com.platform.chat.core.event.ApplicationResolvedEvent;
 import com.platform.chat.core.event.DomainEventPublisher;
 import lombok.RequiredArgsConstructor;
@@ -110,7 +110,13 @@ public class ApplicationService {
         application.setType(type);
         application.setPayload(payload);
         // status остаётся PENDING (значение по умолчанию в entity)
-        return applicationRepository.save(application);
+        Application pending = applicationRepository.save(application);
+        eventPublisher.publish(new ApplicationResolvedEvent(
+                pending.getUserId(),
+                pending.getId(),
+                pending.getStatus() != null ? pending.getStatus().name() : null
+        ));
+        return pending;
     }
 
     /** Одобрить заявку (передать handler-у для обработки).
