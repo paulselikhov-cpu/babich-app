@@ -150,11 +150,6 @@ public class ApplicationService {
         return resolved;
     }
 
-    /** Все заявки на получение паспорта (PENDING + обработанные). */
-    public List<Application> getRegisterPassportApplications() {
-        return applicationRepository.findByTypeOrderByCreatedAtDesc(ApplicationType.REGISTER_PASSPORT);
-    }
-
     public Optional<Application> findById(Long id) {
         return applicationRepository.findById(id);
     }

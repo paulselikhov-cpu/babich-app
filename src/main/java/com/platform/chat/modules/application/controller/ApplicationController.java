@@ -51,7 +51,9 @@ public class ApplicationController {
 
         if (chatUser.getPassportId() != null) {
             throw new RuntimeException(
-                    messages.resolve(ApplicationMessageKey.PASSPORT_ALREADY_EXISTS)
+                    messages.resolve(ApplicationMessageKey.CANCELED)
+                            + ": "
+                            + messages.resolve(ApplicationMessageKey.PASSPORT_ALREADY_EXISTS)
             );
         }
         // Создаём заявку в PENDING — обработка будет при одобрении сотрудником мэрии
@@ -67,24 +69,17 @@ public class ApplicationController {
             return ResponseEntity.badRequest().build();
         }
 
-        if (chatUser.getPassportId() != null) {
+        if (chatUser.getWorkLicenceId() != null) {
             throw new RuntimeException(
-                    messages.resolve(ApplicationMessageKey.WORK_LICENCE_ALREADY_EXISTS)
+                    messages.resolve(ApplicationMessageKey.CANCELED)
+                            + ": "
+                            + messages.resolve(ApplicationMessageKey.WORK_LICENCE_ALREADY_EXISTS)
             );
         }
         // Создаём заявку в PENDING — обработка будет при одобрении сотрудником мэрии
         Application application = applicationService.createPendingApplication(
                 chatUser.getUserId(), ApplicationType.REGISTER_WORK_LICENCE, null);
         return ResponseEntity.ok(application);
-    }
-
-    /** Список заявок на получение паспорта (для модерации сотрудником мэрии). */
-    @GetMapping("/register-passport")
-    public ResponseEntity<List<ApplicationView>> getRegisterPassportApplications() {
-        return ResponseEntity.ok(
-                applicationService.getRegisterPassportApplications().stream()
-                        .map(this::toView)
-                        .toList());
     }
 
     /** Одобрить заявку (только для сотрудника мэрии — ADMIN/MODERATOR). */
