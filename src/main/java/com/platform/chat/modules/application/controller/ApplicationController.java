@@ -3,6 +3,8 @@ package com.platform.chat.modules.application.controller;
 import com.platform.auth.entity.User;
 import com.platform.auth.repository.UserRepository;
 import com.platform.chat.entity.ChatUser;
+import com.platform.chat.modules.application.enums.ApplicationMessageKey;
+import com.platform.chat.modules.application.utils.ApplicationMessages;
 import com.platform.chat.service.chatUser.ChatUserService;
 import com.platform.chat.modules.application.dto.ApplicationView;
 import com.platform.chat.modules.application.entity.Application;
@@ -27,6 +29,7 @@ public class ApplicationController {
     private final ApplicationService applicationService;
     private final ChatUserService chatUserService;
     private final UserRepository userRepository;
+    private final ApplicationMessages messages;
 
     @PostMapping("/buy-first-location")
     public ResponseEntity<Application> buyFirstLocation(Principal principal) {
@@ -45,6 +48,12 @@ public class ApplicationController {
         if (chatUser == null) {
             return ResponseEntity.badRequest().build();
         }
+
+        if (chatUser.getPassportId() != null) {
+            throw new RuntimeException(
+                    messages.resolve(ApplicationMessageKey.PASSPORT_ALREADY_EXISTS)
+            );
+        }
         // Создаём заявку в PENDING — обработка будет при одобрении сотрудником мэрии
         Application application = applicationService.createPendingApplication(
                 chatUser.getUserId(), ApplicationType.REGISTER_PASSPORT, null);
@@ -56,6 +65,12 @@ public class ApplicationController {
         ChatUser chatUser = chatUserService.getChatUserByUserName(principal.getName());
         if (chatUser == null) {
             return ResponseEntity.badRequest().build();
+        }
+
+        if (chatUser.getPassportId() != null) {
+            throw new RuntimeException(
+                    messages.resolve(ApplicationMessageKey.WORK_LICENCE_ALREADY_EXISTS)
+            );
         }
         // Создаём заявку в PENDING — обработка будет при одобрении сотрудником мэрии
         Application application = applicationService.createPendingApplication(
