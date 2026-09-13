@@ -2,9 +2,11 @@ package com.platform.chat.modules.application.handler;
 
 import com.platform.chat.entity.ChatUser;
 import com.platform.chat.modules.application.entity.Application;
+import com.platform.chat.modules.application.enums.ApplicationMessageKey;
 import com.platform.chat.modules.application.enums.ApplicationStatus;
 import com.platform.chat.modules.application.enums.ApplicationType;
 import com.platform.chat.modules.application.utils.ApplicationIdGenerator;
+import com.platform.chat.modules.application.utils.ApplicationMessages;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -16,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RegisterWorkLicence implements ApplicationHandler {
     private final ChatUserRepository chatUserRepository;
+    private final ApplicationMessages messages;
 
     @Override
     public ApplicationType getType() {
@@ -26,13 +29,15 @@ public class RegisterWorkLicence implements ApplicationHandler {
     public void handle(Application application) {
         List<ChatUser> users = chatUserRepository.findAllByUserId(application.getUserId());
         if (users.isEmpty()) {
-            throw new RuntimeException("Персонаж не найден для userId: " + application.getUserId());
+            throw new RuntimeException(
+                    messages.resolve(ApplicationMessageKey.CHARACTER_NOT_FOUND, application.getUserId())
+            );
         }
         ChatUser user = users.getFirst();
 
         if (user.getWorkLicenceId() != null) {
             application.setStatus(ApplicationStatus.REJECTED);
-            application.setResultMessage("У персонажа уже есть лицензия для работы");
+            application.setResultMessage(messages.resolve(ApplicationMessageKey.WORK_LICENCE_ALREADY_EXISTS));
             return;
         }
 
@@ -40,19 +45,6 @@ public class RegisterWorkLicence implements ApplicationHandler {
         user.setWorkLicenceId(workLicenceId);
 
         application.setStatus(ApplicationStatus.APPROVED);
-        application.setResultMessage("Лицензия для работу выдана");
-    }
-
-    private static String generateId(ApplicationType type) {
-        SecureRandom random = new SecureRandom();
-        int first = random.nextInt(9000) + 1000; // 1000..9999
-        int second = random.nextInt(9000) + 1000; // 1000..9999
-
-        return switch (type) {
-            case REGISTER_WORK_LICENCE -> String.format("WRK-%04d-%04d", first, second);
-            case REGISTER_PASSPORT -> String.format("PP-%04d-%04d", first, second);
-            case null, default -> String.format("DF-%04d-%04d", first, second);
-        };
-
+        application.setResultMessage(messages.resolve(ApplicationMessageKey.WORK_LICENCE_ISSUED, workLicenceId));
     }
 }

@@ -2,9 +2,11 @@ package com.platform.chat.modules.application.handler;
 
 import com.platform.chat.entity.ChatUser;
 import com.platform.chat.modules.application.entity.Application;
+import com.platform.chat.modules.application.enums.ApplicationMessageKey;
 import com.platform.chat.modules.application.enums.ApplicationStatus;
 import com.platform.chat.modules.application.enums.ApplicationType;
 import com.platform.chat.modules.application.utils.ApplicationIdGenerator;
+import com.platform.chat.modules.application.utils.ApplicationMessages;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -16,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RegisterPassport implements ApplicationHandler {
     private final ChatUserRepository chatUserRepository;
+    private final ApplicationMessages messages;
 
     @Override
     public ApplicationType getType() {
@@ -26,13 +29,15 @@ public class RegisterPassport implements ApplicationHandler {
     public void handle(Application application) {
         List<ChatUser> users = chatUserRepository.findAllByUserId(application.getUserId());
         if (users.isEmpty()) {
-            throw new RuntimeException("Персонаж не найден для userId: " + application.getUserId());
+            throw new RuntimeException(
+                    messages.resolve(ApplicationMessageKey.CHARACTER_NOT_FOUND, application.getUserId())
+            );
         }
         ChatUser user = users.getFirst();
 
         if (user.getPassportId() != null) {
             application.setStatus(ApplicationStatus.REJECTED);
-            application.setResultMessage("У персонажа уже есть паспорт");
+            application.setResultMessage(messages.resolve(ApplicationMessageKey.PASSPORT_ALREADY_EXISTS));
             return;
         }
 
@@ -41,6 +46,6 @@ public class RegisterPassport implements ApplicationHandler {
         user.setGameStatus("RESIDENT");
 
         application.setStatus(ApplicationStatus.APPROVED);
-        application.setResultMessage("Паспорт выдан: " + passportId);
+        application.setResultMessage(messages.resolve(ApplicationMessageKey.PASSPORT_ISSUED, passportId));
     }
 }
