@@ -1,6 +1,8 @@
 spring:
   application:
     name: babichChat
+  messages:
+    encoding: UTF-8
   datasource:
     url: jdbc:postgresql://localhost:5432/chatdb
     username: chatuser
