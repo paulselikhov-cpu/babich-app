@@ -93,7 +93,7 @@ FROM location_templates WHERE code = 'PRIVATE_HOUSE'
         WHERE lt.code = 'PRIVATE_HOUSE' AND tr.name = 'Двор'
     );
 
--- ===================================
+-- =================================== //TODO зачем здесь это?
 -- Дефолтные значения экономики в chat_users
 -- (страховка на случай если Hibernate ещё не успел создать колонки —
 --  в норме они уже есть за счёт полей в @Entity ChatUser)
@@ -133,7 +133,7 @@ FROM districts d WHERE d.code = 'CENTRAL'
 
 -- 3. Полицейский участок
 INSERT INTO locations (district_id, type, name, description, is_system, is_public, created_at)
-SELECT d.id, 'POLICE_STATION', 'Полицейский участок', 'База civicRole. Сюда обращаются по вопросам правопорядка.', TRUE, FALSE, NOW()
+SELECT d.id, 'POLICE_STATION', 'Полицейский участок', 'База civic_role. Сюда обращаются по вопросам правопорядка.', TRUE, FALSE, NOW()
 FROM districts d WHERE d.code = 'CENTRAL'
                    AND NOT EXISTS (
         SELECT 1 FROM locations l WHERE l.district_id = d.id AND l.is_system = TRUE AND l.type = 'POLICE_STATION'

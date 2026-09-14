@@ -122,7 +122,7 @@ public class ChatUser {
      * HOMELESS = бомж (начальный статус, нет своей локации).
      * RESIDENT = житель (есть хотя бы одна своя локация).
      */
-    @Column(name = "game_status", nullable = false, length = 20)
+    @Column(name = "game_status", nullable = false, length = 20) ///TODO - вырезать
     private String gameStatus = "HOMELESS";
 
     /**

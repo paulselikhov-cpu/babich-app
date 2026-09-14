@@ -8,12 +8,12 @@ public enum PublicLocationType {
     // === Государственные (требуют мэрии) ===
     CITY_HALL,           // Мэрия — управление районом
     LENIN_SQUARE,        // Площадь Ленина — народные голосования + комната "Тёплые трубы" для бомжей
-    POLICE_STATION,      // Полицейский участок — база civicRole
+    POLICE_STATION,      // Полицейский участок — база civic_role
     PRISON,              // Тюрьма — требует мэрии
-    BANK,                // Банк — системная локация, appointedRole (директор назначается мэрией)
+    BANK,                // Банк — системная локация, chatUser.civic_role= DIRECTOR (директор назначается мэрией)
     
     // === Экономические (доступны без мэрии или частично) ===
-    WAREHOUSE,           // Склад — работает только для бизнесменов (businessRole)
+    WAREHOUSE,           // Склад — работает только для бизнесменов (chatUser.civic_role = BUSINESSMAN)
     GENERAL_MARKET,      // Рынок (общий, "Авито") — доступен всем без мэрии
-    REAL_ESTATE_MARKET   // Рынок недвижимости — appointedRole (владелец назначается мэрией)
+    REAL_ESTATE_MARKET   // Рынок недвижимости — chatUser.civic_role= DIRECTOR (владелец назначается мэрией)
 }
