@@ -31,17 +31,6 @@ public class ApplicationController {
     private final UserRepository userRepository;
     private final ApplicationMessages messages;
 
-    @PostMapping("/buy-first-location")
-    public ResponseEntity<Application> buyFirstLocation(Principal principal) {
-        ChatUser chatUser = chatUserService.getChatUserByUserName(principal.getName());
-        if (chatUser == null) {
-            return ResponseEntity.badRequest().build();
-        }
-        Application application = applicationService.submit(
-                chatUser.getUserId(), ApplicationType.BUY_FIRST_LOCATION, null);
-        return ResponseEntity.ok(application);
-    }
-
     @PostMapping("/register-passport")
     public ResponseEntity<Application> registerPassport(Principal principal) {
         ChatUser chatUser = chatUserService.getChatUserByUserName(principal.getName());
