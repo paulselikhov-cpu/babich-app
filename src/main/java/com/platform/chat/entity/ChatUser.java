@@ -2,6 +2,7 @@ package com.platform.chat.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.platform.chat.enums.ChatRole;
+import com.platform.chat.enums.CivicRole;
 import com.platform.chat.modules.economy.enums.Profession;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -22,10 +23,6 @@ import java.util.List;
         name = "uq_chat_user_user_district")
 })
 public class ChatUser {
-
-    /**
-     * Первичный ключ — автоинкремент, не связан с User.id.
-     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -64,11 +61,18 @@ public class ChatUser {
     private Long districtId;
 
     /**
-     * Глобальная роль персонажа на всей платформе.
+     * Глобальная роль персонажа на локации.
      */
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ChatRole role = ChatRole.USER;
+
+    /**
+     * Cоциальная роль персонажа на всей платформе.
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private CivicRole civicRole = CivicRole.UNEMPLOYED;
 
     /**
      * Рейтинг персонажа.
@@ -104,6 +108,12 @@ public class ChatUser {
      */
     @Column(name = "xp_user", nullable = false)
     private Long xpUser = 0L;
+
+    /**
+     * XP персонажа в группировке (личный прогресс).
+     */
+    @Column(name = "xp_gang", nullable = false)
+    private Long xpGang = 0L;
 
     /**
      * Текущая энергия персонажа (0–100).
