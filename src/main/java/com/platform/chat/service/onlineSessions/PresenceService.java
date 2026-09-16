@@ -1,7 +1,7 @@
 package com.platform.chat.service.onlineSessions;
 
-import com.platform.chat.dto.events.LocationPresenceCountEvent;
-import com.platform.chat.dto.events.PresenceEvent;
+import com.platform.chat.dto.response.LocationPresenceCountResponse;
+import com.platform.chat.dto.response.PresenceResponse;
 import com.platform.chat.entity.CharacterPresence;
 import com.platform.chat.entity.ChatUser;
 import com.platform.chat.entity.Location;
@@ -178,14 +178,14 @@ public class PresenceService implements TickHandler {
     private void broadcastPresenceDetail(Long locationId, Long characterId, boolean online, Long roomId) {
         messagingTemplate.convertAndSend(
                 "/topic/location." + locationId + ".presence",
-                new PresenceEvent(characterId, online, roomId)
+                new PresenceResponse(characterId, online, roomId)
         );
     }
 
     private void broadcastPresenceCount(Long locationId, boolean online) {
         messagingTemplate.convertAndSend(
                 "/topic/locations.presence-counts",
-                new LocationPresenceCountEvent(locationId, online)
+                new LocationPresenceCountResponse(locationId, online)
         );
     }
 

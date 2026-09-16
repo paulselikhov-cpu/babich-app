@@ -1,10 +1,9 @@
 package com.platform.chat.service.message;
 
 import com.platform.chat.entity.LocationMember;
-import com.platform.chat.entity.Message;
 import com.platform.chat.entity.Room;
 import com.platform.chat.entity.RoomReadStatus;
-import com.platform.chat.dto.response.UnreadUpdateEvent;
+import com.platform.chat.dto.response.UnreadUpdateResponse;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
 import com.platform.chat.repository.location.LocationMemberRepository;
 import com.platform.chat.repository.message.MessageRepository;
@@ -101,7 +100,7 @@ public class UnreadService {
             messagingTemplate.convertAndSendToUser(
                     username,
                     "/queue/unread-updates",
-                    new UnreadUpdateEvent(roomId, locationId, count)
+                    new UnreadUpdateResponse(roomId, locationId, count)
             );
         }
     }
@@ -114,7 +113,7 @@ public class UnreadService {
         messagingTemplate.convertAndSendToUser(
                 username,
                 "/queue/unread-updates",
-                new UnreadUpdateEvent(room.getId(), room.getLocation().getId(), 0L)
+                new UnreadUpdateResponse(room.getId(), room.getLocation().getId(), 0L)
         );
     }
 

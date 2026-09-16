@@ -1,7 +1,7 @@
 package com.platform.chat.service.district;
 
 import com.platform.chat.dto.settings.DistrictSettingsDto;
-import com.platform.chat.dto.settings.PollSettings;
+import com.platform.chat.dto.settings.PollSettingsDto;
 import com.platform.chat.entity.District;
 import com.platform.chat.entity.DistrictSettings;
 import com.platform.chat.repository.district.DistrictRepository;
@@ -40,9 +40,9 @@ public class DistrictSettingsService {
 
     /** Эффективные настройки выборов губернатора района. */
     @Transactional
-    public PollSettings getElectionSettings(Long districtId) {
+    public PollSettingsDto getElectionSettings(Long districtId) {
         DistrictSettings s = getOrCreate(districtId);
-        return new PollSettings(
+        return new PollSettingsDto(
                 s.getElectionDurationHours(),
                 s.getElectionAliveWindowDays(),
                 s.getElectionQuorumPercent(),
@@ -52,9 +52,9 @@ public class DistrictSettingsService {
 
     /** Эффективные настройки обжалования/переизбрания (запланировано). */
     @Transactional
-    public PollSettings getRecallSettings(Long districtId) {
+    public PollSettingsDto getRecallSettings(Long districtId) {
         DistrictSettings s = getOrCreate(districtId);
-        return new PollSettings(
+        return new PollSettingsDto(
                 s.getRecallDurationHours(),
                 s.getRecallAliveWindowDays(),
                 s.getRecallQuorumPercent(),

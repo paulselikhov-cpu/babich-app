@@ -12,7 +12,7 @@ import com.platform.chat.repository.district.DistrictRepository;
 import com.platform.chat.repository.location.LocationPostRepository;
 import com.platform.chat.repository.location.LocationRepository;
 import com.platform.chat.core.scheduler.ScheduledCheckService;
-import com.platform.chat.dto.settings.PollSettings;
+import com.platform.chat.dto.settings.PollSettingsDto;
 import com.platform.chat.service.district.DistrictSettingsService;
 import com.platform.chat.modules.poll.entity.Poll;
 import com.platform.chat.modules.poll.entity.PollCandidate;
@@ -90,7 +90,7 @@ public class PollService {
                 .orElseThrow(() -> new IllegalStateException("Площадь Ленина не найдена в районе: " + districtId));
 
         // Настройки района (длительность, окно «живого», кворум, число слотов)
-        PollSettings settings = districtSettingsService.getElectionSettings(districtId);
+        PollSettingsDto settings = districtSettingsService.getElectionSettings(districtId);
         int maxCandidates = Math.max(1, settings.maxCandidates());
 
         // Кворум = X% от живых участников района (за последние N суток по настройкам)

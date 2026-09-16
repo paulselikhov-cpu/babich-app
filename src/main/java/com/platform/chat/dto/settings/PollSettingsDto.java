@@ -5,7 +5,7 @@ package com.platform.chat.dto.settings;
  * Возвращаются сервисом из пер-районных настроек; значений по умолчанию
  * в конфиге нет — они лежат в самой сущности DistrictSettings.
  */
-public record PollSettings(
+public record PollSettingsDto(
         int durationHours,
         int aliveWindowDays,
         int quorumPercent,

@@ -1,7 +1,7 @@
-package com.platform.chat.dto.events;
+package com.platform.chat.dto.response;
 
 /**
  * Событие presence, рассылаемое через /topic/location.{id}.presence.
  * Десериализуется на фронте как IPresenceEvent.
  */
-public record PresenceEvent(Long characterId, boolean online, Long roomId) {};
+public record PresenceResponse(Long characterId, boolean online, Long roomId) {};

@@ -1,4 +1,4 @@
-package com.platform.chat.dto;
+package com.platform.chat.dto.request;
 
 import com.platform.chat.enums.LocationPostType;
 
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * помечает character/location как {@code @JsonIgnore}, поэтому без этого
  * проекции клиент не увидит, кто занимает должность.
  */
-public record LocationPostView(
+public record LocationPostViewRequest(
         Long id,
         Long characterId,
         String characterName,

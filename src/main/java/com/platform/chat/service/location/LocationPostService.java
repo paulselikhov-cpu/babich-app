@@ -1,12 +1,10 @@
 package com.platform.chat.service.location;
 
-import com.platform.chat.dto.LocationPostView;
+import com.platform.chat.dto.request.LocationPostViewRequest;
 import com.platform.chat.entity.ChatUser;
 import com.platform.chat.entity.Location;
 import com.platform.chat.entity.LocationPost;
-import com.platform.chat.entity.LocationMember;
 import com.platform.chat.enums.LocationPostType;
-import com.platform.chat.enums.LocationMemberRole;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
 import com.platform.chat.repository.location.LocationPostRepository;
 import com.platform.chat.repository.location.LocationRepository;
@@ -105,9 +103,9 @@ public class LocationPostService {
      * Должности в локации вместе с именем персонажа (для UI).
      */
     @Transactional(readOnly = true)
-    public List<LocationPostView> getPostViewsByLocation(Long locationId) {
+    public List<LocationPostViewRequest> getPostViewsByLocation(Long locationId) {
         return locationPostRepository.findByLocationId(locationId).stream()
-                .map(lp -> new LocationPostView(
+                .map(lp -> new LocationPostViewRequest(
                         lp.getId(),
                         lp.getCharacter().getId(),
                         lp.getCharacter().getCharacterName(),
