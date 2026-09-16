@@ -12,7 +12,6 @@ import com.platform.chat.modules.economy.enums.Profession;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
 import com.platform.chat.repository.location.LocationMemberRepository;
 import com.platform.chat.repository.location.LocationRepository;
-import com.platform.chat.enums.PersonLevel;
 import com.platform.chat.service.level.PersonLevelService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,11 +60,6 @@ public class ChatUserService {
         return personLevelService.nextLevelXpThreshold(chatUser);
     }
 
-    // получить всех персонажей пользователя
-    public List<ChatUser> getAllChatUsersByUserId(Long userId) {
-        return chatUserRepository.findAllByUserId(userId);
-    }
-
     // получить персонажа пользователя в конкретном районе
     public ChatUser getChatUserByUserIdAndDistrictId(Long userId, Long districtId) {
         return chatUserRepository.findByUserIdAndDistrictId(userId, districtId)
@@ -76,21 +70,6 @@ public class ChatUserService {
     // получить персонажа пользователя в районе (Optional)
     public Optional<ChatUser> findChatUserByUserIdAndDistrictId(Long userId, Long districtId) {
         return chatUserRepository.findByUserIdAndDistrictId(userId, districtId);
-    }
-
-    // получить персонажа по userId (Optional) — для обратной совместимости,
-    // ищет среди всех персонажей пользователя, возвращает первого найденного
-    @Deprecated
-    public Optional<ChatUser> findChatUserByUserId(Long userId) {
-        List<ChatUser> users = chatUserRepository.findAllByUserId(userId);
-        return users.isEmpty() ? Optional.empty() : Optional.of(users.get(0));
-    }
-
-    // получить персонажа по userId (выбрасывает исключение если нет) — для обратной совместимости
-    @Deprecated
-    public ChatUser getChatUserByUserId(Long userId) {
-        return findChatUserByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Персонаж для userId не найден: " + userId));
     }
 
     public ChatUser getChatUserByUserName(String userName) {
@@ -259,25 +238,6 @@ public class ChatUserService {
         }
     }
 
-    // обновить last_seen для персонажа в районе
-    @Transactional
-    public void updateLastSeen(Long userId, Long districtId) {
-        chatUserRepository.findByUserIdAndDistrictId(userId, districtId).ifPresent(chatUser -> {
-            chatUser.setLastSeen(LocalDateTime.now());
-            chatUserRepository.save(chatUser);
-        });
-    }
-
-    // обновить last_seen для любого персонажа пользователя (для обратной совместимости)
-    @Deprecated
-    @Transactional
-    public void updateLastSeen(Long userId) {
-        findChatUserByUserId(userId).ifPresent(chatUser -> {
-            chatUser.setLastSeen(LocalDateTime.now());
-            chatUserRepository.save(chatUser);
-        });
-    }
-
     // топ персонажей по рейтингу
     public List<ChatUser> getTopChatUsers() {
         return chatUserRepository.findAllByOrderByRatingDesc();
@@ -291,12 +251,4 @@ public class ChatUserService {
         return chatUserRepository.save(chatUser);
     }
 
-    // обновить рейтинг (для обратной совместимости)
-    @Deprecated
-    @Transactional
-    public ChatUser updateRating(Long userId, Integer delta) {
-        ChatUser chatUser = getChatUserByUserId(userId);
-        chatUser.setRating(chatUser.getRating() + delta);
-        return chatUserRepository.save(chatUser);
-    }
 }

@@ -24,6 +24,15 @@ public class Application {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
+    /**
+     * Внутренний id персонажа (ChatUser.id), за которого подана заявка.
+     * Отличается от {@code userId} (внешний User.id): у пользователя может быть
+     * несколько персонажей (по одному на район), и обработка/уведомление
+     * адресуются именно тому персонажу, чья заявка подана.
+     */
+    @Column(name = "character_id")
+    private Long characterId;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 40)
     private ApplicationType type;

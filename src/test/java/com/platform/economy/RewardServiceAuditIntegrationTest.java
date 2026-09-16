@@ -206,6 +206,7 @@ class RewardServiceAuditIntegrationTest {
         // Обработчик ищет персонажа по внешнему User.id (userId).
         Application result = applicationService.submit(
                 externalUserId,
+                characterId,
                 ApplicationType.BUY_FIRST_LOCATION,
                 "PRIVATE_HOUSE"
         );

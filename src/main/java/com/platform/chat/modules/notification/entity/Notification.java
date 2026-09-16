@@ -38,6 +38,17 @@ public class Notification {
     @Column(name = "related_entity_id")
     private Long relatedEntityId;
 
+    /**
+     * Структурированные данные контекста уведомления (простое текстовое
+     * представление {@code key=value;...} — см. {@code NotificationContextData};
+     * null, если их нет). Для {@code APPLICATION_RESULT} содержит
+     * {@code applicationType} и {@code applicationStatus} — фронт по ним решает,
+     * что делать. Без JSONB и без жёсткой привязки к Jackson (образец — поле
+     * {@code Application.payload}).
+     */
+    @Column(columnDefinition = "TEXT")
+    private String data;
+
     /** Прочитано ли. */
     @Column(nullable = false)
     private boolean read = false;

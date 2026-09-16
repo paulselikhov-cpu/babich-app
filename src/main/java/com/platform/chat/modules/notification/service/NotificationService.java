@@ -4,11 +4,13 @@ import com.platform.chat.entity.ChatUser;
 import com.platform.chat.modules.notification.repository.NotificationRepository;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
 import com.platform.chat.modules.notification.entity.Notification;
+import com.platform.chat.modules.notification.dto.NotificationContextData;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Слой 2 (Use Cases). Сервис уведомлений.
@@ -22,17 +24,30 @@ public class NotificationService {
     private final ChatUserRepository chatUserRepository;
 
     /**
-     * Отправить уведомление одному персонажу.
+     * Отправить уведомление одному персонажу (без контекстных данных).
      */
     @Transactional
     public Notification notify(Long recipientCharacterId, String title, String body,
                                String notificationType, Long relatedEntityId) {
+        return notify(recipientCharacterId, title, body, notificationType, relatedEntityId, null);
+    }
+
+    /**
+     * Отправить уведомление одному персонажу со структурированными контекстными
+     * данными (сохраняются в поле {@code data} и возвращаются клиенту и по WS,
+     * и по REST-истории).
+     */
+    @Transactional
+    public Notification notify(Long recipientCharacterId, String title, String body,
+                               String notificationType, Long relatedEntityId,
+                               Map<String, Object> data) {
         Notification notification = new Notification();
         notification.setRecipientCharacterId(recipientCharacterId);
         notification.setTitle(title);
         notification.setBody(body);
         notification.setNotificationType(notificationType);
         notification.setRelatedEntityId(relatedEntityId);
+        notification.setData(NotificationContextData.toText(data));
         return notificationRepository.save(notification);
     }
 

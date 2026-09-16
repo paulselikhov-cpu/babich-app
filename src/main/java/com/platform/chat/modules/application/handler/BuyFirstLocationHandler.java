@@ -10,7 +10,6 @@ import com.platform.chat.repository.location.LocationRepository;
 import com.platform.chat.repository.location.LocationTemplateRepository;
 import com.platform.chat.service.location.LocationService;
 
-import java.util.List;
 import com.platform.chat.modules.application.enums.ApplicationStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -42,13 +41,11 @@ public class BuyFirstLocationHandler implements ApplicationHandler {
 
     @Override
     public void handle(Application application) {
-        // application.getUserId() — это User.id, ищем персонажа пользователя
-        // TODO: districtId брать из payload/application, когда появится выбор района
-        List<ChatUser> users = chatUserRepository.findAllByUserId(application.getUserId());
-        if (users.isEmpty()) {
-            throw new RuntimeException("Персонаж не найден для userId: " + application.getUserId());
-        }
-        ChatUser user = users.get(0);
+        // Адресуем персонажа по characterId (внутренний ChatUser.id), за которого
+        // подана заявка — см. Application.characterId.
+        ChatUser user = chatUserRepository.findById(application.getCharacterId())
+                .orElseThrow(() -> new RuntimeException(
+                        "Персонаж не найден: " + application.getCharacterId()));
 
         if (!"HOMELESS".equals(user.getGameStatus())) {
             application.setStatus(ApplicationStatus.REJECTED);

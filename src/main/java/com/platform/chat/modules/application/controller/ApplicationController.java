@@ -46,13 +46,13 @@ public class ApplicationController {
             );
         }
 
-        if (applicationService.existsPendingApplication(chatUser.getUserId(), ApplicationType.REGISTER_PASSPORT)) {
+        if (applicationService.existsPendingApplication(chatUser.getId(), ApplicationType.REGISTER_PASSPORT)) {
             throw new RuntimeException(messages.resolve(ApplicationMessageKey.APPLICATION_ALREADY_PENDING));
         }
 
         // Создаём заявку в PENDING — обработка будет при одобрении сотрудником мэрии
         Application application = applicationService.createPendingApplication(
-                chatUser.getUserId(), ApplicationType.REGISTER_PASSPORT, null);
+                chatUser.getUserId(), chatUser.getId(), ApplicationType.REGISTER_PASSPORT, null);
         return ResponseEntity.ok(application);
     }
 
@@ -71,17 +71,17 @@ public class ApplicationController {
             );
         }
 
-        if (applicationService.existsPendingApplication(chatUser.getUserId(), ApplicationType.REGISTER_WORK_LICENCE)) {
+        if (applicationService.existsPendingApplication(chatUser.getId(), ApplicationType.REGISTER_WORK_LICENCE)) {
             throw new RuntimeException(messages.resolve(ApplicationMessageKey.APPLICATION_ALREADY_PENDING));
         }
 
         // Создаём заявку в PENDING — обработка будет при одобрении сотрудником мэрии
         Application application = applicationService.createPendingApplication(
-                chatUser.getUserId(), ApplicationType.REGISTER_WORK_LICENCE, null);
+                chatUser.getUserId(), chatUser.getId(), ApplicationType.REGISTER_WORK_LICENCE, null);
         return ResponseEntity.ok(application);
     }
 
-    /** Одобрить заявку (только для сотрудника мэрии — ADMIN/MODERATOR). */
+    /** TODO ДЛЯ СОТРУДНИКА Мэрии, а не для системной роли. Одобрить заявку (только для сотрудника мэрии — ADMIN/MODERATOR). */
     @PostMapping("/{id}/approve")
     public ResponseEntity<Application> approveApplication(
             @PathVariable Long id,
@@ -90,7 +90,7 @@ public class ApplicationController {
         if (chatUser == null) {
             return ResponseEntity.badRequest().build();
         }
-        if (!chatUserService.isStaff(principal.getName())) {
+        if (chatUserService.isStaff(principal.getName())) {
             return ResponseEntity.status(403).build();
         }
         Application application = applicationService.approveApplication(id);
@@ -107,7 +107,7 @@ public class ApplicationController {
         if (chatUser == null) {
             return ResponseEntity.badRequest().build();
         }
-        if (!chatUserService.isStaff(principal.getName())) {
+        if (chatUserService.isStaff(principal.getName())) {
             return ResponseEntity.status(403).build();
         }
         Application application = applicationService.rejectApplication(id, reason);

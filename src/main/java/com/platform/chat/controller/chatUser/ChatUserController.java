@@ -4,7 +4,6 @@ import com.platform.chat.dto.request.CharacterUpdateRequest;
 import com.platform.chat.dto.request.CreateChatUserRequest;
 import com.platform.chat.dto.request.RoleUpdateRequest;
 import com.platform.chat.entity.ChatUser;
-import com.platform.chat.enums.ChatRole;
 import com.platform.chat.service.chatUser.ChatUserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -60,26 +59,6 @@ public class ChatUserController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    /**
-     * Получить всех персонажей пользователя.
-     * GET /api/chat/users/{userId}/characters/all
-     */
-    @GetMapping("/{userId}/characters/all")
-    public List<ChatUser> getAllChatUsersByUserId(@PathVariable Long userId) {
-        return chatUserService.getAllChatUsersByUserId(userId);
-    }
-
-    /**
-     * Получить персонажа по userId (первый найденный) — для обратной совместимости.
-     * GET /api/chat/users/by-user/{userId}
-     */
-    @GetMapping("/by-user/{userId}")
-    public ResponseEntity<ChatUser> getChatUserByUserId(@PathVariable Long userId) {
-        return chatUserService.findChatUserByUserId(userId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
     @GetMapping("/top")
     public List<ChatUser> getTopChatUsers() {
         return chatUserService.getTopChatUsers();
@@ -106,14 +85,6 @@ public class ChatUserController {
             @RequestParam Long districtId,
             @RequestParam Integer delta) {
         return ResponseEntity.ok(chatUserService.updateRating(userId, districtId, delta));
-    }
-
-    // Для обратной совместимости — старый эндпоинт
-    @PatchMapping("/{userId}/rating")
-    public ResponseEntity<ChatUser> updateRatingLegacy(
-            @PathVariable Long userId,
-            @RequestParam Integer delta) {
-        return ResponseEntity.ok(chatUserService.updateRating(userId, delta));
     }
 
     /**

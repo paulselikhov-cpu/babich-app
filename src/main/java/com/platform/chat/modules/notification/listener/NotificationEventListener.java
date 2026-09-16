@@ -16,6 +16,7 @@ import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Слой 4 (Доставка). Реагирует на доменные события и доставляет уведомления:
@@ -125,44 +126,63 @@ public class NotificationEventListener {
      * Результат рассмотрения гражданской заявки (APPROVED/REJECTED) —
      * уведомить заявителя.
      *
-     * <p>{@code userId} в событии — ВНЕШНИЙ User.id (поле
-     * {@code Application.userId}), а уведомления адресуются внутреннему
-     * ChatUser.id. Пользователь может иметь несколько персонажей
-     * (по одному на район), поэтому находим всех через
-     * {@link ChatUserRepository#findAllByUserId(Long)} и уведомляем каждого.</p>
+     * <p>Адресация — по внутреннему {@code characterId} (поле
+     * {@code Application.characterId}), чья заявка подана: уведомление уходит
+     * конкретному персонажу (а не всем персонажам пользователя). В контекстные
+     * данные уведомления ({@code Notification.data}) кладём {@code applicationType}
+     * и {@code applicationStatus} — фронт по ним решает, что делать (например,
+     * перезагрузить профиль после одобрения паспорта/лицензии).</p>
      *
      * <p>AFTER_COMMIT: срабатывает после успешного коммита транзакции, в которой
      * ApplicationService разрешил заявку (см. javadoc {@link #onElectionClosed}).</p>
      */
     @ApplicationModuleListener
     public void onApplicationResolved(ApplicationResolvedEvent event) {
-        List<ChatUser> characters = chatUserRepository.findAllByUserId(event.getUserId());
-        if (characters.isEmpty()) {
-            log.info("No characters for userId {}, skip application notification", event.getUserId());
+        ChatUser character = event.getCharacterId() == null
+                ? null
+                : chatUserRepository.findById(event.getCharacterId()).orElse(null);
+        if (character == null) {
+            log.info("Character {} not found for application {}, skip notification",
+                    event.getCharacterId(), event.getApplicationId());
             return;
         }
 
+        String appType = event.getApplicationType() != null ? event.getApplicationType() : "UNKNOWN";
         String statusText = event.getStatus() != null ? event.getStatus() : "UNKNOWN";
-        String title = switch (statusText) {
-            case "APPROVED" -> "Заявка одобрена";
-            case "REJECTED" -> "Заявка отклонена";
-            default -> "Заявка обработана";
+        // родительный падеж: «Ваша заявка на получение паспорта одобрена»
+        String typePhrase = switch (appType) {
+            case "BUY_FIRST_LOCATION" -> "на покупку первого жилья";
+            case "REGISTER_PASSPORT" -> "на получение паспорта";
+            case "REGISTER_WORK_LICENCE" -> "на получение рабочей лицензии";
+            default -> "№" + event.getApplicationId();
         };
-        String body = "Ваша заявка №" + event.getApplicationId() + " обработана. Статус: " + statusText;
+        String title = switch (statusText) {
+            case "APPROVED" -> "Заявка " + typePhrase + " одобрена";
+            case "REJECTED" -> "Заявка " + typePhrase + " отклонена";
+            default -> "Заявка " + typePhrase + " обработана";
+        };
+        String body = switch (statusText) {
+            case "APPROVED" -> "Ваша заявка " + typePhrase + " одобрена.";
+            case "REJECTED" -> "Ваша заявка " + typePhrase + " отклонена.";
+            default -> "Ваша заявка " + typePhrase + " обработана.";
+        };
         Long applicationId = event.getApplicationId();
 
-        for (ChatUser character : characters) {
-            Notification notification = notificationService.notify(
-                    character.getId(), title, body, "APPLICATION_RESULT", applicationId);
+        Map<String, Object> data = Map.of(
+                "applicationType", appType,
+                "applicationStatus", statusText
+        );
 
-            messagingTemplate.convertAndSendToUser(
-                    character.getUsername(),
-                    "/queue/notifications",
-                    NotificationResponse.from(notification)
-            );
-        }
+        Notification notification = notificationService.notify(
+                character.getId(), title, body, "APPLICATION_RESULT", applicationId, data);
 
-        log.info("Application result delivered: applicationId={}, userId={}, status={}, recipients={}",
-                applicationId, event.getUserId(), statusText, characters.size());
+        messagingTemplate.convertAndSendToUser(
+                character.getUsername(),
+                "/queue/notifications",
+                NotificationResponse.from(notification)
+        );
+
+        log.info("Application result delivered: applicationId={}, characterId={}, type={}, status={}",
+                applicationId, character.getId(), appType, statusText);
     }
 }

@@ -19,4 +19,7 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
     List<Application> findByTypeOrderByCreatedAtDesc(ApplicationType type);
 
     boolean existsByUserIdAndTypeAndStatus(Long userId, ApplicationType type, ApplicationStatus status);
+
+    /** Есть ли незакрытая заявка ТИПА у конкретного персонажа (адресно). */
+    boolean existsByCharacterIdAndTypeAndStatus(Long characterId, ApplicationType type, ApplicationStatus status);
 }

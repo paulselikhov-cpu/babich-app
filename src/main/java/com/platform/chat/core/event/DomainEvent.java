@@ -34,7 +34,8 @@ import java.util.UUID;
         @JsonSubTypes.Type(value = CoinsChangedEvent.class, name = "CoinsChangedEvent"),
         @JsonSubTypes.Type(value = XpChangedEvent.class, name = "XpChangedEvent"),
         @JsonSubTypes.Type(value = ApplicationResolvedEvent.class, name = "ApplicationResolvedEvent"),
-        @JsonSubTypes.Type(value = PollClosedEvent.class, name = "PollClosedEvent")
+        @JsonSubTypes.Type(value = PollClosedEvent.class, name = "PollClosedEvent"),
+        @JsonSubTypes.Type(value = CharacterUpdatedEvent.class, name = "CharacterUpdatedEvent")
 })
 public abstract class DomainEvent implements Serializable {
 

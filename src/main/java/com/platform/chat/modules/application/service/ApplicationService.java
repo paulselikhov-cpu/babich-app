@@ -6,6 +6,7 @@ import com.platform.chat.modules.application.enums.ApplicationType;
 import com.platform.chat.modules.application.handler.ApplicationHandler;
 import com.platform.chat.modules.application.repository.ApplicationRepository;
 import com.platform.chat.core.event.ApplicationResolvedEvent;
+import com.platform.chat.core.event.CharacterUpdatedEvent;
 import com.platform.chat.core.event.DomainEventPublisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,9 +42,10 @@ public class ApplicationService {
     }
 
     @Transactional
-    public Application submit(Long userId, ApplicationType type, String payload) {
+    public Application submit(Long userId, Long characterId, ApplicationType type, String payload) {
         Application application = new Application();
         application.setUserId(userId);
+        application.setCharacterId(characterId);
         application.setType(type);
         application.setPayload(payload);
         applicationRepository.save(application);
@@ -57,11 +59,8 @@ public class ApplicationService {
         application.setProcessedAt(LocalDateTime.now());
         Application resolved = applicationRepository.save(application);
 
-        eventPublisher.publish(new ApplicationResolvedEvent(
-                resolved.getUserId(),
-                resolved.getId(),
-                resolved.getStatus() != null ? resolved.getStatus().name() : null
-        ));
+        publishResolved(resolved);
+        publishCharacterUpdatedIfApproved(resolved);
 
         return resolved;
     }
@@ -85,11 +84,7 @@ public class ApplicationService {
         application.setProcessedAt(LocalDateTime.now());
         Application rejected = applicationRepository.save(application);
 
-        eventPublisher.publish(new ApplicationResolvedEvent(
-                rejected.getUserId(),
-                rejected.getId(),
-                rejected.getStatus() != null ? rejected.getStatus().name() : null
-        ));
+        publishResolved(rejected);
 
         return rejected;
     }
@@ -104,19 +99,17 @@ public class ApplicationService {
      *  через {@link #approveApplication(Long)}.
      */
     @Transactional
-    public Application createPendingApplication(Long userId, ApplicationType type, String payload) {
+    public Application createPendingApplication(Long userId, Long characterId, ApplicationType type, String payload) {
         Application application = new Application();
         application.setUserId(userId);
+        application.setCharacterId(characterId);
         application.setType(type);
         application.setPayload(payload);
-        // status остаётся PENDING (значение по умолчанию в entity)
-        Application pending = applicationRepository.save(application);
-        eventPublisher.publish(new ApplicationResolvedEvent(
-                pending.getUserId(),
-                pending.getId(),
-                pending.getStatus() != null ? pending.getStatus().name() : null
-        ));
-        return pending;
+        // status остаётся PENDING (значение по умолчанию в entity).
+        // Событие ApplicationResolvedEvent на подаче НЕ публикуем: его смысл —
+        // «заявка РЕШЕНА» (APPROVED/REJECTED), а подача к этому не относится.
+        // Пользователь и так видит тост «Заявка подана» на фронте.
+        return applicationRepository.save(application);
     }
 
     /** Одобрить заявку (передать handler-у для обработки).
@@ -141,11 +134,8 @@ public class ApplicationService {
         application.setProcessedAt(LocalDateTime.now());
         Application resolved = applicationRepository.save(application);
 
-        eventPublisher.publish(new ApplicationResolvedEvent(
-                resolved.getUserId(),
-                resolved.getId(),
-                resolved.getStatus() != null ? resolved.getStatus().name() : null
-        ));
+        publishResolved(resolved);
+        publishCharacterUpdatedIfApproved(resolved);
 
         return resolved;
     }
@@ -154,8 +144,31 @@ public class ApplicationService {
         return applicationRepository.findById(id);
     }
 
-    public boolean existsPendingApplication(Long userId, ApplicationType type) {
-        return applicationRepository.existsByUserIdAndTypeAndStatus(
-                userId, type, ApplicationStatus.PENDING);
+    public boolean existsPendingApplication(Long characterId, ApplicationType type) {
+        return applicationRepository.existsByCharacterIdAndTypeAndStatus(
+                characterId, type, ApplicationStatus.PENDING);
+    }
+
+    /** Опубликовать факт «заявка решена» (несущий applicationType + status). */
+    private void publishResolved(Application resolved) {
+        eventPublisher.publish(new ApplicationResolvedEvent(
+                resolved.getUserId(),
+                resolved.getCharacterId(),
+                resolved.getId(),
+                resolved.getType() != null ? resolved.getType().name() : null,
+                resolved.getStatus() != null ? resolved.getStatus().name() : null
+        ));
+    }
+
+    /**
+     * «Персонаж изменился» — только при одобрении: именно оно меняет ChatUser
+     * (паспорт/лицензия). Отклонение состояния персонажа не меняет, поэтому
+     * событие не публикуем. Фронт по нему перезагружает currentChatUser.
+     */
+    private void publishCharacterUpdatedIfApproved(Application resolved) {
+        if (ApplicationStatus.APPROVED.equals(resolved.getStatus())
+                && resolved.getCharacterId() != null) {
+            eventPublisher.publish(new CharacterUpdatedEvent(resolved.getCharacterId()));
+        }
     }
 }

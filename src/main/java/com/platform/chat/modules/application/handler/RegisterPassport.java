@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -27,13 +26,10 @@ public class RegisterPassport implements ApplicationHandler {
 
     @Override
     public void handle(Application application) {
-        List<ChatUser> users = chatUserRepository.findAllByUserId(application.getUserId());
-        if (users.isEmpty()) {
-            throw new RuntimeException(
-                    messages.resolve(ApplicationMessageKey.CHARACTER_NOT_FOUND, application.getUserId())
-            );
-        }
-        ChatUser user = users.getFirst();
+        ChatUser user = chatUserRepository.findById(application.getCharacterId())
+                .orElseThrow(() -> new RuntimeException(
+                        messages.resolve(ApplicationMessageKey.CHARACTER_NOT_FOUND, application.getCharacterId())
+                ));
 
         if (user.getPassportId() != null) {
             application.setStatus(ApplicationStatus.REJECTED);
@@ -44,6 +40,7 @@ public class RegisterPassport implements ApplicationHandler {
         String passportId = ApplicationIdGenerator.generate(application.getType());
         user.setPassportId(passportId);
         user.setGameStatus("RESIDENT");
+        chatUserRepository.save(user);
 
         application.setStatus(ApplicationStatus.APPROVED);
         application.setResultMessage(messages.resolve(ApplicationMessageKey.PASSPORT_ISSUED, passportId));

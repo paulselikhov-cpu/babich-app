@@ -4,7 +4,9 @@ import com.platform.chat.entity.ChatUser;
 import com.platform.chat.modules.notification.listener.NotificationEventListener;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
 import com.platform.chat.core.event.ElectionClosedEvent;
+import com.platform.chat.core.event.ApplicationResolvedEvent;
 import com.platform.chat.modules.notification.dto.NotificationResponse;
+import com.platform.chat.modules.notification.dto.NotificationContextData;
 import com.platform.chat.modules.notification.entity.Notification;
 import com.platform.chat.modules.notification.service.NotificationService;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +20,8 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
@@ -46,6 +50,9 @@ class NotificationEventListenerTest {
 
     @Captor
     private ArgumentCaptor<NotificationResponse> responseCaptor;
+
+    @Captor
+    private ArgumentCaptor<Map<String, Object>> dataCaptor;
 
     @BeforeEach
     void setUp() {
@@ -107,6 +114,66 @@ class NotificationEventListenerTest {
         listener.onElectionClosed(event);
 
         // then — ни уведомлений, ни WS-пушей
+        verify(notificationService, never()).notify(anyLong(), anyString(), anyString(), anyString(), anyLong());
+        verify(messagingTemplate, never()).convertAndSendToUser(anyString(), anyString(), any());
+    }
+
+    @Test
+    void shouldNotifyApplicantOnApprovedApplicationWithContextData() {
+        // given — заявка одобрена для конкретного персонажа (addressivity по characterId)
+        Long characterId = 5L;
+        ChatUser character = createResident(characterId, "petrov", 1L);
+        when(chatUserRepository.findById(characterId)).thenReturn(Optional.of(character));
+
+        // сервис возвращает сохранённое уведомление с данными контекста
+        Notification notification = createNotification(characterId, 10L);
+        notification.setNotificationType("APPLICATION_RESULT");
+        notification.setData(NotificationContextData.toText(
+                Map.of("applicationType", "REGISTER_PASSPORT", "applicationStatus", "APPROVED")));
+        when(notificationService.notify(
+                eq(characterId), anyString(), anyString(), eq("APPLICATION_RESULT"), eq(10L), anyMap()))
+                .thenReturn(notification);
+
+        ApplicationResolvedEvent event = new ApplicationResolvedEvent(
+                1L, characterId, 10L, "REGISTER_PASSPORT", "APPROVED");
+
+        // when
+        listener.onApplicationResolved(event);
+
+        // then — notify вызван с context-данными и человеко-читаемым текстом
+        // (тип + статус для фронта; никаких «Статус: PENDING»)
+        verify(notificationService).notify(
+                eq(characterId),
+                argThat(t -> t.contains("одобрена")),
+                argThat(b -> !b.contains("PENDING")),
+                eq("APPLICATION_RESULT"),
+                eq(10L),
+                dataCaptor.capture());
+        assertThat(dataCaptor.getValue())
+                .containsEntry("applicationType", "REGISTER_PASSPORT")
+                .containsEntry("applicationStatus", "APPROVED");
+
+        // and — WS-пуш адресован именно этому персонажу, а ответ несёт data
+        verify(messagingTemplate).convertAndSendToUser(
+                eq("petrov"), eq("/queue/notifications"), responseCaptor.capture());
+        NotificationResponse response = responseCaptor.getValue();
+        assertThat(response.notificationType()).isEqualTo("APPLICATION_RESULT");
+        assertThat(response.relatedEntityId()).isEqualTo(10L);
+        assertThat(response.data())
+                .containsEntry("applicationType", "REGISTER_PASSPORT")
+                .containsEntry("applicationStatus", "APPROVED");
+    }
+
+    @Test
+    void shouldSkipWhenCharacterNotFound() {
+        // given — события нет персонажа (сломанная заявка/удалённый персонаж)
+        when(chatUserRepository.findById(anyLong())).thenReturn(Optional.empty());
+        ApplicationResolvedEvent event = new ApplicationResolvedEvent(1L, 99L, 10L, "REGISTER_PASSPORT", "APPROVED");
+
+        // when
+        listener.onApplicationResolved(event);
+
+        // then — без notify и WS
         verify(notificationService, never()).notify(anyLong(), anyString(), anyString(), anyString(), anyLong());
         verify(messagingTemplate, never()).convertAndSendToUser(anyString(), anyString(), any());
     }

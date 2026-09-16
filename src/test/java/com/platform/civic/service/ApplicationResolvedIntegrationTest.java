@@ -5,8 +5,11 @@ import com.platform.chat.modules.application.entity.Application;
 import com.platform.chat.modules.application.service.ApplicationService;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
 import com.platform.chat.modules.application.enums.ApplicationType;
+import com.platform.chat.core.event.ApplicationResolvedEvent;
 import com.platform.chat.modules.notification.entity.Notification;
 import com.platform.chat.modules.notification.repository.NotificationRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -118,6 +121,7 @@ class ApplicationResolvedIntegrationTest {
         // Обработчик ищет персонажа по внешнему User.id (userId).
         Application result = applicationService.submit(
                 externalUserId,
+                characterId,
                 ApplicationType.BUY_FIRST_LOCATION,
                 "PRIVATE_HOUSE"
         );
@@ -135,6 +139,21 @@ class ApplicationResolvedIntegrationTest {
                     assertThat(n.getNotificationType()).isEqualTo("APPLICATION_RESULT");
                     assertThat(n.getRelatedEntityId()).isEqualTo(applicationId);
                     assertThat(n.getTitle()).contains("одобрена");
+                    // тело без «Статус: PENDING» — человеко-читаемое
+                    assertThat(n.getBody()).doesNotContain("PENDING");
+                    // контекстные данные позволяют фронту понять тип/статус заявки
+                    assertThat(n.getData()).contains("BUY_FIRST_LOCATION", "APPROVED");
                 });
+    }
+
+    @Test
+    @DisplayName("ApplicationResolvedEvent сериализуется в границы event_publication.serialized_event (varchar(255))")
+    void serializedApplicationResolvedEventFitsVarchar255() throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        // самый «длинный» тип — REGISTER_WORK_LICENCE, плюс строка статуса APPROVED
+        ApplicationResolvedEvent event = new ApplicationResolvedEvent(
+                1L, 2L, 3L, ApplicationType.REGISTER_WORK_LICENCE.name(), "APPROVED");
+        int length = mapper.writeValueAsString(event).length();
+        assertThat(length).isLessThanOrEqualTo(255);
     }
 }
