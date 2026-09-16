@@ -28,7 +28,7 @@ public class DistrictSettingsController {
     public ResponseEntity<DistrictSettingsDto> getSettings(
             @PathVariable Long districtId,
             Principal principal) {
-        if (!isAdminOrModerator(principal)) {
+        if (isNotAdmin(principal)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         return ResponseEntity.ok(districtSettingsService.getSettings(districtId));
@@ -39,22 +39,22 @@ public class DistrictSettingsController {
             @PathVariable Long districtId,
             @RequestBody DistrictSettingsDto dto,
             Principal principal) {
-        if (!isAdminOrModerator(principal)) {
+        if (isNotAdmin(principal)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         return ResponseEntity.ok(districtSettingsService.updateSettings(districtId, dto));
     }
 
-    private boolean isAdminOrModerator(Principal principal) {
+    private boolean isNotAdmin(Principal principal) {
         if (principal == null) {
-            return false;
+            return true;
         }
         ChatUser character = chatUserRepository.findByUsername(principal.getName()).orElse(null);
         if (character == null) {
-            return false;
+            return true;
         }
-        return character.getRole() == ChatRole.ADMIN
-                || character.getRole() == ChatRole.MODERATOR;
+        return character.getRole() != ChatRole.ADMIN
+                && character.getRole() != ChatRole.MODERATOR;
     }
 }
 
