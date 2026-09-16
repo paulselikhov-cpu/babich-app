@@ -36,20 +36,6 @@ public class ChatUserController {
         return chatUserService.getChatUserLevelById(id);
     }
 
-
-    /**
-     * Порог XP следующего уровня персонажа — для прогресс-бара XP на UI.
-     * GET /api/chat/users/{id}/xp-threshold
-     */
-    @GetMapping("/{id}/xp-threshold")
-    public Long getChatUserXpThreshold(@PathVariable Long id) {
-        return chatUserService.getChatUserXpThresholdById(id);
-    }
-
-    /**
-     * Получить персонажа пользователя в конкретном районе.
-     * GET /api/chat/users/{userId}/characters?districtId={districtId}
-     */
     @GetMapping("/{userId}/characters")
     public ResponseEntity<ChatUser> getChatUserByUserIdAndDistrict(
             @PathVariable Long userId,
@@ -64,10 +50,24 @@ public class ChatUserController {
         return chatUserService.getTopChatUsers();
     }
 
-    /**
-     * Создать персонажа для авторизованного пользователя в указанном районе.
-     * POST /api/chat/users/{userId}/characters
-     */
+    /** Порог XP следующего уровня персонажа*/
+    @GetMapping("/{id}/xp-threshold")
+    public Long getChatUserXpThreshold(@PathVariable Long id) {
+        return chatUserService.getChatUserXpThresholdById(id);
+    }
+
+    /** Список персонажей района — для админской таблицы. */
+    @GetMapping("/district/{districtId}")
+    public ResponseEntity<List<ChatUser>> listDistrictCharacters(
+            @PathVariable Long districtId,
+            Principal principal) {
+        if (isNotAdmin(principal)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        return ResponseEntity.ok(chatUserService.listByDistrict(districtId));
+    }
+
+    /** Создать персонажа для авторизованного пользователя в указанном районе. Только ADMIN. */
     @PostMapping("/{userId}/characters")
     public ResponseEntity<ChatUser> createChatUser(
             @PathVariable Long userId,
@@ -75,42 +75,13 @@ public class ChatUserController {
         return ResponseEntity.ok(chatUserService.createChatUser(userId, request));
     }
 
-    /**
-     * Обновить рейтинг персонажа в районе.
-     * PATCH /api/chat/users/{userId}/characters/rating?districtId={districtId}&delta={delta}
-     */
-    @PatchMapping("/{userId}/characters/rating")
-    public ResponseEntity<ChatUser> updateRating(
-            @PathVariable Long userId,
-            @RequestParam Long districtId,
-            @RequestParam Integer delta) {
-        return ResponseEntity.ok(chatUserService.updateRating(userId, districtId, delta));
-    }
-
-    /**
-     * Список персонажей района — для админской таблицы. Только ADMIN.
-     * GET /api/chat/users/district/{districtId}
-     */
-    @GetMapping("/district/{districtId}")
-    public ResponseEntity<List<ChatUser>> listDistrictCharacters(
-            @PathVariable Long districtId,
-            Principal principal) {
-        if (!isAdmin(principal)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-        return ResponseEntity.ok(chatUserService.listByDistrict(districtId));
-    }
-
-    /**
-     * Сменить роль персонажа. Только ADMIN.
-     * PUT /api/chat/users/{characterId}/role
-     */
+    /** Сменить роль персонажа. Только ADMIN. */
     @PutMapping("/{characterId}/role")
     public ResponseEntity<?> updateRole(
             @PathVariable Long characterId,
             @RequestBody RoleUpdateRequest request,
             Principal principal) {
-        if (!isAdmin(principal)) {
+        if (isNotAdmin(principal)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         if (request.role() == null) {
@@ -123,17 +94,13 @@ public class ChatUserController {
         }
     }
 
-    /**
-     * Обновить поля персонажа (роль, профессия, статус, монеты, энергия, рейтинг).
-     * Только ADMIN. null в теле — не менять поле.
-     * PUT /api/chat/users/{characterId}/settings
-     */
+    /** Обновить поля персонажа. Только ADMIN. null в теле — не менять поле. */
     @PutMapping("/{characterId}/settings")
     public ResponseEntity<?> updateCharacterSettings(
             @PathVariable Long characterId,
             @RequestBody CharacterUpdateRequest request,
             Principal principal) {
-        if (!isAdmin(principal)) {
+        if (isNotAdmin(principal)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         try {
@@ -143,7 +110,7 @@ public class ChatUserController {
         }
     }
 
-    private boolean isAdmin(Principal principal) {
-        return principal != null && chatUserService.isAdmin(principal.getName());
+    private boolean isNotAdmin(Principal principal) {
+        return principal == null || !chatUserService.isAdmin(principal.getName());
     }
 }

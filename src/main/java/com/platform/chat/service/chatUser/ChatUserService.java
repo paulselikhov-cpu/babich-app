@@ -243,12 +243,4 @@ public class ChatUserService {
         return chatUserRepository.findAllByOrderByRatingDesc();
     }
 
-    // обновить рейтинг персонажа в районе
-    @Transactional
-    public ChatUser updateRating(Long userId, Long districtId, Integer delta) {
-        ChatUser chatUser = getChatUserByUserIdAndDistrictId(userId, districtId);
-        chatUser.setRating(chatUser.getRating() + delta);
-        return chatUserRepository.save(chatUser);
-    }
-
 }
