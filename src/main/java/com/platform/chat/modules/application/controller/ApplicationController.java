@@ -90,7 +90,7 @@ public class ApplicationController {
         if (chatUser == null) {
             return ResponseEntity.badRequest().build();
         }
-        if (chatUserService.isStaff(principal.getName())) {
+        if (!chatUserService.isStaff(principal.getName())) {
             return ResponseEntity.status(403).build();
         }
         Application application = applicationService.approveApplication(id);
@@ -107,7 +107,7 @@ public class ApplicationController {
         if (chatUser == null) {
             return ResponseEntity.badRequest().build();
         }
-        if (chatUserService.isStaff(principal.getName())) {
+        if (!chatUserService.isStaff(principal.getName())) {
             return ResponseEntity.status(403).build();
         }
         Application application = applicationService.rejectApplication(id, reason);
