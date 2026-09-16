@@ -143,7 +143,7 @@ public class ChatUserService {
                 .orElse(false);
     }
 
-    /** Является ли персонаж администратором или модератором. */
+    /** Является ли персонаж администратором или модератором. */ //TODO  СМОТРЕТЬ НА location_members.posts
     public boolean isStaff(String username) {
         return chatUserRepository.findByUsername(username)
                 .map(u -> u.getRole() == ChatRole.ADMIN || u.getRole() == ChatRole.MODERATOR)
