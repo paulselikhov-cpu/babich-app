@@ -152,7 +152,7 @@ public class LocationController {
         return ResponseEntity.ok(member);
     }
 
-    // покинуть локацию
+    /** покинуть локацию */
     @DeleteMapping("/{locationId}/leave")
     public ResponseEntity<Void> leaveLocation(
             @PathVariable Long locationId,
@@ -161,7 +161,7 @@ public class LocationController {
         return ResponseEntity.ok().build();
     }
 
-    // удалить локацию (только владелец)
+    /** удалить локацию (только владелец) */
     @DeleteMapping("/{locationId}")
     public ResponseEntity<Void> deleteLocation(
             @PathVariable Long locationId,

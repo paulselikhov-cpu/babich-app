@@ -57,11 +57,7 @@ public class LocationService {
     }
 
     /**
-     * Получить все локации персонажа (где он участник).
-     * Показываем в боковом меню — "мои локации".
-     */
-    /**
-     * Получить локации пользователя с его ролью в каждой.
+     * Получить локации пользователя с его ролью в каждой. //TODO сейчас логика так устроена, что новый персонаж в системной локации по дефолту MEMBER. Правильно ли это?
      */
     public List<LocationResponse> getMyLocations(Long characterId) {
         List<LocationMember> memberships = locationMemberRepository
