@@ -47,8 +47,15 @@ class ModuleBoundaryTest {
     @Test
     void moduleStructureIsRecognized() {
         ApplicationModules modules = ApplicationModules.of(PlatformApplication.class);
+
+        // ВРЕМЕННЫЙ ДИАГНОСТИЧЕСКИЙ ВЫВОД — потом удалить
+        modules.forEach(m -> System.out.println(
+                "MODULE id=" + m.getIdentifier() +
+                        " basePackage=" + m.getBasePackage()
+        ));
+
         assertThat(modules).isNotNull();
-        assertThat(modules.getModuleByName("core")).isPresent();
+        assertThat(modules.getModuleByName("chat.core")).isPresent();
     }
 
     @Test

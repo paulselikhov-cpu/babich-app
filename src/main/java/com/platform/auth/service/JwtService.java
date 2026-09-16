@@ -3,10 +3,12 @@ package com.platform.auth.service;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.modulith.NamedInterface;
 import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 import java.util.Date;
 
+@NamedInterface("JwtService")
 @Service
 public class JwtService {
 

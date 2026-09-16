@@ -2,8 +2,11 @@ package com.platform.auth.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.modulith.NamedInterface;
+
 import java.time.LocalDateTime;
 
+@NamedInterface("entityUser")
 @Data               // Lombok: генерирует геттеры, сеттеры, toString автоматически
 @Entity             // говорит Hibernate — это таблица в БД
 @Table(name = "users") // название таблицы (без аннотации = название класса)
