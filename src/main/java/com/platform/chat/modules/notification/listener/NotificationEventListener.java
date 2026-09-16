@@ -2,9 +2,9 @@ package com.platform.chat.modules.notification.listener;
 
 import com.platform.chat.entity.ChatUser;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
-import com.platform.chat.core.event.ApplicationResolvedEvent;
-import com.platform.chat.core.event.ElectionClosedEvent;
-import com.platform.chat.core.event.ElectionStartedEvent;
+import com.platform.chat.core.event.childs.ApplicationResolvedEvent;
+import com.platform.chat.core.event.childs.ElectionClosedEvent;
+import com.platform.chat.core.event.childs.ElectionStartedEvent;
 import com.platform.chat.modules.notification.dto.NotificationResponse;
 import com.platform.chat.modules.notification.entity.Notification;
 import com.platform.chat.modules.notification.service.NotificationService;

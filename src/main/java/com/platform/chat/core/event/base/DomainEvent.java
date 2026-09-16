@@ -1,10 +1,11 @@
-package com.platform.chat.core.event;
+package com.platform.chat.core.event.base;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.platform.chat.core.event.childs.*;
 
 import java.io.Serial;
 import java.io.Serializable;

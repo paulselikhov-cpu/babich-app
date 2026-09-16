@@ -1,4 +1,4 @@
-package com.platform.chat.core.event;
+package com.platform.chat.core.event.base;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

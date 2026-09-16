@@ -5,7 +5,7 @@ import com.platform.chat.modules.application.entity.Application;
 import com.platform.chat.modules.application.service.ApplicationService;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
 import com.platform.chat.modules.application.enums.ApplicationType;
-import com.platform.chat.core.event.ApplicationResolvedEvent;
+import com.platform.chat.core.event.childs.ApplicationResolvedEvent;
 import com.platform.chat.modules.notification.entity.Notification;
 import com.platform.chat.modules.notification.repository.NotificationRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;

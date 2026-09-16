@@ -1,4 +1,4 @@
-package com.platform.chat.core.event;
+package com.platform.chat.core.event.base;
 
 /**
  * Область действия события.

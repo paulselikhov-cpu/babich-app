@@ -1,8 +1,8 @@
 package com.platform.chat.modules.economy.event;
 
 import com.platform.chat.modules.economy.repository.TransactionLogRepository;
-import com.platform.chat.core.event.CoinsChangedEvent;
-import com.platform.chat.core.event.XpChangedEvent;
+import com.platform.chat.core.event.childs.CoinsChangedEvent;
+import com.platform.chat.core.event.childs.XpChangedEvent;
 import com.platform.chat.modules.economy.entity.TransactionLog;
 import com.platform.chat.modules.economy.enums.RewardReason;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,9 @@
-package com.platform.chat.core.event;
+package com.platform.chat.core.event.childs;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.platform.chat.core.event.base.DomainEvent;
+import com.platform.chat.core.event.base.EventType;
+import com.platform.chat.core.event.base.ScopeType;
 
 import java.util.HashMap;
 import java.util.Map;

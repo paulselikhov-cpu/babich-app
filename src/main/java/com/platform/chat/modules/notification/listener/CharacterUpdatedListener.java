@@ -1,6 +1,6 @@
 package com.platform.chat.modules.notification.listener;
 
-import com.platform.chat.core.event.CharacterUpdatedEvent;
+import com.platform.chat.core.event.childs.CharacterUpdatedEvent;
 import com.platform.chat.modules.notification.dto.CharacterUpdatedResponse;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
 import lombok.RequiredArgsConstructor;

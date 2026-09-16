@@ -1,8 +1,8 @@
 package com.platform.chat.modules.poll.handler;
 
-import com.platform.chat.core.event.DomainEventPublisher;
-import com.platform.chat.core.event.ElectionClosedEvent;
-import com.platform.chat.core.event.PollClosedEvent;
+import com.platform.chat.core.event.base.DomainEventPublisher;
+import com.platform.chat.core.event.childs.ElectionClosedEvent;
+import com.platform.chat.core.event.childs.PollClosedEvent;
 import com.platform.chat.modules.poll.entity.Poll;
 import com.platform.chat.modules.poll.enums.PollType;
 import jakarta.annotation.PostConstruct;
