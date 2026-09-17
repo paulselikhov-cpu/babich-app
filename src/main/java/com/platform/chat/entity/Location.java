@@ -1,6 +1,7 @@
 package com.platform.chat.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.platform.chat.enums.LocationCategoryType;
 import com.platform.chat.enums.PublicLocationType;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -89,6 +90,30 @@ public class Location {
     private PublicLocationType type;
 
     /**
+     * Категория локации. Проставляется всем при создании:
+     * BUSINESS / HOME — пользовательские, системным — при инициализации района.
+     * Термин не смешивать с {@link #type} (PublicLocationType — только системные).
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category", length = 20)
+    private LocationCategoryType category;
+
+    /**
+     * XP самой локации как игрового объекта (прокачка заведения).
+     * Только для пользовательских локаций; системным не начисляется.
+     */
+    @Column(name = "xp_location", nullable = false)
+    private Long xpLocation = 0L;
+
+    /**
+     * Идентификатор группировки, владеющей локацией. Без FK на {@link Gang}
+     * (минимальная заготовка) — целостность на стороне сервиса.
+     * При появлении полноценной модели Gang — перевести на связь.
+     */
+    @Column(name = "gang_id")
+    private Long gangId;
+
+    /**
      * Уникальный код для приглашения (только для пользовательских локаций).
      */
     @Column(name = "invite_code", unique = true, length = 20)
@@ -120,7 +145,7 @@ public class Location {
      */
     @JsonIgnore
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<LocationMember> members;
+    private List<LocationUser> users;
 
     @PrePersist
     public void prePersist() {

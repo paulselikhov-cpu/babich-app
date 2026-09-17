@@ -1,7 +1,8 @@
 package com.platform.chat.repository.location;
 
-import com.platform.chat.entity.LocationMember;
-import com.platform.chat.enums.LocationMemberRole;
+import com.platform.chat.entity.LocationUser;
+import com.platform.chat.enums.LocationUserRole;
+import com.platform.chat.enums.SystemRoleType;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -14,34 +15,47 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
 
 /**
- * Репозиторий для работы с членством в локациях.
+ * Репозиторий для работы с пользователями локаций.
  * Через эту таблицу определяем кто в какой локации состоит
  * и какую роль имеет.
  */
 @Repository
-public interface LocationMemberRepository extends JpaRepository<LocationMember, Long> {
+public interface LocationUserRepository extends JpaRepository<LocationUser, Long> {
 
     // найти членство конкретного персонажа в конкретной локации
     // используется чтобы проверить — состоит ли персонаж в локации
-    Optional<LocationMember> findByLocationIdAndCharacterId(
+    Optional<LocationUser> findByLocationIdAndCharacterId(
             Long locationId,
             Long characterId
     );
 
     // все участники конкретной локации
     @EntityGraph(attributePaths = {"character"})
-    List<LocationMember> findByLocationId(Long locationId);
+    List<LocationUser> findByLocationId(Long locationId);
 
     // все локации конкретного персонажа
     @EntityGraph(attributePaths = {"location", "location.template"})
-    List<LocationMember> findByCharacterId(Long characterId);
+    List<LocationUser> findByCharacterId(Long characterId);
 
     // модераторы и владелец конкретной локации
     // используется для проверки прав на управление
-    List<LocationMember> findByLocationIdAndRoleIn(
+    List<LocationUser> findByLocationIdAndRoleIn(
             Long locationId,
-            List<LocationMemberRole> roles
+            List<LocationUserRole> roles
     );
+
+    // персонаж на конкретной должности в конкретной локации (для единоличных должностей)
+    Optional<LocationUser> findByLocationIdAndSystemRole(Long locationId, SystemRoleType systemRole);
+
+    // штат системной локации (держатели должностей)
+    List<LocationUser> findByLocationIdAndSystemRoleNotNull(Long locationId);
+
+    // все должности конкретного персонажа
+    List<LocationUser> findByCharacterIdAndSystemRoleNotNull(Long characterId);
+
+    // все занимающие конкретную должность в локации (кроме указанного персонажа)
+    List<LocationUser> findByLocationIdAndSystemRoleAndCharacterIdNot(
+            Long locationId, SystemRoleType systemRole, Long characterId);
 
     /**
      * LEFT JOIN на CharacterPresence — если записи нет, presenceId будет null
@@ -54,9 +68,10 @@ public interface LocationMemberRepository extends JpaRepository<LocationMember, 
         lm.character.lastSeen,
         cp.id,
         r.id,
-        r.name
+        r.name,
+        lm.systemRole
     )
-    FROM LocationMember lm
+    FROM LocationUser lm
     LEFT JOIN CharacterPresence cp
         ON cp.character.id = lm.character.id AND cp.location.id = lm.location.id
     LEFT JOIN cp.room r

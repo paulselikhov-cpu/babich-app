@@ -2,10 +2,10 @@ package com.platform.poll;
 
 import com.platform.chat.entity.ChatUser;
 import com.platform.chat.entity.Location;
-import com.platform.chat.enums.LocationPostType;
+import com.platform.chat.enums.SystemRoleType;
 import com.platform.chat.enums.PublicLocationType;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
-import com.platform.chat.repository.location.LocationPostRepository;
+import com.platform.chat.repository.location.LocationUserRepository;
 import com.platform.chat.repository.location.LocationRepository;
 import com.platform.chat.core.event.base.EventType;
 import com.platform.chat.core.event.childs.PollClosedEvent;
@@ -49,7 +49,7 @@ class PollClosedEventIntegrationTest {
     @Autowired
     private LocationRepository locationRepository;
     @Autowired
-    private LocationPostRepository locationPostRepository;
+    private LocationUserRepository locationUserRepository;
 
     private Long initiatorId;
 
@@ -101,8 +101,8 @@ class PollClosedEventIntegrationTest {
         List<Location> systemLocations = locationRepository.findByDistrictIdAndIsSystemTrue(districtId);
         for (Location loc : systemLocations) {
             if (loc.getType() == PublicLocationType.CITY_HALL) {
-                locationPostRepository.findByLocationIdAndPost(loc.getId(), LocationPostType.GOVERNOR)
-                        .ifPresent(locationPostRepository::delete);
+                locationUserRepository.findByLocationIdAndSystemRole(loc.getId(), SystemRoleType.GOVERNOR)
+                        .ifPresent(locationUserRepository::delete);
             }
         }
     }

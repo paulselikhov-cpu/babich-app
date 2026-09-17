@@ -1,35 +1,39 @@
 package com.platform.chat.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.platform.chat.enums.LocationMemberRole;
+import com.platform.chat.enums.LocationUserRole;
+import com.platform.chat.enums.SystemRoleType;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
- * Связь между персонажем и локацией — "членство в локации".
+ * Связь между персонажем и локацией — «пользователь локации».
  * Это таблица-мост для связи многие-ко-многим между ChatUser и Location.
  *
  * Аналогия с реальной жизнью:
  * - Location = дом/клуб
  * - ChatUser = человек
- * - LocationMember = запись в домовой книге
+ * - LocationUser = запись в домовой книге
  *
  * Здесь также хранится роль персонажа ВНУТРИ конкретной локации.
  * Это отличается от глобальной роли ChatUser.role:
  * - ChatUser.role = ADMIN → администратор всей платформы
- * - LocationMember.role = OWNER → хозяин только этой локации
+ * - LocationUser.role = OWNER → хозяин только этой локации
+ *
+ * В системных локациях запись появляется только у штата: держатель должности
+ * ({@code systemRole} не null) — это и есть «member» такой локации.
  */
 @Data
 @Entity
-@Table(name = "location_members",
+@Table(name = "location_users",
         // составной первичный ключ: один персонаж не может быть
         // дважды в одной локации
         uniqueConstraints = @UniqueConstraint(
                 columnNames = {"location_id", "character_id"}
         )
 )
-public class LocationMember {
+public class LocationUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -61,7 +65,7 @@ public class LocationMember {
      */
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private LocationMemberRole role = LocationMemberRole.MEMBER;
+    private LocationUserRole role = LocationUserRole.MEMBER;
 
     /**
      * "Прописан" ли персонаж в этой локации.
@@ -71,6 +75,20 @@ public class LocationMember {
      */
     @Column(name = "is_registered", nullable = false)
     private Boolean isRegistered = false;
+
+    /**
+     * Должность персонажа в системной локации. null = обычный участник.
+     * Перенос из упразднённой таблицы location_posts (LocationPost).
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "system_role", length = 50)
+    private SystemRoleType systemRole;
+
+    /**
+     * Когда персонаж был назначен на должность (переезд из LocationPost.appointedAt).
+     */
+    @Column(name = "appointed_at")
+    private LocalDateTime appointedAt;
 
     /**
      * Когда персонаж вступил в локацию.

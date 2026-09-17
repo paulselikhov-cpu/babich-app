@@ -2,10 +2,10 @@ package com.platform.chat.service.location;
 
 import com.platform.chat.dto.response.LocationResponse;
 import com.platform.chat.entity.*;
-import com.platform.chat.enums.LocationMemberRole;
+import com.platform.chat.enums.LocationUserRole;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
 import com.platform.chat.repository.district.DistrictRepository;
-import com.platform.chat.repository.location.LocationMemberRepository;
+import com.platform.chat.repository.location.LocationUserRepository;
 import com.platform.chat.repository.location.LocationRepository;
 import com.platform.chat.repository.location.LocationTemplateRepository;
 import com.platform.chat.repository.room.RoomReadStatusRepository;
@@ -34,7 +34,7 @@ public class LocationService {
 
     private final LocationRepository locationRepository;
     private final LocationTemplateRepository locationTemplateRepository;
-    private final LocationMemberRepository locationMemberRepository;
+    private final LocationUserRepository locationUserRepository;
     private final RoomReadStatusRepository roomReadStatusRepository;
     private final RoomRepository roomRepository;
     private final ChatUserRepository chatUserRepository;
@@ -57,10 +57,13 @@ public class LocationService {
     }
 
     /**
-     * Получить локации пользователя с его ролью в каждой. //TODO сейчас логика так устроена, что новый персонаж в системной локации по дефолту MEMBER. Правильно ли это?
+     * Получить локации пользователя с его ролью в каждой.
+     * Для системной локации membership = штат (держатель должности),
+     * поэтому она попадает в «мои локации» только если персонаж в ней что-то занимает.
+     * Сами публичные системные локации фронт берёт из /api/districts (не зависят от членства).
      */
     public List<LocationResponse> getMyLocations(Long characterId) {
-        List<LocationMember> memberships = locationMemberRepository
+        List<LocationUser> memberships = locationUserRepository
                 .findByCharacterId(characterId);
 
         return memberships.stream()
@@ -88,7 +91,7 @@ public class LocationService {
      * 3. Создаём локацию
      * 4. Генерируем уникальный invite_code
      * 5. Копируем базовые комнаты из шаблона
-     * 6. Добавляем создателя как OWNER в location_members
+     * 6. Добавляем создателя как OWNER в location_users
      *
      * @Transactional — всё создаётся за одну транзакцию.
      * Если что-то упало — откатываем всё назад.
@@ -159,12 +162,12 @@ public class LocationService {
         }
 
         // шаг 6: добавляем создателя как OWNER
-        LocationMember ownerMember = new LocationMember();
+        LocationUser ownerMember = new LocationUser();
         ownerMember.setLocation(savedLocation);
         ownerMember.setCharacter(character);
-        ownerMember.setRole(LocationMemberRole.OWNER);
+        ownerMember.setRole(LocationUserRole.OWNER);
         ownerMember.setIsRegistered(true); // владелец всегда "прописан"
-        locationMemberRepository.save(ownerMember);
+        locationUserRepository.save(ownerMember);
 
         return savedLocation;
     }
@@ -176,15 +179,15 @@ public class LocationService {
      * Что происходит:
      * 1. Находим локацию по коду
      * 2. Проверяем что персонаж ещё не в локации
-     * 3. Добавляем запись в location_members
+     * 3. Добавляем запись в location_users
      */
     @Transactional
-    public LocationMember joinByInviteCode(String inviteCode, Long characterId) {
+    public LocationUser joinByInviteCode(String inviteCode, Long characterId) {
         Location location = locationRepository.findByInviteCode(inviteCode)
                 .orElseThrow(() -> new RuntimeException("Локация не найдена"));
 
         // если уже состоит — возвращаем существующее членство вместо ошибки
-        Optional<LocationMember> existing = locationMemberRepository
+        Optional<LocationUser> existing = locationUserRepository
                 .findByLocationIdAndCharacterId(location.getId(), characterId);
 
         if (existing.isPresent()) {
@@ -194,13 +197,13 @@ public class LocationService {
         ChatUser character = chatUserRepository.findById(characterId)
                 .orElseThrow(() -> new RuntimeException("Персонаж не найден: " + characterId));
 
-        LocationMember member = new LocationMember();
+        LocationUser member = new LocationUser();
         member.setLocation(location);
         member.setCharacter(character);
-        member.setRole(LocationMemberRole.MEMBER);
+        member.setRole(LocationUserRole.MEMBER);
         member.setIsRegistered(false);
 
-        return locationMemberRepository.save(member);
+        return locationUserRepository.save(member);
     }
 
     /**
@@ -221,11 +224,11 @@ public class LocationService {
                 ));
 
         // проверяем что это владелец
-        LocationMember member = locationMemberRepository
+        LocationUser member = locationUserRepository
                 .findByLocationIdAndCharacterId(locationId, characterId)
                 .orElseThrow(() -> new RuntimeException("Вы не состоите в этой локации"));
 
-        if (member.getRole() != LocationMemberRole.OWNER) {
+        if (member.getRole() != LocationUserRole.OWNER) {
             throw new RuntimeException(
                     "Только владелец может добавлять комнаты"
             );
@@ -277,34 +280,34 @@ public class LocationService {
      * Только владелец может назначать модераторов.
      */
     @Transactional
-    public LocationMember appointModerator(Long locationId,
+    public LocationUser appointModerator(Long locationId,
                                            Long ownerId,
                                            Long targetCharacterId) {
         // проверяем что это владелец
-        LocationMember ownerMember = locationMemberRepository
+        LocationUser ownerMember = locationUserRepository
                 .findByLocationIdAndCharacterId(locationId, ownerId)
                 .orElseThrow(() -> new RuntimeException(
                         "Вы не состоите в этой локации"
                 ));
 
-        if (ownerMember.getRole() != LocationMemberRole.OWNER) {
+        if (ownerMember.getRole() != LocationUserRole.OWNER) {
             throw new RuntimeException(
                     "Только владелец может назначать модераторов"
             );
         }
 
         // находим целевого участника
-        LocationMember targetMember = locationMemberRepository
+        LocationUser targetMember = locationUserRepository
                 .findByLocationIdAndCharacterId(locationId, targetCharacterId)
                 .orElseThrow(() -> new RuntimeException(
                         "Персонаж не состоит в этой локации"
                 ));
 
         // "прописываем" — назначаем модератором
-        targetMember.setRole(LocationMemberRole.MODERATOR);
+        targetMember.setRole(LocationUserRole.MODERATOR);
         targetMember.setIsRegistered(true);
 
-        return locationMemberRepository.save(targetMember);
+        return locationUserRepository.save(targetMember);
     }
 
     private String generateUniqueInviteCode() {
@@ -323,15 +326,15 @@ public class LocationService {
      */
     @Transactional
     public void leaveLocation(Long locationId, Long characterId) {
-        LocationMember member = locationMemberRepository
+        LocationUser member = locationUserRepository
                 .findByLocationIdAndCharacterId(locationId, characterId)
                 .orElseThrow(() -> new RuntimeException("Вы не состоите в этой локации"));
 
-        if (member.getRole() == LocationMemberRole.OWNER) {
+        if (member.getRole() == LocationUserRole.OWNER) {
             throw new RuntimeException("Владелец не может покинуть локацию — только удалить");
         }
 
-        locationMemberRepository.delete(member);
+        locationUserRepository.delete(member);
     }
 
     /**
@@ -340,11 +343,11 @@ public class LocationService {
      */
     @Transactional
     public void deleteLocation(Long locationId, Long characterId) {
-        LocationMember member = locationMemberRepository
+        LocationUser member = locationUserRepository
                 .findByLocationIdAndCharacterId(locationId, characterId)
                 .orElseThrow(() -> new RuntimeException("Вы не состоите в этой локации"));
 
-        if (member.getRole() != LocationMemberRole.OWNER) {
+        if (member.getRole() != LocationUserRole.OWNER) {
             throw new RuntimeException("Только владелец может удалить локацию");
         }
 
@@ -361,9 +364,9 @@ public class LocationService {
         roomRepository.deleteAll(rooms);
 
         // 4. Удаляем участников локации
-        List<LocationMember> members = locationMemberRepository.findByLocationId(locationId);
+        List<LocationUser> members = locationUserRepository.findByLocationId(locationId);
         if (!members.isEmpty()) {
-            locationMemberRepository.deleteAll(members);
+            locationUserRepository.deleteAll(members);
         }
 
         // 5. Удаляем саму локацию

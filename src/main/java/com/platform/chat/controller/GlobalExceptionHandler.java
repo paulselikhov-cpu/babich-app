@@ -43,7 +43,7 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.BAD_REQUEST, "Некорректный параметр запроса");
     }
 
-    /** Нарушение целостности БД (уникальные ограничения location_posts и т.п.) — конфликт. */
+    /** Нарушение целостности БД (уникальные ограничения location_users и т.п.) — конфликт. */
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Map<String, Object>> handleConflict(DataIntegrityViolationException ex) {
         log.warn("Нарушение целостности данных: {}", ex.getMostSpecificCause().getMessage());

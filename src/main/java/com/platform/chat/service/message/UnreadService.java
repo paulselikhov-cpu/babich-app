@@ -1,11 +1,11 @@
 package com.platform.chat.service.message;
 
-import com.platform.chat.entity.LocationMember;
+import com.platform.chat.entity.LocationUser;
 import com.platform.chat.entity.Room;
 import com.platform.chat.entity.RoomReadStatus;
 import com.platform.chat.dto.response.UnreadUpdateResponse;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
-import com.platform.chat.repository.location.LocationMemberRepository;
+import com.platform.chat.repository.location.LocationUserRepository;
 import com.platform.chat.repository.message.MessageRepository;
 import com.platform.chat.repository.onlineSessions.CharacterPresenceRepository;
 import com.platform.chat.repository.room.RoomReadStatusRepository;
@@ -27,7 +27,7 @@ public class UnreadService {
     private final RoomReadStatusRepository readStatusRepository;
     private final MessageRepository messageRepository;
     private final RoomRepository roomRepository;
-    private final LocationMemberRepository locationMemberRepository;
+    private final LocationUserRepository locationUserRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final CharacterPresenceRepository characterPresenceRepository;
     private final ChatUserRepository chatUserRepository;
@@ -78,9 +78,9 @@ public class UnreadService {
         if (room == null) return;
 
         Long locationId = room.getLocation().getId();
-        List<LocationMember> members = locationMemberRepository.findByLocationId(locationId);
+        List<LocationUser> members = locationUserRepository.findByLocationId(locationId);
 
-        for (LocationMember member : members) {
+        for (LocationUser member : members) {
             Long characterId = member.getCharacter().getId();
             if (characterId.equals(authorCharacterId)) continue;
 

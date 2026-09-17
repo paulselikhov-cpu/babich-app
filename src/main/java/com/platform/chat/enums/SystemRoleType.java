@@ -1,10 +1,12 @@
 package com.platform.chat.enums;
 
 /**
- * Типы должностей в системных локациях.
+ * Должность персонажа в системной локации (SystemRole). Бывший LocationPostType:
+ * должность переехала из отдельной таблицы location_posts в поле LocationUser.systemRole.
+ *
  * Каждая должность привязана к конкретному типу системной локации (PublicLocationType).
  */
-public enum LocationPostType {
+public enum SystemRoleType {
     // === Мэрия (CITY_HALL) ===
     GOVERNOR,           // Глава администрации района — 1 слот
     MAYOR,              // Мэр — 1 слот

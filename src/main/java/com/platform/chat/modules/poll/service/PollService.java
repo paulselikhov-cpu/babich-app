@@ -1,15 +1,15 @@
 package com.platform.chat.modules.poll.service;
 
 import com.platform.chat.entity.Location;
-import com.platform.chat.enums.LocationPostType;
 import com.platform.chat.enums.PublicLocationType;
+import com.platform.chat.enums.SystemRoleType;
 import com.platform.chat.modules.poll.repository.PollCandidateRepository;
 import com.platform.chat.modules.poll.repository.PollRepository;
 import com.platform.chat.modules.poll.repository.PollVoteRepository;
 import com.platform.chat.modules.poll.scheduler.PollCloseCheckHandler;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
 import com.platform.chat.repository.district.DistrictRepository;
-import com.platform.chat.repository.location.LocationPostRepository;
+import com.platform.chat.repository.location.LocationUserRepository;
 import com.platform.chat.repository.location.LocationRepository;
 import com.platform.chat.core.scheduler.ScheduledCheckService;
 import com.platform.chat.dto.settings.PollSettingsDto;
@@ -47,7 +47,7 @@ public class PollService {
     private final PollVoteRepository voteRepository;
     private final DistrictRepository districtRepository;
     private final LocationRepository locationRepository;
-    private final LocationPostRepository locationPostRepository;
+    private final LocationUserRepository locationUserRepository;
     private final ChatUserRepository chatUserRepository;
     private final ScheduledCheckService scheduledCheckService;
     private final DistrictSettingsService districtSettingsService;
@@ -65,11 +65,11 @@ public class PollService {
                 .orElseThrow(() -> new IllegalArgumentException("Район не найден: " + districtId));
 
         // Гейт-условие (сценарий №2): выборы доступны только если в районе нет
-        // действующего губернатора (LocationPost с ролью GOVERNOR в мэрии).
+        // действующего губернатора (LocationUser с systemRole = GOVERNOR в мэрии).
         boolean hasGovernor = locationRepository
                 .findByDistrictIdAndIsSystemTrueAndType(districtId, PublicLocationType.CITY_HALL)
-                .map(cityHall -> locationPostRepository
-                        .findByLocationIdAndPost(cityHall.getId(), LocationPostType.GOVERNOR)
+                .map(cityHall -> locationUserRepository
+                        .findByLocationIdAndSystemRole(cityHall.getId(), SystemRoleType.GOVERNOR)
                         .isPresent())
                 .orElse(false);
         if (hasGovernor) {

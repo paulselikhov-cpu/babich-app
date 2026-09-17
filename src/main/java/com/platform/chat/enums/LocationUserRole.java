@@ -5,9 +5,9 @@ package com.platform.chat.enums;
  * Не путать с глобальной ролью ChatRole!
  *
  * ChatRole.ADMIN = администратор всей платформы
- * LocationMemberRole.OWNER = хозяин только своей локации
+ * LocationUserRole.OWNER = хозяин только своей локации
  */
-public enum LocationMemberRole {
+public enum LocationUserRole {
     OWNER,      // создатель локации — полный контроль
     MODERATOR,  // "прописан" — может кикать, управлять комнатами
     MEMBER      // обычный участник

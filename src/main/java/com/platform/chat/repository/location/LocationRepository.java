@@ -45,7 +45,7 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
     List<Location> findByTemplateId(Long templateId);
 
     /**
-     * Все локации в которых состоит персонаж (через location_members).
+     * Все локации в которых состоит персонаж (через location_users).
      * @Query = пишем HQL вручную когда Spring не может сгенерировать по имени метода.
      * HQL похож на SQL но использует названия Java классов и полей,
      * а не названия таблиц и колонок.
@@ -57,7 +57,7 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
     @Query("""
         SELECT l FROM Location l
         JOIN FETCH l.template
-        JOIN LocationMember lm ON lm.location = l
+        JOIN LocationUser lm ON lm.location = l
         WHERE lm.character.id = :characterId
     """)
     List<Location> findAllByMemberCharacterId(@Param("characterId") Long characterId);

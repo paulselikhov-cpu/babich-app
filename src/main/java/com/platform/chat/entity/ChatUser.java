@@ -152,9 +152,9 @@ public class ChatUser {
 
     /**
      * Локации в которых состоит персонаж.
-     * mappedBy указывает на поле character в LocationMember — @JoinColumn только на той стороне.
+     * mappedBy указывает на поле character в LocationUser — @JoinColumn только на той стороне.
      */
     @JsonIgnore
     @OneToMany(mappedBy = "character", fetch = FetchType.LAZY)
-    private List<LocationMember> locationMemberships;
+    private List<LocationUser> locationMemberships;
 }

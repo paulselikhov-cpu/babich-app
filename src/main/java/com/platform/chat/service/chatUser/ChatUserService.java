@@ -4,14 +4,9 @@ import com.platform.auth.repository.UserRepository;
 import com.platform.chat.dto.request.CreateChatUserRequest;
 import com.platform.chat.dto.request.CharacterUpdateRequest;
 import com.platform.chat.entity.ChatUser;
-import com.platform.chat.entity.Location;
-import com.platform.chat.entity.LocationMember;
 import com.platform.chat.enums.ChatRole;
-import com.platform.chat.enums.LocationMemberRole;
 import com.platform.chat.modules.economy.enums.Profession;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
-import com.platform.chat.repository.location.LocationMemberRepository;
-import com.platform.chat.repository.location.LocationRepository;
 import com.platform.chat.service.level.PersonLevelService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,8 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -30,8 +23,6 @@ public class ChatUserService {
 
     private final ChatUserRepository chatUserRepository;
     private final UserRepository userRepository;
-    private final LocationRepository locationRepository;
-    private final LocationMemberRepository locationMemberRepository;
     private final PersonLevelService personLevelService;
 
     // получить всех персонажей
@@ -143,7 +134,7 @@ public class ChatUserService {
                 .orElse(false);
     }
 
-    /** Является ли персонаж администратором или модератором. */ //TODO  СМОТРЕТЬ НА location_members.posts
+    /** Является ли персонаж администратором или модератором (глобальная роль ChatUser.role). */
     public boolean isStaff(String username) {
         return chatUserRepository.findByUsername(username)
                 .map(u -> u.getRole() == ChatRole.ADMIN || u.getRole() == ChatRole.MODERATOR)
@@ -202,40 +193,7 @@ public class ChatUserService {
 
         ChatUser saved = chatUserRepository.save(chatUser);
 
-        // Автоматически добавляем персонажа во все системные локации района
-        autoJoinSystemLocations(saved);
-
         return saved;
-    }
-
-    /**
-     * Автоматически добавить персонажа во все системные локации района.
-     * Вызывается при создании персонажа или при первом входе в район.
-     * Если записи уже существуют — пропускает (идемпотентность).
-     */
-    private void autoJoinSystemLocations(ChatUser character) {
-        List<Location> systemLocations = locationRepository
-                .findByDistrictIdAndIsSystemTrue(character.getDistrictId());
-
-        // Получаем ID системных локаций, в которых персонаж уже состоит
-        Set<Long> existingLocationIds = locationMemberRepository
-                .findByCharacterId(character.getId())
-                .stream()
-                .map(m -> m.getLocation().getId())
-                .collect(Collectors.toSet());
-
-        for (Location location : systemLocations) {
-            if (!existingLocationIds.contains(location.getId())) {
-                LocationMember member = new LocationMember();
-                member.setLocation(location);
-                member.setCharacter(character);
-                member.setRole(LocationMemberRole.MEMBER);
-                member.setIsRegistered(false);
-                locationMemberRepository.save(member);
-                log.info("Персонаж {} ({}) автоматически добавлен в системную локацию {}",
-                        character.getCharacterName(), character.getId(), location.getName());
-            }
-        }
     }
 
     // топ персонажей по рейтингу

@@ -87,10 +87,10 @@ public class LocationController {
      * где abc123xy = invite_code
      */
     @PostMapping("/join/{inviteCode}")
-    public ResponseEntity<LocationMember> joinLocation(
+    public ResponseEntity<LocationUser> joinLocation(
             @PathVariable String inviteCode,
             @RequestParam Long characterId) {
-        LocationMember member = locationService.joinByInviteCode(
+        LocationUser member = locationService.joinByInviteCode(
                 inviteCode,
                 characterId
         );
@@ -140,11 +140,11 @@ public class LocationController {
      * @param targetCharacterId — id персонажа которого назначают
      */
     @PostMapping("/{locationId}/moderator/{targetCharacterId}")
-    public ResponseEntity<LocationMember> appointModerator(
+    public ResponseEntity<LocationUser> appointModerator(
             @PathVariable Long locationId,
             @PathVariable Long targetCharacterId,
             @RequestParam Long ownerId) {
-        LocationMember member = locationService.appointModerator(
+        LocationUser member = locationService.appointModerator(
                 locationId,
                 ownerId,
                 targetCharacterId

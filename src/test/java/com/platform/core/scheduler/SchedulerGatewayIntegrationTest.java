@@ -6,10 +6,10 @@ import com.platform.chat.core.scheduler.ScheduledCheckStatus;
 import com.platform.chat.core.scheduler.SchedulerGateway;
 import com.platform.chat.entity.ChatUser;
 import com.platform.chat.entity.Location;
-import com.platform.chat.enums.LocationPostType;
+import com.platform.chat.enums.SystemRoleType;
 import com.platform.chat.enums.PublicLocationType;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
-import com.platform.chat.repository.location.LocationPostRepository;
+import com.platform.chat.repository.location.LocationUserRepository;
 import com.platform.chat.repository.location.LocationRepository;
 import com.platform.chat.modules.notification.entity.Notification;
 import com.platform.chat.modules.notification.repository.NotificationRepository;
@@ -43,7 +43,7 @@ class SchedulerGatewayIntegrationTest {
     @Autowired private ScheduledCheckRepository scheduledCheckRepository;
     @Autowired private SchedulerGateway schedulerGateway;
     @Autowired private LocationRepository locationRepository;
-    @Autowired private LocationPostRepository locationPostRepository;
+    @Autowired private LocationUserRepository locationUserRepository;
 
     private Long characterId;
 
@@ -124,8 +124,8 @@ class SchedulerGatewayIntegrationTest {
         List<Location> systemLocations = locationRepository.findByDistrictIdAndIsSystemTrue(districtId);
         for (Location loc : systemLocations) {
             if (loc.getType() == PublicLocationType.CITY_HALL) {
-                locationPostRepository.findByLocationIdAndPost(loc.getId(), LocationPostType.GOVERNOR)
-                        .ifPresent(locationPostRepository::delete);
+                locationUserRepository.findByLocationIdAndSystemRole(loc.getId(), SystemRoleType.GOVERNOR)
+                        .ifPresent(locationUserRepository::delete);
             }
         }
     }

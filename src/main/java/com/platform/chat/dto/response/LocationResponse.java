@@ -1,7 +1,7 @@
 package com.platform.chat.dto.response;
 
 import com.platform.chat.entity.Location;
-import com.platform.chat.enums.LocationMemberRole;
+import com.platform.chat.enums.LocationUserRole;
 import com.platform.chat.enums.PublicLocationType;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -28,7 +28,7 @@ public class LocationResponse {
     // роль текущего пользователя в этой локации
     private String memberRole;
 
-    public static LocationResponse from(Location location, LocationMemberRole role) {
+    public static LocationResponse from(Location location, LocationUserRole role) {
         LocationResponse dto = new LocationResponse();
         dto.setId(location.getId());
         dto.setName(location.getName());

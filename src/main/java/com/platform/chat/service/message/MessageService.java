@@ -6,10 +6,10 @@ import com.platform.chat.entity.Message;
 import com.platform.chat.entity.Room;
 import com.platform.chat.entity.ChatUser;
 import com.platform.chat.entity.RoomReadStatus;
-import com.platform.chat.enums.LocationMemberRole;
+import com.platform.chat.enums.LocationUserRole;
 import com.platform.chat.enums.MessageType;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
-import com.platform.chat.repository.location.LocationMemberRepository;
+import com.platform.chat.repository.location.LocationUserRepository;
 import com.platform.chat.repository.message.MessageRepository;
 import com.platform.chat.repository.room.RoomReadStatusRepository;
 import com.platform.chat.repository.room.RoomRepository;
@@ -35,7 +35,7 @@ public class MessageService {
     private final MessageRepository messageRepository;
     private final RoomRepository roomRepository;
     private final ChatUserRepository chatUserRepository;
-    private final LocationMemberRepository locationMemberRepository;
+    private final LocationUserRepository locationUserRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final RoomReadStatusRepository readStatusRepository;
     private final UnreadService unreadService;
@@ -163,15 +163,15 @@ public class MessageService {
 
         if (!isAuthor) {
             var member = message.getRoom().getLocation() != null
-                    ? locationMemberRepository.findByLocationIdAndCharacterId(
+                    ? locationUserRepository.findByLocationIdAndCharacterId(
                     message.getRoom().getLocation().getId(),
                     character.getId()
             ).orElse(null)
                     : null;
 
             boolean isModerator = member != null &&
-                    (member.getRole() == LocationMemberRole.OWNER ||
-                            member.getRole() == LocationMemberRole.MODERATOR);
+                    (member.getRole() == LocationUserRole.OWNER ||
+                            member.getRole() == LocationUserRole.MODERATOR);
 
             if (!isModerator) {
                 throw new RuntimeException("Нет прав для удаления сообщения");

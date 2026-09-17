@@ -116,64 +116,64 @@ VALUES ('CENTRAL', 'Центральный район', 'Первый район
 -- ===================================
 
 -- 1. Мэрия
-INSERT INTO locations (district_id, type, name, description, is_system, is_public, created_at)
-SELECT d.id, 'CITY_HALL', 'Мэрия', 'Управление районом. Здесь решаются все административные вопросы.', TRUE, FALSE, NOW()
+INSERT INTO locations (district_id, type, name, description, is_system, is_public, xp_location, created_at)
+SELECT d.id, 'CITY_HALL', 'Мэрия', 'Управление районом. Здесь решаются все административные вопросы.', TRUE, FALSE, 0, NOW()
 FROM districts d WHERE d.code = 'CENTRAL'
                    AND NOT EXISTS (
         SELECT 1 FROM locations l WHERE l.district_id = d.id AND l.is_system = TRUE AND l.type = 'CITY_HALL'
     );
 
 -- 2. Площадь Ленина
-INSERT INTO locations (district_id, type, name, description, is_system, is_public, created_at)
-SELECT d.id, 'LENIN_SQUARE', 'Площадь Ленина', 'Место народных голосований и собраний. Здесь бомжи могут переночевать в комнате "Тёплые трубы".', TRUE, FALSE, NOW()
+INSERT INTO locations (district_id, type, name, description, is_system, is_public, xp_location, created_at)
+SELECT d.id, 'LENIN_SQUARE', 'Площадь Ленина', 'Место народных голосований и собраний. Здесь бомжи могут переночевать в комнате "Тёплые трубы".', TRUE, FALSE, 0, NOW()
 FROM districts d WHERE d.code = 'CENTRAL'
                    AND NOT EXISTS (
         SELECT 1 FROM locations l WHERE l.district_id = d.id AND l.is_system = TRUE AND l.type = 'LENIN_SQUARE'
     );
 
 -- 3. Полицейский участок
-INSERT INTO locations (district_id, type, name, description, is_system, is_public, created_at)
-SELECT d.id, 'POLICE_STATION', 'Полицейский участок', 'База civic_role. Сюда обращаются по вопросам правопорядка.', TRUE, FALSE, NOW()
+INSERT INTO locations (district_id, type, name, description, is_system, is_public, xp_location, created_at)
+SELECT d.id, 'POLICE_STATION', 'Полицейский участок', 'База civic_role. Сюда обращаются по вопросам правопорядка.', TRUE, FALSE, 0, NOW()
 FROM districts d WHERE d.code = 'CENTRAL'
                    AND NOT EXISTS (
         SELECT 1 FROM locations l WHERE l.district_id = d.id AND l.is_system = TRUE AND l.type = 'POLICE_STATION'
     );
 
 -- 4. Тюрьма
-INSERT INTO locations (district_id, type, name, description, is_system, is_public, created_at)
-SELECT d.id, 'PRISON', 'Тюрьма', 'Место временного содержания нарушителей.', TRUE, FALSE, NOW()
+INSERT INTO locations (district_id, type, name, description, is_system, is_public, xp_location, created_at)
+SELECT d.id, 'PRISON', 'Тюрьма', 'Место временного содержания нарушителей.', TRUE, FALSE, 0, NOW()
 FROM districts d WHERE d.code = 'CENTRAL'
                    AND NOT EXISTS (
         SELECT 1 FROM locations l WHERE l.district_id = d.id AND l.is_system = TRUE AND l.type = 'PRISON'
     );
 
 -- 5. Банк
-INSERT INTO locations (district_id, type, name, description, is_system, is_public, created_at)
-SELECT d.id, 'BANK', 'Банк', 'Системная локация. Директор назначается мэрией. Вклады, ипотека и другие финансовые услуги.', TRUE, FALSE, NOW()
+INSERT INTO locations (district_id, type, name, description, is_system, is_public, xp_location, created_at)
+SELECT d.id, 'BANK', 'Банк', 'Системная локация. Директор назначается мэрией. Вклады, ипотека и другие финансовые услуги.', TRUE, FALSE, 0, NOW()
 FROM districts d WHERE d.code = 'CENTRAL'
                    AND NOT EXISTS (
         SELECT 1 FROM locations l WHERE l.district_id = d.id AND l.is_system = TRUE AND l.type = 'BANK'
     );
 
 -- 6. Склад
-INSERT INTO locations (district_id, type, name, description, is_system, is_public, created_at)
-SELECT d.id, 'WAREHOUSE', 'Склад', 'Доступен только владельцам бизнеса. Здесь можно закупить товары для своего бизнеса.', TRUE, FALSE, NOW()
+INSERT INTO locations (district_id, type, name, description, is_system, is_public, xp_location, created_at)
+SELECT d.id, 'WAREHOUSE', 'Склад', 'Доступен только владельцам бизнеса. Здесь можно закупить товары для своего бизнеса.', TRUE, FALSE, 0, NOW()
 FROM districts d WHERE d.code = 'CENTRAL'
                    AND NOT EXISTS (
         SELECT 1 FROM locations l WHERE l.district_id = d.id AND l.is_system = TRUE AND l.type = 'WAREHOUSE'
     );
 
 -- 7. Рынок (общий, "Авито")
-INSERT INTO locations (district_id, type, name, description, is_system, is_public, created_at)
-SELECT d.id, 'GENERAL_MARKET', 'Рынок', 'Общий рынок района. Аренда прилавка доступна всем без участия мэрии.', TRUE, FALSE, NOW()
+INSERT INTO locations (district_id, type, name, description, is_system, is_public, xp_location, created_at)
+SELECT d.id, 'GENERAL_MARKET', 'Рынок', 'Общий рынок района. Аренда прилавка доступна всем без участия мэрии.', TRUE, FALSE, 0, NOW()
 FROM districts d WHERE d.code = 'CENTRAL'
                    AND NOT EXISTS (
         SELECT 1 FROM locations l WHERE l.district_id = d.id AND l.is_system = TRUE AND l.type = 'GENERAL_MARKET'
     );
 
 -- 8. Рынок недвижимости
-INSERT INTO locations (district_id, type, name, description, is_system, is_public, created_at)
-SELECT d.id, 'REAL_ESTATE_MARKET', 'Рынок недвижимости', 'Купля-продажа локаций. Владелец назначается мэрией и берёт комиссию со сделок.', TRUE, FALSE, NOW()
+INSERT INTO locations (district_id, type, name, description, is_system, is_public, xp_location, created_at)
+SELECT d.id, 'REAL_ESTATE_MARKET', 'Рынок недвижимости', 'Купля-продажа локаций. Владелец назначается мэрией и берёт комиссию со сделок.', TRUE, FALSE, 0, NOW()
 FROM districts d WHERE d.code = 'CENTRAL'
                    AND NOT EXISTS (
         SELECT 1 FROM locations l WHERE l.district_id = d.id AND l.is_system = TRUE AND l.type = 'REAL_ESTATE_MARKET'
