@@ -1,4 +1,4 @@
-package com.platform.chat.listener;
+package com.platform.chat.eventListener;
 
 import com.platform.chat.core.event.childs.CharacterUpdatedEvent;
 import com.platform.chat.dto.CharacterUpdatedResponse;
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @RequiredArgsConstructor
-public class CharacterUpdatedListener {
+public class CharacterUpdatedEventListener {
 
     private final ChatUserRepository chatUserRepository;
     private final SimpMessagingTemplate messagingTemplate;

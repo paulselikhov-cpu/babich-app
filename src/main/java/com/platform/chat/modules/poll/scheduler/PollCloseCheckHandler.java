@@ -2,7 +2,7 @@ package com.platform.chat.modules.poll.scheduler;
 
 import com.platform.chat.core.scheduler.ScheduledCheck;
 import com.platform.chat.core.scheduler.ScheduledCheckHandler;
-import com.platform.chat.modules.poll.service.ElectionFacade;
+import com.platform.chat.modules.poll.service.ElectionService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
  * создании Poll. Когда {@code dueAt} наступает, {@code SchedulerGateway}
  * находит проверку одним индексным запросом и вызывает {@link #handle}.</p>
  *
- * <p>Делегирует в {@link ElectionFacade#closeElection(Long)} — тот же путь,
+ * <p>Делегирует в {@link ElectionService#closeElection(Long)} — тот же путь,
  * что и ручное закрытие: closePoll → подсчёт голосов → ElectionResultHandlerAdapter
  * (найден PollResultDispatcher по типу голосования) → публикация
  * ElectionClosedEvent (уведомления жителям района уходят через
@@ -30,7 +30,7 @@ public class PollCloseCheckHandler implements ScheduledCheckHandler {
 
     private static final Logger log = LoggerFactory.getLogger(PollCloseCheckHandler.class);
 
-    private final ElectionFacade electionFacade;
+    private final ElectionService electionService;
 
     @Override
     public String checkType() {
@@ -41,6 +41,6 @@ public class PollCloseCheckHandler implements ScheduledCheckHandler {
     public void handle(ScheduledCheck check) {
         log.info("Scheduled check: closing poll entityId={} (check id={})",
                 check.getEntityId(), check.getId());
-        electionFacade.closeElection(check.getEntityId());
+        electionService.closeElection(check.getEntityId());
     }
 }

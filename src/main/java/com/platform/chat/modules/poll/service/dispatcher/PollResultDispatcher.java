@@ -1,10 +1,11 @@
-package com.platform.chat.modules.poll.handler;
+package com.platform.chat.modules.poll.service.dispatcher;
 
 import com.platform.chat.core.event.base.DomainEventPublisher;
 import com.platform.chat.core.event.childs.ElectionClosedEvent;
 import com.platform.chat.core.event.childs.PollClosedEvent;
 import com.platform.chat.modules.poll.entity.Poll;
 import com.platform.chat.modules.poll.enums.PollType;
+import com.platform.chat.modules.poll.handler.PollResultHandler;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -17,12 +18,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Диспетчер обработчиков результатов голосования (Слой 4, Этап 6 миграции событий).
+ * Диспетчер обработчиков результатов голосования (Слой 4).
  * <p>
  * Spring собирает все реализации {@link PollResultHandler} в список и передаёт
  * сюда. Диспетчер строит карту {@code PollType → PollResultHandler} и выбирает
  * обработчик по {@link Poll#getPollType()}: так последствия закрытия голосования
- * отделены от сценария ({@code ElectionFacade} больше не знает про конкретного
+ * отделены от сценария ({@code ElectionService} больше не знает про конкретного
  * обработчика) и легко добавляется новый тип голосования — новой реализацией
  * интерфейса, без правки фасада.
  * <p>

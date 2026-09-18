@@ -273,13 +273,6 @@ public class PollService {
         return candidateRepository.findByPollId(pollId);
     }
 
-    public Poll getWithCandidates(Long pollId) {
-        Poll poll = pollRepository.findById(pollId)
-                .orElseThrow(() -> new IllegalArgumentException("Голосование не найдено: " + pollId));
-        List<PollCandidate> candidates = candidateRepository.findByPollId(pollId);
-        return poll;
-    }
-
     public List<Poll> findByDistrict(Long districtId) {
         return pollRepository.findByScopeTypeAndScopeId(ScopeType.DISTRICT, districtId);
     }

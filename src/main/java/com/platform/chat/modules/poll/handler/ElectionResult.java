@@ -13,6 +13,7 @@ import com.platform.chat.modules.poll.enums.PollType;
 import com.platform.chat.modules.poll.repository.PollCandidateRepository;
 import com.platform.chat.modules.poll.repository.PollRepository;
 import com.platform.chat.modules.poll.repository.PollVoteRepository;
+import com.platform.chat.modules.poll.service.dispatcher.PollResultDispatcher;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
 import com.platform.chat.repository.location.LocationUserRepository;
 import com.platform.chat.repository.location.LocationRepository;
@@ -38,7 +39,7 @@ import java.util.Set;
  */
 @Component
 @RequiredArgsConstructor
-public class ElectionResultHandlerAdapter implements PollResultHandler {
+public class ElectionResult implements PollResultHandler {
 
     private static final Set<PollType> SUPPORTED = EnumSet.of(PollType.ELECTION);
 

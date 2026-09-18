@@ -11,7 +11,7 @@ import com.platform.chat.core.event.base.EventType;
 import com.platform.chat.core.event.childs.PollClosedEvent;
 import com.platform.chat.modules.poll.entity.Poll;
 import com.platform.chat.modules.poll.enums.PollType;
-import com.platform.chat.modules.poll.service.ElectionFacade;
+import com.platform.chat.modules.poll.service.ElectionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,7 +41,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class PollClosedEventIntegrationTest {
 
     @Autowired
-    private ElectionFacade electionFacade;
+    private ElectionService electionService;
     @Autowired
     private ChatUserRepository chatUserRepository;
     @Autowired
@@ -73,11 +73,11 @@ class PollClosedEventIntegrationTest {
     @DisplayName("Scenario: closeElection публикует PollClosedEvent через диспетчер (по PollType)")
     void closeElection_publishesPollClosedEvent_viaDispatcher() {
         // 1. Initiate governor election - PollType GOVERNOR_ELECTION
-        Poll poll = electionFacade.initiateElection(1L, initiatorId);
+        Poll poll = electionService.initiateElection(1L, initiatorId);
         Long pollId = poll.getId();
 
         // 2. Close election - dispatcher picks ElectionResultHandlerAdapter
-        electionFacade.closeElection(pollId);
+        electionService.closeElection(pollId);
 
         // 3. Event published by the handler (facade does not publish PollClosedEvent)
         List<PollClosedEvent> events = eventCaptor.getEvents();
@@ -93,7 +93,7 @@ class PollClosedEventIntegrationTest {
         assertThat(event.getPollType()).isEqualTo(PollType.ELECTION.name());
 
         // 6. Poll is closed - result processing ran
-        assertThat(electionFacade.getStatus(pollId).getStatus().name()).isEqualTo("CLOSED");
+        assertThat(electionService.getStatus(pollId).getStatus().name()).isEqualTo("CLOSED");
     }
 
     /** Убирает действующего губернатора района, чтобы гейт «нет губернатора» не блокировал повторный прогон теста. */

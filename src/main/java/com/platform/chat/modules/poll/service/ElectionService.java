@@ -10,7 +10,7 @@ import com.platform.chat.modules.poll.entity.PollCandidate;
 import com.platform.chat.modules.poll.entity.PollVote;
 import com.platform.chat.modules.poll.enums.PollStatus;
 import com.platform.chat.modules.poll.enums.PollType;
-import com.platform.chat.modules.poll.handler.PollResultDispatcher;
+import com.platform.chat.modules.poll.service.dispatcher.PollResultDispatcher;
 import com.platform.chat.service.district.DistrictSettingsService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Слой 2 (Сценарии / Workflows).
- * ElectionFacade — оркестратор выборов губернатора.
+ * Слой 2 (Сценарии).
+ * ElectionService — оркестратор выборов губернатора.
  * Собирает шаги сценария "Выборы губернатора" в один вызов, понятный клиенту.
  * Не содержит бизнес-логики — делегирует в Слой 3 (PollService).
  * После закрытия голосования результат обрабатывает PollResultDispatcher
@@ -35,9 +35,9 @@ import java.util.Map;
  */
 @Service
 @RequiredArgsConstructor
-public class ElectionFacade {
+public class ElectionService {
 
-    private static final Logger log = LoggerFactory.getLogger(ElectionFacade.class);
+    private static final Logger log = LoggerFactory.getLogger(ElectionService.class);
 
     private final PollService pollService;
     private final PollResultDispatcher pollResultDispatcher;
@@ -111,7 +111,7 @@ public class ElectionFacade {
      * Подписчик (NotificationEventListener) разошлёт уведомления жителям района
      * и сделает WS-пуш — фасад больше не знает про Слой 4.
      */
-    private void publishElectionClosed(Poll closed) {
+    private void publishElectionClosed(Poll closed) { //TODO: есть PollClosedEvent - нужен ли нам ElectionClosedEvent?
         String winnerName = resolveWinnerName(closed.getId());
         eventPublisher.publish(new ElectionClosedEvent(closed.getScopeId(), closed.getId(), winnerName));
     }
@@ -142,10 +142,6 @@ public class ElectionFacade {
 
     public List<Poll> getElectionsInDistrict(Long districtId) {
         return pollService.findByDistrict(districtId);
-    }
-
-    public boolean hasCharacterVoted(Long pollId, Long characterId) {
-        return pollService.hasVoted(pollId, characterId);
     }
 
     public Map<Long, Integer> getResults(Long pollId) {

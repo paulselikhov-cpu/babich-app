@@ -15,7 +15,7 @@ import com.platform.chat.modules.notification.entity.Notification;
 import com.platform.chat.modules.notification.repository.NotificationRepository;
 import com.platform.chat.modules.poll.entity.Poll;
 import com.platform.chat.modules.poll.scheduler.PollCloseCheckHandler;
-import com.platform.chat.modules.poll.service.ElectionFacade;
+import com.platform.chat.modules.poll.service.ElectionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 class SchedulerGatewayIntegrationTest {
 
-    @Autowired private ElectionFacade electionFacade;
+    @Autowired private ElectionService electionService;
     @Autowired private ChatUserRepository chatUserRepository;
     @Autowired private NotificationRepository notificationRepository;
     @Autowired private ScheduledCheckRepository scheduledCheckRepository;
@@ -86,7 +86,7 @@ class SchedulerGatewayIntegrationTest {
     @DisplayName("Scenario: истечение dueAt в ScheduledCheck закрывает выборы и публикует событие (уведомление жителю)")
     void expiredScheduledCheck_closesPoll_andPublishesEvent() {
         // 1. Инициировать выборы — PollService регистрирует ScheduledCheck (dueAt = endsAt)
-        Poll poll = electionFacade.initiateElection(1L, characterId);
+        Poll poll = electionService.initiateElection(1L, characterId);
         Long pollId = poll.getId();
 
         List<ScheduledCheck> pending = scheduledCheckRepository
@@ -116,7 +116,7 @@ class SchedulerGatewayIntegrationTest {
                 .getStatus()).isEqualTo(ScheduledCheckStatus.COMPLETED);
 
         // 6. Poll реально закрыт
-        assertThat(electionFacade.getStatus(pollId).getStatus().name()).isEqualTo("CLOSED");
+        assertThat(electionService.getStatus(pollId).getStatus().name()).isEqualTo("CLOSED");
     }
 
     /** Убирает действующего губернатора района, чтобы гейт «нет губернатора» не блокировал повторный прогон теста. */

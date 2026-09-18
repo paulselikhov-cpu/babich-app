@@ -2,6 +2,7 @@ package com.platform.chat.modules.poll.handler;
 
 import com.platform.chat.modules.poll.entity.Poll;
 import com.platform.chat.modules.poll.enums.PollType;
+import com.platform.chat.modules.poll.service.dispatcher.PollResultDispatcher;
 
 import java.util.Set;
 
