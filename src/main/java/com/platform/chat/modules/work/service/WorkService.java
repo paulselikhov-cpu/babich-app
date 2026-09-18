@@ -1,12 +1,12 @@
 package com.platform.chat.modules.work.service;
 
-import com.platform.chat.core.service.CoinService;
-import com.platform.chat.core.service.EnergyService;
-import com.platform.chat.entity.ChatUser;
-import com.platform.chat.repository.chatUser.ChatUserRepository;
+import com.platform.chat.modules.coin.service.CoinService;
+import com.platform.chat.base.chatUser.service.EnergyService;
+import com.platform.chat.base.chatUser.entity.ChatUser;
+import com.platform.chat.base.chatUser.repository.ChatUserRepository;
 import com.platform.chat.modules.work.dto.WorkResultResponse;
 import com.platform.chat.modules.work.enums.Profession;
-import com.platform.chat.core.enums.CoinUpdateReason;
+import com.platform.chat.modules.coin.enums.CoinUpdateReason;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,17 +1,16 @@
 package com.platform.chat.modules.application.handler;
 
-import com.platform.chat.entity.ChatUser;
-import com.platform.chat.modules.application.entity.Application;
-import com.platform.chat.modules.application.enums.ApplicationMessageKey;
-import com.platform.chat.modules.application.enums.ApplicationStatus;
-import com.platform.chat.modules.application.enums.ApplicationType;
-import com.platform.chat.modules.application.utils.ApplicationIdGenerator;
-import com.platform.chat.modules.application.utils.ApplicationMessages;
-import com.platform.chat.repository.chatUser.ChatUserRepository;
+import com.platform.chat.core.modules.application.models.ApplicationHandler;
+import com.platform.chat.base.chatUser.entity.ChatUser;
+import com.platform.chat.core.modules.application.entity.Application;
+import com.platform.chat.core.modules.application.enums.ApplicationMessageKey;
+import com.platform.chat.core.modules.application.models.ApplicationStatus;
+import com.platform.chat.core.modules.application.ApplicationType;
+import com.platform.chat.core.modules.application.utils.ApplicationIdGenerator;
+import com.platform.chat.core.modules.application.utils.ApplicationMessages;
+import com.platform.chat.base.chatUser.repository.ChatUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import java.security.SecureRandom;
 
 @Component
 @RequiredArgsConstructor

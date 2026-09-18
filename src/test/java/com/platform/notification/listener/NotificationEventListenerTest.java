@@ -1,14 +1,14 @@
 package com.platform.notification.listener;
 
-import com.platform.chat.entity.ChatUser;
-import com.platform.chat.modules.notification.listener.NotificationEventListener;
-import com.platform.chat.repository.chatUser.ChatUserRepository;
-import com.platform.chat.core.event.childs.ElectionClosedEvent;
-import com.platform.chat.core.event.childs.ApplicationResolvedEvent;
-import com.platform.chat.modules.notification.dto.NotificationResponse;
-import com.platform.chat.modules.notification.dto.NotificationContextData;
-import com.platform.chat.modules.notification.entity.Notification;
-import com.platform.chat.modules.notification.service.NotificationService;
+import com.platform.chat.base.chatUser.entity.ChatUser;
+import com.platform.chat.modules.domainEvent.listener.NotificationEventListener;
+import com.platform.chat.base.chatUser.repository.ChatUserRepository;
+import com.platform.chat.modules.domainEvent.event.ElectionClosedEvent;
+import com.platform.chat.modules.domainEvent.event.ApplicationResolvedEvent;
+import com.platform.chat.core.modules.notification.dto.NotificationResponse;
+import com.platform.chat.core.modules.notification.dto.NotificationContextData;
+import com.platform.chat.core.modules.notification.entity.Notification;
+import com.platform.chat.core.modules.notification.service.NotificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

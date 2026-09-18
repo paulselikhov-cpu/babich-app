@@ -1,6 +1,6 @@
 package com.platform.poll;
 
-import com.platform.chat.core.event.childs.PollClosedEvent;
+import com.platform.chat.modules.domainEvent.event.PollClosedEvent;
 import org.springframework.context.event.EventListener;
 
 import java.util.List;

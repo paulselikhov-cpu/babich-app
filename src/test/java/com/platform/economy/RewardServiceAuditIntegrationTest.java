@@ -1,14 +1,12 @@
 package com.platform.economy;
 
-import com.platform.chat.entity.ChatUser;
-import com.platform.chat.modules.application.entity.Application;
-import com.platform.chat.repository.chatUser.ChatUserRepository;
-import com.platform.chat.modules.application.enums.ApplicationType;
-import com.platform.chat.modules.application.service.ApplicationService;
-import com.platform.chat.core.entity.TransactionLog;
-import com.platform.chat.core.enums.CoinUpdateReason;
-import com.platform.chat.core.repository.TransactionLogRepository;
-import com.platform.chat.core.service.CoinService;
+import com.platform.chat.base.chatUser.entity.ChatUser;
+import com.platform.chat.base.chatUser.repository.ChatUserRepository;
+import com.platform.chat.core.modules.application.service.ApplicationService;
+import com.platform.chat.core.modules.transactionLog.entity.TransactionLog;
+import com.platform.chat.modules.coin.enums.CoinUpdateReason;
+import com.platform.chat.core.modules.transactionLog.repository.TransactionLogRepository;
+import com.platform.chat.modules.coin.service.CoinService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

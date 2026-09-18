@@ -1,8 +1,8 @@
 package com.platform.chat.modules.work.controller;
 
-import com.platform.chat.entity.ChatUser;
+import com.platform.chat.base.chatUser.entity.ChatUser;
 import com.platform.chat.modules.work.service.WorkService;
-import com.platform.chat.service.chatUser.ChatUserService;
+import com.platform.chat.base.chatUser.service.ChatUserService;
 import com.platform.chat.modules.work.dto.WorkResultResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -1,21 +1,21 @@
 package com.platform.core.scheduler;
 
-import com.platform.chat.core.scheduler.ScheduledCheck;
-import com.platform.chat.core.scheduler.ScheduledCheckRepository;
-import com.platform.chat.core.scheduler.ScheduledCheckStatus;
-import com.platform.chat.core.scheduler.SchedulerGateway;
-import com.platform.chat.entity.ChatUser;
-import com.platform.chat.entity.Location;
-import com.platform.chat.enums.SystemRoleType;
-import com.platform.chat.enums.PublicLocationType;
-import com.platform.chat.repository.chatUser.ChatUserRepository;
-import com.platform.chat.repository.location.LocationUserRepository;
-import com.platform.chat.repository.location.LocationRepository;
-import com.platform.chat.modules.notification.entity.Notification;
-import com.platform.chat.modules.notification.repository.NotificationRepository;
-import com.platform.chat.modules.poll.entity.Poll;
-import com.platform.chat.modules.poll.scheduler.PollCloseCheckHandler;
-import com.platform.chat.modules.poll.service.ElectionService;
+import com.platform.chat.core.modules.scheduledCheck.entity.ScheduledCheck;
+import com.platform.chat.core.modules.scheduledCheck.repository.ScheduledCheckRepository;
+import com.platform.chat.core.modules.scheduledCheck.enums.ScheduledCheckStatus;
+import com.platform.chat.core.modules.scheduledCheck.SchedulerGateway;
+import com.platform.chat.base.chatUser.entity.ChatUser;
+import com.platform.chat.base.location.entity.Location;
+import com.platform.chat.base.chatUser.enums.SystemRoleType;
+import com.platform.chat.base.location.enums.PublicLocationType;
+import com.platform.chat.base.chatUser.repository.ChatUserRepository;
+import com.platform.chat.base.location.repository.LocationUserRepository;
+import com.platform.chat.base.location.repository.LocationRepository;
+import com.platform.chat.core.modules.notification.entity.Notification;
+import com.platform.chat.core.modules.notification.repository.NotificationRepository;
+import com.platform.chat.core.modules.poll.entity.Poll;
+import com.platform.chat.modules.governorElection.sheduledCheck.ElectionClose;
+import com.platform.chat.modules.governorElection.service.ElectionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -91,7 +91,7 @@ class SchedulerGatewayIntegrationTest {
 
         List<ScheduledCheck> pending = scheduledCheckRepository
                 .findByCheckTypeAndEntityTypeAndEntityIdAndStatus(
-                        PollCloseCheckHandler.CHECK_TYPE, "Poll", pollId, ScheduledCheckStatus.PENDING);
+                        ElectionClose.CHECK_TYPE, "Poll", pollId, ScheduledCheckStatus.PENDING);
         assertThat(pending).hasSize(1);
         ScheduledCheck check = pending.get(0);
 
