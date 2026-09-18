@@ -5,7 +5,7 @@ import com.platform.chat.dto.request.CreateChatUserRequest;
 import com.platform.chat.dto.request.CharacterUpdateRequest;
 import com.platform.chat.entity.ChatUser;
 import com.platform.chat.enums.ChatRole;
-import com.platform.chat.modules.economy.enums.Profession;
+import com.platform.chat.modules.work.enums.Profession;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
 import com.platform.chat.service.level.PersonLevelService;
 import lombok.RequiredArgsConstructor;

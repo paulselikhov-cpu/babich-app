@@ -1,10 +1,12 @@
-package com.platform.chat.modules.economy.service;
+package com.platform.chat.modules.work.service;
 
+import com.platform.chat.core.service.CoinService;
+import com.platform.chat.core.service.EnergyService;
 import com.platform.chat.entity.ChatUser;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
-import com.platform.chat.modules.economy.dto.WorkResultResponse;
-import com.platform.chat.modules.economy.enums.Profession;
-import com.platform.chat.modules.economy.enums.RewardReason;
+import com.platform.chat.modules.work.dto.WorkResultResponse;
+import com.platform.chat.modules.work.enums.Profession;
+import com.platform.chat.core.enums.CoinUpdateReason;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +27,7 @@ public class WorkService {
     private static final long XP_PER_SHIFT = 1;
 
     private final ChatUserRepository chatUserRepository;
-    private final RewardService rewardService;
+    private final CoinService coinService;
     private final EnergyService energyService;
 
     /** userId -> момент последнего тапа, для rate limit. */
@@ -43,8 +45,8 @@ public class WorkService {
         checkCooldown(userId);
 
         energyService.consumeEnergy(userId, ENERGY_COST);
-        rewardService.giveCoins(userId, COINS_PER_SHIFT, RewardReason.WORK_SHIFT, null);
-        rewardService.giveXp(userId, XP_PER_SHIFT, RewardReason.WORK_SHIFT);
+        coinService.giveCoins(userId, COINS_PER_SHIFT, CoinUpdateReason.WORK_SHIFT, null);
+        coinService.giveXp(userId, XP_PER_SHIFT, CoinUpdateReason.WORK_SHIFT);
 
         lastWorkAt.put(userId, Instant.now());
 

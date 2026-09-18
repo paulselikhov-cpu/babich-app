@@ -35,12 +35,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * которую пишет подписчик на AFTER_COMMIT; появление записи ожидается с
  * таймаутом (см. {@link #awaitNotifications}).</p>
  *
- * <p>Сценарий «покупка первой платной локации» идёт через реальный
- * ApplicationService → BuyFirstLocationHandler → LocationService: заявка
- * получает APPROVED, ApplicationService публикует ApplicationResolvedEvent.
- * Обработчик ищет персонажа по внешнему User.id (поле userId), поэтому
- * submit вызывается с внешним id, а уведомление проверяется по внутреннему
- * ChatUser.id (recipientCharacterId).</p>
  */
 @SpringBootTest
 class ApplicationResolvedIntegrationTest {
@@ -112,38 +106,6 @@ class ApplicationResolvedIntegrationTest {
         ChatUser saved = chatUserRepository.save(user);
         characterId = saved.getId();
         externalUserId = userId;
-    }
-
-    @Test
-    @DisplayName("Scenario: покупка первой платной локации одобряет заявку + ApplicationResolvedEvent + уведомление заявителя")
-    void buyFirstPaidLocation_resolvesApplication_andNotifiesOwner() {
-        // PRIVATE_HOUSE — платный шаблон (100 Coin) из data.sql.
-        // Обработчик ищет персонажа по внешнему User.id (userId).
-        Application result = applicationService.submit(
-                externalUserId,
-                characterId,
-                ApplicationType.BUY_FIRST_LOCATION,
-                "PRIVATE_HOUSE"
-        );
-
-        assertThat(result.getStatus().name()).isEqualTo("APPROVED");
-        Long applicationId = result.getId();
-
-        // уведомление пишет подписчик ApplicationResolvedEvent
-        // (@ApplicationModuleListener) — наличие записи подтверждает сквозной
-        // путь: ApplicationService → событие → подписчик → Notification
-        List<Notification> notifications = awaitNotifications();
-        assertThat(notifications)
-                .anySatisfy(n -> {
-                    assertThat(n.getRecipientCharacterId()).isEqualTo(characterId);
-                    assertThat(n.getNotificationType()).isEqualTo("APPLICATION_RESULT");
-                    assertThat(n.getRelatedEntityId()).isEqualTo(applicationId);
-                    assertThat(n.getTitle()).contains("одобрена");
-                    // тело без «Статус: PENDING» — человеко-читаемое
-                    assertThat(n.getBody()).doesNotContain("PENDING");
-                    // контекстные данные позволяют фронту понять тип/статус заявки
-                    assertThat(n.getData()).contains("BUY_FIRST_LOCATION", "APPROVED");
-                });
     }
 
     @Test

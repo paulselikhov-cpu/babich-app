@@ -3,7 +3,7 @@ package com.platform.chat.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.platform.chat.enums.ChatRole;
 import com.platform.chat.enums.CivicRole;
-import com.platform.chat.modules.economy.enums.Profession;
+import com.platform.chat.modules.work.enums.Profession;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;

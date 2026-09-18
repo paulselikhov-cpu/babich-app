@@ -1,4 +1,4 @@
-package com.platform.chat.listener;
+package com.platform.chat.core.eventListener;
 
 import com.platform.chat.service.onlineSessions.PresenceService;
 import lombok.RequiredArgsConstructor;

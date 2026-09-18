@@ -41,30 +41,6 @@ public class ApplicationService {
         return handlerMap;
     }
 
-    @Transactional
-    public Application submit(Long userId, Long characterId, ApplicationType type, String payload) {
-        Application application = new Application();
-        application.setUserId(userId);
-        application.setCharacterId(characterId);
-        application.setType(type);
-        application.setPayload(payload);
-        applicationRepository.save(application);
-
-        ApplicationHandler handler = getHandlerMap().get(type);
-        if (handler == null) {
-            throw new RuntimeException("Нет обработчика для типа заявки: " + type);
-        }
-
-        handler.handle(application);
-        application.setProcessedAt(LocalDateTime.now());
-        Application resolved = applicationRepository.save(application);
-
-        publishResolved(resolved);
-        publishCharacterUpdatedIfApproved(resolved);
-
-        return resolved;
-    }
-
     public List<Application> getMyApplications(Long userId) {
         return applicationRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }
@@ -138,10 +114,6 @@ public class ApplicationService {
         publishCharacterUpdatedIfApproved(resolved);
 
         return resolved;
-    }
-
-    public Optional<Application> findById(Long id) {
-        return applicationRepository.findById(id);
     }
 
     public boolean existsPendingApplication(Long characterId, ApplicationType type) {

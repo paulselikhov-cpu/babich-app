@@ -1,4 +1,4 @@
-package com.platform.chat.modules.economy.enums;
+package com.platform.chat.core.enums;
 
 /**
  * Причина начисления/списания монет или XP.
@@ -6,7 +6,7 @@ package com.platform.chat.modules.economy.enums;
  * Список открыт для расширения — новые причины добавляются по мере
  * реализации новых механик (группировки, полиция, банк, рынок и т.д.).
  */
-public enum RewardReason {
+public enum CoinUpdateReason {
     WORK_SHIFT,             // заработок за смену/тап-фарм (профессия)
     BUY_FIRST_LOCATION,     // списание за покупку первой локации
     LOCATION_CREATE,        // списание за создание платной локации через REST

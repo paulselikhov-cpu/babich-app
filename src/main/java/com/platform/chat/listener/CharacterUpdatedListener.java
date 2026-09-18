@@ -1,7 +1,7 @@
-package com.platform.chat.modules.notification.listener;
+package com.platform.chat.listener;
 
 import com.platform.chat.core.event.childs.CharacterUpdatedEvent;
-import com.platform.chat.modules.notification.dto.CharacterUpdatedResponse;
+import com.platform.chat.dto.CharacterUpdatedResponse;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.platform.chat.core.event.base.DomainEvent;
 import com.platform.chat.core.event.base.EventType;
 import com.platform.chat.core.event.base.ScopeType;
-import com.platform.chat.modules.economy.enums.RewardReason;
+import com.platform.chat.core.enums.CoinUpdateReason;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +22,7 @@ import java.util.Map;
  */
 public class CoinsChangedEvent extends DomainEvent {
 
-    public CoinsChangedEvent(Long characterId, Long amount, RewardReason reason, Long relatedEntityId) {
+    public CoinsChangedEvent(Long characterId, Long amount, CoinUpdateReason reason, Long relatedEntityId) {
         super(
                 EventType.COINS_CHANGED,
                 characterId, // actorId — персонаж-инициатор изменения баланса
@@ -44,9 +44,9 @@ public class CoinsChangedEvent extends DomainEvent {
     }
 
     @JsonIgnore
-    public RewardReason getReason() {
+    public CoinUpdateReason getReason() {
         Object reason = getPayload().get("reason");
-        return reason != null ? RewardReason.valueOf((String) reason) : null;
+        return reason != null ? CoinUpdateReason.valueOf((String) reason) : null;
     }
 
     @JsonIgnore
@@ -54,7 +54,7 @@ public class CoinsChangedEvent extends DomainEvent {
         return (Long) getPayload().get("relatedEntityId");
     }
 
-    private static Map<String, Object> buildPayload(Long amount, RewardReason reason, Long relatedEntityId) {
+    private static Map<String, Object> buildPayload(Long amount, CoinUpdateReason reason, Long relatedEntityId) {
         Map<String, Object> payload = new HashMap<>();
         payload.put("amount", amount);
         if (reason != null) {

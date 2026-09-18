@@ -1,9 +1,9 @@
-package com.platform.chat.modules.economy.controller;
+package com.platform.chat.modules.work.controller;
 
 import com.platform.chat.entity.ChatUser;
-import com.platform.chat.modules.economy.service.WorkService;
+import com.platform.chat.modules.work.service.WorkService;
 import com.platform.chat.service.chatUser.ChatUserService;
-import com.platform.chat.modules.economy.dto.WorkResultResponse;
+import com.platform.chat.modules.work.dto.WorkResultResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

@@ -1,10 +1,10 @@
-package com.platform.chat.modules.economy.event;
+package com.platform.chat.core.eventListener;
 
-import com.platform.chat.modules.economy.repository.TransactionLogRepository;
+import com.platform.chat.core.repository.TransactionLogRepository;
 import com.platform.chat.core.event.childs.CoinsChangedEvent;
 import com.platform.chat.core.event.childs.XpChangedEvent;
-import com.platform.chat.modules.economy.entity.TransactionLog;
-import com.platform.chat.modules.economy.enums.RewardReason;
+import com.platform.chat.core.entity.TransactionLog;
+import com.platform.chat.core.enums.CoinUpdateReason;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +60,7 @@ public class TransactionLogEventListener {
     }
 
     private void write(Long userId, String resourceType, long amount,
-                       RewardReason reason, Long relatedEntityId) {
+                       CoinUpdateReason reason, Long relatedEntityId) {
         TransactionLog entry = new TransactionLog();
         entry.setUserId(userId);
         entry.setResourceType(resourceType);

@@ -13,7 +13,7 @@
                 "auth::userRepository",
                 "chat.core",
                 "chat.modules.application",
-                "chat.modules.economy"
+                "chat.modules.work"
         },
         type = ApplicationModule.Type.OPEN
 )

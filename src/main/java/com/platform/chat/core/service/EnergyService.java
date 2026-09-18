@@ -1,4 +1,4 @@
-package com.platform.chat.modules.economy.service;
+package com.platform.chat.core.service;
 
 import com.platform.chat.entity.ChatUser;
 import com.platform.chat.repository.chatUser.ChatUserRepository;

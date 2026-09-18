@@ -1,6 +1,6 @@
-package com.platform.chat.modules.economy.entity;
+package com.platform.chat.core.entity;
 
-import com.platform.chat.modules.economy.enums.RewardReason;
+import com.platform.chat.core.enums.CoinUpdateReason;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -38,7 +38,7 @@ public class TransactionLog {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 40)
-    private RewardReason reason;
+    private CoinUpdateReason reason;
 
     /**
      * Опциональная ссылка на связанную сущность (например id заявки,

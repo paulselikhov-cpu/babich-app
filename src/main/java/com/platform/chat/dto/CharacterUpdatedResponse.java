@@ -1,4 +1,4 @@
-package com.platform.chat.modules.notification.dto;
+package com.platform.chat.dto;
 
 public record CharacterUpdatedResponse(Long id) {
 }

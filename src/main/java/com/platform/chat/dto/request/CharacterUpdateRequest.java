@@ -1,7 +1,7 @@
 package com.platform.chat.dto.request;
 
 import com.platform.chat.enums.ChatRole;
-import com.platform.chat.modules.economy.enums.Profession;
+import com.platform.chat.modules.work.enums.Profession;
 
 /**
  * Обновление полей персонажа из админской таблицы «Персонажи района».

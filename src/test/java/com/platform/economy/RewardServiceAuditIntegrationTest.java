@@ -5,10 +5,10 @@ import com.platform.chat.modules.application.entity.Application;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
 import com.platform.chat.modules.application.enums.ApplicationType;
 import com.platform.chat.modules.application.service.ApplicationService;
-import com.platform.chat.modules.economy.entity.TransactionLog;
-import com.platform.chat.modules.economy.enums.RewardReason;
-import com.platform.chat.modules.economy.repository.TransactionLogRepository;
-import com.platform.chat.modules.economy.service.RewardService;
+import com.platform.chat.core.entity.TransactionLog;
+import com.platform.chat.core.enums.CoinUpdateReason;
+import com.platform.chat.core.repository.TransactionLogRepository;
+import com.platform.chat.core.service.CoinService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -49,7 +49,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class RewardServiceAuditIntegrationTest {
 
     @Autowired
-    private RewardService rewardService;
+    private CoinService coinService;
 
     @Autowired
     private ChatUserRepository chatUserRepository;
@@ -78,7 +78,7 @@ class RewardServiceAuditIntegrationTest {
      * RewardService запись может ещё не появиться. Хелпер поллит с интервалом
      * 50 мс до 5 с — этого достаточно, чтобы подписчик успел записать аудит.</p>
      */
-    private List<TransactionLog> awaitAuditLogs(Long userId, RewardReason reason) {
+    private List<TransactionLog> awaitAuditLogs(Long userId, CoinUpdateReason reason) {
         long deadline = System.currentTimeMillis() + 5_000;
         List<TransactionLog> logs = List.of();
         while (System.currentTimeMillis() < deadline) {
@@ -124,19 +124,19 @@ class RewardServiceAuditIntegrationTest {
     void giveCoins_publishesEvent_andWritesAudit() {
         long amount = 250L;
 
-        rewardService.giveCoins(characterId, amount, RewardReason.WORK_SHIFT, null);
+        coinService.giveCoins(characterId, amount, CoinUpdateReason.WORK_SHIFT, null);
 
         ChatUser user = chatUserRepository.findById(characterId).orElseThrow();
         assertThat(user.getCoinBalance()).isEqualTo(START_BALANCE + amount);
 
         // аудит пишет подписчик CoinsChangedEvent (@ApplicationModuleListener) —
         // наличие записи подтверждает сквозной путь: сервис → событие → подписчик → аудит
-        List<TransactionLog> logs = awaitAuditLogs(characterId, RewardReason.WORK_SHIFT);
+        List<TransactionLog> logs = awaitAuditLogs(characterId, CoinUpdateReason.WORK_SHIFT);
         assertThat(logs)
                 .anySatisfy(log -> {
                     assertThat(log.getResourceType()).isEqualTo("COIN");
                     assertThat(log.getAmount()).isEqualTo(amount);
-                    assertThat(log.getReason()).isEqualTo(RewardReason.WORK_SHIFT);
+                    assertThat(log.getReason()).isEqualTo(CoinUpdateReason.WORK_SHIFT);
                 });
     }
 
@@ -145,18 +145,18 @@ class RewardServiceAuditIntegrationTest {
     void takeCoins_publishesEventWithNegativeAmount_andWritesAudit() {
         long amount = 100L;
 
-        rewardService.takeCoins(characterId, amount, RewardReason.LOCATION_CREATE, 777L);
+        coinService.takeCoins(characterId, amount, CoinUpdateReason.LOCATION_CREATE, 777L);
 
         ChatUser user = chatUserRepository.findById(characterId).orElseThrow();
         assertThat(user.getCoinBalance()).isEqualTo(START_BALANCE - amount);
 
         // аудит списания: amount отрицательный, связанная сущность сохраняется
-        List<TransactionLog> logs = awaitAuditLogs(characterId, RewardReason.LOCATION_CREATE);
+        List<TransactionLog> logs = awaitAuditLogs(characterId, CoinUpdateReason.LOCATION_CREATE);
         assertThat(logs)
                 .anySatisfy(log -> {
                     assertThat(log.getResourceType()).isEqualTo("COIN");
                     assertThat(log.getAmount()).isEqualTo(-amount);
-                    assertThat(log.getReason()).isEqualTo(RewardReason.LOCATION_CREATE);
+                    assertThat(log.getReason()).isEqualTo(CoinUpdateReason.LOCATION_CREATE);
                     assertThat(log.getRelatedEntityId()).isEqualTo(777L);
                 });
     }
@@ -166,8 +166,8 @@ class RewardServiceAuditIntegrationTest {
     void takeCoins_withoutEnoughBalance_throws_andWritesNoAudit() {
         long overdraw = START_BALANCE + 1;
 
-        assertThatThrownBy(() -> rewardService.takeCoins(
-                characterId, overdraw, RewardReason.LOCATION_CREATE, null))
+        assertThatThrownBy(() -> coinService.takeCoins(
+                characterId, overdraw, CoinUpdateReason.LOCATION_CREATE, null))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Недостаточно монет");
 
@@ -176,7 +176,7 @@ class RewardServiceAuditIntegrationTest {
 
         // событие не публиковалось — аудит-запись не должна появиться
         assertThat(transactionLogRepository.findByUserIdAndReason(
-                characterId, RewardReason.LOCATION_CREATE)).isEmpty();
+                characterId, CoinUpdateReason.LOCATION_CREATE)).isEmpty();
     }
 
     @Test
@@ -184,48 +184,18 @@ class RewardServiceAuditIntegrationTest {
     void giveXp_publishesEvent_andWritesAudit() {
         long amount = 40L;
 
-        rewardService.giveXp(characterId, amount, RewardReason.WORK_SHIFT);
+        coinService.giveXp(characterId, amount, CoinUpdateReason.WORK_SHIFT);
 
         ChatUser user = chatUserRepository.findById(characterId).orElseThrow();
         assertThat(user.getXpUser()).isEqualTo(START_XP + amount);
 
         // аудит XP_USER пишет подписчик XpChangedEvent — сквозной путь подтверждён
-        List<TransactionLog> logs = awaitAuditLogs(characterId, RewardReason.WORK_SHIFT);
+        List<TransactionLog> logs = awaitAuditLogs(characterId, CoinUpdateReason.WORK_SHIFT);
         assertThat(logs)
                 .anySatisfy(log -> {
                     assertThat(log.getResourceType()).isEqualTo("XP_USER");
                     assertThat(log.getAmount()).isEqualTo(amount);
-                    assertThat(log.getReason()).isEqualTo(RewardReason.WORK_SHIFT);
-                });
-    }
-
-    @Test
-    @DisplayName("Scenario: покупка первой платной локации списывает монеты и пишет аудит LOCATION_CREATE")
-    void buyFirstPaidLocation_debitsCoins_andWritesAudit() {
-        // PRIVATE_HOUSE — платный шаблон (100 Coin) из data.sql.
-        // Обработчик ищет персонажа по внешнему User.id (userId).
-        Application result = applicationService.submit(
-                externalUserId,
-                characterId,
-                ApplicationType.BUY_FIRST_LOCATION,
-                "PRIVATE_HOUSE"
-        );
-
-        assertThat(result.getStatus().name()).isEqualTo("APPROVED");
-
-        // баланс уменьшен на цену шаблона
-        ChatUser user = chatUserRepository.findById(characterId).orElseThrow();
-        assertThat(user.getCoinBalance()).isEqualTo(START_BALANCE - 100L);
-        assertThat(user.getGameStatus()).isEqualTo("RESIDENT");
-
-        // аудит списания через событие CoinsChangedEvent от LocationService.createLocation
-        List<TransactionLog> logs = awaitAuditLogs(characterId, RewardReason.LOCATION_CREATE);
-        assertThat(logs)
-                .anySatisfy(log -> {
-                    assertThat(log.getResourceType()).isEqualTo("COIN");
-                    assertThat(log.getAmount()).isEqualTo(-100L);
-                    assertThat(log.getReason()).isEqualTo(RewardReason.LOCATION_CREATE);
-                    assertThat(log.getRelatedEntityId()).isNotNull();
+                    assertThat(log.getReason()).isEqualTo(CoinUpdateReason.WORK_SHIFT);
                 });
     }
 }

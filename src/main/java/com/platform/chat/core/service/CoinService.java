@@ -1,11 +1,11 @@
-package com.platform.chat.modules.economy.service;
+package com.platform.chat.core.service;
 
 import com.platform.chat.entity.ChatUser;
 import com.platform.chat.repository.chatUser.ChatUserRepository;
 import com.platform.chat.core.event.childs.CoinsChangedEvent;
 import com.platform.chat.core.event.base.DomainEventPublisher;
 import com.platform.chat.core.event.childs.XpChangedEvent;
-import com.platform.chat.modules.economy.enums.RewardReason;
+import com.platform.chat.core.enums.CoinUpdateReason;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,13 +19,13 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @RequiredArgsConstructor
-public class RewardService {
+public class CoinService {
 
     private final ChatUserRepository chatUserRepository;
     private final DomainEventPublisher eventPublisher;
 
     @Transactional
-    public void giveCoins(Long userId, long amount, RewardReason reason, Long relatedEntityId) {
+    public void giveCoins(Long userId, long amount, CoinUpdateReason reason, Long relatedEntityId) {
         ChatUser user = getUser(userId);
         user.setCoinBalance(user.getCoinBalance() + amount);
         chatUserRepository.save(user);
@@ -34,7 +34,7 @@ public class RewardService {
     }
 
     @Transactional
-    public void takeCoins(Long userId, long amount, RewardReason reason, Long relatedEntityId) {
+    public void takeCoins(Long userId, long amount, CoinUpdateReason reason, Long relatedEntityId) {
         ChatUser user = getUser(userId);
         if (user.getCoinBalance() < amount) {
             throw new IllegalStateException(
@@ -47,7 +47,7 @@ public class RewardService {
     }
 
     @Transactional
-    public void giveXp(Long userId, long amount, RewardReason reason) {
+    public void giveXp(Long userId, long amount, CoinUpdateReason reason) {
         ChatUser user = getUser(userId);
         user.setXpUser(user.getXpUser() + amount);
         chatUserRepository.save(user);

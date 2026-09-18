@@ -10,8 +10,8 @@ import com.platform.chat.repository.location.LocationRepository;
 import com.platform.chat.repository.location.LocationTemplateRepository;
 import com.platform.chat.repository.room.RoomReadStatusRepository;
 import com.platform.chat.repository.room.RoomRepository;
-import com.platform.chat.modules.economy.enums.RewardReason;
-import com.platform.chat.modules.economy.service.RewardService;
+import com.platform.chat.core.enums.CoinUpdateReason;
+import com.platform.chat.core.service.CoinService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +39,7 @@ public class LocationService {
     private final RoomRepository roomRepository;
     private final ChatUserRepository chatUserRepository;
     private final DistrictRepository districtRepository;
-    private final RewardService rewardService;
+    private final CoinService coinService;
 
     /**
      * Получить все публичные пользовательские локации.
@@ -142,8 +142,8 @@ public class LocationService {
 
         // шаг 3b: списываем Coin за создание (аудит — через доменное событие)
         if (template.getPriceCoin() > 0) {
-            rewardService.takeCoins(characterId, template.getPriceCoin(),
-                    RewardReason.LOCATION_CREATE, savedLocation.getId());
+            coinService.takeCoins(characterId, template.getPriceCoin(),
+                    CoinUpdateReason.LOCATION_CREATE, savedLocation.getId());
         }
 
         // шаг 5: копируем базовые комнаты из шаблона
@@ -256,8 +256,8 @@ public class LocationService {
                                 ", есть: " + character.getCoinBalance()
                 );
             }
-            rewardService.takeCoins(characterId, price,
-                    RewardReason.LOCATION_EXTEND_ROOM, locationId);
+            coinService.takeCoins(characterId, price,
+                    CoinUpdateReason.LOCATION_EXTEND_ROOM, locationId);
         }
 
         // определяем порядковый номер новой комнаты

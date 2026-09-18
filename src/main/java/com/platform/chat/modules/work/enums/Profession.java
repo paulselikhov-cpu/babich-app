@@ -1,4 +1,4 @@
-package com.platform.chat.modules.economy.enums;
+package com.platform.chat.modules.work.enums;
 
 /**
  * Профессия персонажа — определяет доступные механики тап-фарма.
