@@ -1,8 +1,8 @@
-package com.platform.chat.modules.domainEvent.listener;
+package com.platform.chat.modules.domainEvent.listeners;
 
 import com.platform.chat.core.modules.transactionLog.repository.TransactionLogRepository;
-import com.platform.chat.modules.domainEvent.event.CoinsChangedEvent;
-import com.platform.chat.modules.domainEvent.event.XpChangedEvent;
+import com.platform.chat.modules.domainEvent.events.CoinsChangedEvent;
+import com.platform.chat.modules.domainEvent.events.XpChangedEvent;
 import com.platform.chat.core.modules.transactionLog.entity.TransactionLog;
 import com.platform.chat.modules.coin.enums.CoinUpdateReason;
 import lombok.RequiredArgsConstructor;

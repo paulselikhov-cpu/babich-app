@@ -1,4 +1,4 @@
-package com.platform.chat.modules.domainEvent.event;
+package com.platform.chat.modules.domainEvent.events;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.platform.chat.core.modules.domainEvent.DomainEvent;

@@ -55,7 +55,7 @@ class ModuleBoundaryTest {
         ));
 
         assertThat(modules).isNotNull();
-        assertThat(modules.getModuleByName("chat.core")).isPresent();
+        assertThat(modules.getModuleByName("chat.base.chatUser")).isPresent();
     }
 
     @Test

@@ -1,4 +1,4 @@
-package com.platform.chat.core.modules.domainEvent.base;
+package com.platform.chat.core.modules.domainEvent.service;
 
 import com.platform.chat.core.modules.domainEvent.DomainEvent;
 import org.slf4j.Logger;

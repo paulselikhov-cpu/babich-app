@@ -2,12 +2,14 @@ package com.platform.chat.core.modules.application.service;
 
 import com.platform.chat.core.modules.application.entity.Application;
 import com.platform.chat.core.modules.application.models.ApplicationStatus;
-import com.platform.chat.core.modules.application.ApplicationType;
+import com.platform.chat.core.modules.domainEvent.service.DomainEventPublisher;
 import com.platform.chat.core.modules.application.models.ApplicationHandler;
 import com.platform.chat.core.modules.application.repository.ApplicationRepository;
-import com.platform.chat.modules.domainEvent.event.ApplicationResolvedEvent;
-import com.platform.chat.modules.domainEvent.event.CharacterUpdatedEvent;
-import com.platform.chat.core.modules.domainEvent.base.DomainEventPublisher;
+
+import com.platform.chat.modules.domainEvent.events.ApplicationResolvedEvent;
+import com.platform.chat.modules.domainEvent.events.CharacterUpdatedEvent;
+import com.platform.chat.modules.application.ApplicationType;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

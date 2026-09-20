@@ -1,5 +1,6 @@
-package com.platform.chat.core.modules.scheduledCheck;
+package com.platform.chat.core.modules.scheduledCheck.models;
 
+import com.platform.chat.core.modules.scheduledCheck.service.SchedulerGateway;
 import com.platform.chat.core.modules.scheduledCheck.entity.ScheduledCheck;
 
 /**

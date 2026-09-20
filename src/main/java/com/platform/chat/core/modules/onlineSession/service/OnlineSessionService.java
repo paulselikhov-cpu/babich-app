@@ -4,14 +4,16 @@ import com.platform.chat.core.modules.onlineSession.repository.CharacterPresence
 import com.platform.chat.core.modules.onlineSession.dto.OnlineSessionsCountResponse;
 import com.platform.chat.core.modules.onlineSession.dto.OnlineSessionsResponse;
 import com.platform.chat.core.modules.onlineSession.entity.onlineSessions;
-import com.platform.chat.base.chatUser.entity.ChatUser;
-import com.platform.chat.base.location.entity.Location;
-import com.platform.chat.base.room.entity.Room;
-import com.platform.chat.base.chatUser.repository.ChatUserRepository;
-import com.platform.chat.base.location.repository.LocationRepository;
-import com.platform.chat.base.room.repository.RoomRepository;
 import com.platform.chat.core.modules.message.service.UnreadService;
-import com.platform.chat.core.modules.scheduledCheck.TickHandler;
+import com.platform.chat.core.modules.scheduledCheck.models.TickHandler;
+
+import com.platform.chat.base.chatUser.entity.ChatUser;
+import com.platform.chat.base.chatUser.repository.ChatUserRepository;
+import com.platform.chat.base.location.entity.Location;
+import com.platform.chat.base.location.repository.LocationRepository;
+import com.platform.chat.base.room.entity.Room;
+import com.platform.chat.base.room.repository.RoomRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;

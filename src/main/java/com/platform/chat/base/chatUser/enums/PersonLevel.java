@@ -1,5 +1,8 @@
 package com.platform.chat.base.chatUser.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum PersonLevel {
     LEVEL_1(1, 0),
     LEVEL_2(2, 200),
@@ -13,14 +16,6 @@ public enum PersonLevel {
     PersonLevel(int levelNumber, int xpThreshold) {
         this.levelNumber = levelNumber;
         this.xpThreshold = xpThreshold;
-    }
-
-    public int getLevelNumber() {
-        return levelNumber;
-    }
-
-    public int getXpThreshold() {
-        return xpThreshold;
     }
 
     public static PersonLevel fromXp(long xp) {

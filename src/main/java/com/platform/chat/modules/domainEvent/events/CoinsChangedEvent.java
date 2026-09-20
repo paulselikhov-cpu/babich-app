@@ -1,4 +1,4 @@
-package com.platform.chat.modules.domainEvent.event;
+package com.platform.chat.modules.domainEvent.events;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.platform.chat.core.modules.domainEvent.DomainEvent;
@@ -10,21 +10,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Событие изменения опыта (XP) персонажа.
- * Публикуется RewardService при giveXp.
+ * Событие изменения баланса монет персонажа.
+ * Публикуется RewardService при giveCoins/takeCoins.
  * Подписчик (TransactionLogEventListener) пишет аудит-запись в TransactionLog.
  *
- * <p>Аналогично {@link CoinsChangedEvent}: вычисляемые геттеры помечены
- * {@code @JsonIgnore}, данные живут в payload базового класса и при replay
- * восстанавливаются через конструктор {@link DomainEvent}.</p>
+ * <p>Вычисляемые геттеры {@code getCharacterId()}, {@code getAmount()},
+ * {@code getReason()}, {@code getRelatedEntityId()} помечены {@code @JsonIgnore}:
+ * при сериализации события в event_publication Modulith данные уходят в payload
+ * базового класса и при replay восстанавливаются через конструктор
+ * {@link DomainEvent} — аналогично {@link ElectionClosedEvent}.</p>
  */
-public class XpChangedEvent extends DomainEvent {
+public class CoinsChangedEvent extends DomainEvent {
 
-    public XpChangedEvent(Long characterId, Long amount, CoinUpdateReason reason, Long relatedEntityId) {
+    public CoinsChangedEvent(Long characterId, Long amount, CoinUpdateReason reason, Long relatedEntityId) {
         super(
-                EventType.XP_CHANGED,
-                characterId, // actorId — персонаж-инициатор изменения XP
-                characterId, // targetId — персонаж, чей XP изменился
+                EventType.COINS_CHANGED,
+                characterId, // actorId — персонаж-инициатор изменения баланса
+                characterId, // targetId — персонаж, чей баланс изменился
                 ScopeType.CHARACTER,
                 characterId,
                 buildPayload(amount, reason, relatedEntityId)

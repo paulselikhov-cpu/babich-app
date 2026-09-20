@@ -3,7 +3,7 @@ package com.platform.core.scheduler;
 import com.platform.chat.core.modules.scheduledCheck.entity.ScheduledCheck;
 import com.platform.chat.core.modules.scheduledCheck.repository.ScheduledCheckRepository;
 import com.platform.chat.core.modules.scheduledCheck.enums.ScheduledCheckStatus;
-import com.platform.chat.core.modules.scheduledCheck.SchedulerGateway;
+import com.platform.chat.core.modules.scheduledCheck.service.SchedulerGateway;
 import com.platform.chat.base.chatUser.entity.ChatUser;
 import com.platform.chat.base.location.entity.Location;
 import com.platform.chat.base.chatUser.enums.SystemRoleType;

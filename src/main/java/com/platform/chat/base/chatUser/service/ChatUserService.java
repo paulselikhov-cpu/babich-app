@@ -5,7 +5,7 @@ import com.platform.chat.base.chatUser.entity.ChatUser;
 import com.platform.chat.base.chatUser.dto.CreateChatUserRequest;
 import com.platform.chat.base.chatUser.dto.CharacterUpdateRequest;
 import com.platform.chat.base.chatUser.enums.ChatRole;
-import com.platform.chat.modules.work.enums.Profession;
+import com.platform.chat.base.chatUser.enums.Profession;
 import com.platform.chat.base.chatUser.repository.ChatUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

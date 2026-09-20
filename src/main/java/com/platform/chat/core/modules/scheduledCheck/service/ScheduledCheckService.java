@@ -1,7 +1,6 @@
 package com.platform.chat.core.modules.scheduledCheck.service;
 
 import com.platform.chat.core.modules.scheduledCheck.entity.ScheduledCheck;
-import com.platform.chat.core.modules.scheduledCheck.SchedulerGateway;
 import com.platform.chat.core.modules.scheduledCheck.enums.ScheduledCheckStatus;
 import com.platform.chat.core.modules.scheduledCheck.repository.ScheduledCheckRepository;
 import lombok.RequiredArgsConstructor;

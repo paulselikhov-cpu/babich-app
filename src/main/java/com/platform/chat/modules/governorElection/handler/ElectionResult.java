@@ -1,10 +1,14 @@
 package com.platform.chat.modules.governorElection.handler;
 
 import com.platform.chat.base.chatUser.entity.ChatUser;
+import com.platform.chat.base.chatUser.enums.SystemRoleType;
+import com.platform.chat.base.chatUser.repository.ChatUserRepository;
 import com.platform.chat.base.location.entity.LocationUser;
 import com.platform.chat.base.location.enums.LocationUserRole;
 import com.platform.chat.base.location.enums.PublicLocationType;
-import com.platform.chat.base.chatUser.enums.SystemRoleType;
+import com.platform.chat.base.location.repository.LocationUserRepository;
+import com.platform.chat.base.location.repository.LocationRepository;
+
 import com.platform.chat.core.modules.poll.entity.Poll;
 import com.platform.chat.core.modules.poll.entity.PollCandidate;
 import com.platform.chat.core.modules.poll.entity.PollVote;
@@ -15,9 +19,7 @@ import com.platform.chat.core.modules.poll.repository.PollCandidateRepository;
 import com.platform.chat.core.modules.poll.repository.PollRepository;
 import com.platform.chat.core.modules.poll.repository.PollVoteRepository;
 import com.platform.chat.core.modules.poll.service.PollResultDispatcher;
-import com.platform.chat.base.chatUser.repository.ChatUserRepository;
-import com.platform.chat.base.location.repository.LocationUserRepository;
-import com.platform.chat.base.location.repository.LocationRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;

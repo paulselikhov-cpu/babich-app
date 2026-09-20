@@ -5,7 +5,7 @@ import com.platform.chat.base.location.entity.Location;
 import com.platform.chat.base.location.entity.LocationUser;
 import com.platform.chat.base.chatUser.enums.ChatRole;
 import com.platform.chat.base.chatUser.enums.CivicRole;
-import com.platform.chat.modules.work.enums.Profession;
+import com.platform.chat.base.chatUser.enums.Profession;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;

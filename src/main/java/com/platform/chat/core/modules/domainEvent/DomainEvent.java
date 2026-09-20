@@ -6,7 +6,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.platform.chat.core.modules.domainEvent.enums.ScopeType;
-import com.platform.chat.modules.domainEvent.event.*;
+import com.platform.chat.modules.domainEvent.events.*;
+import lombok.Getter;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -51,27 +52,32 @@ public abstract class DomainEvent implements Serializable {
     private final Instant occurredAt;
 
     /** Тип доменного события — определяет, какое именно действие произошло. */
+    @Getter
     private final EventType type;
 
     /**
      * Идентификатор актора — сущности (ChatUser), которая инициировала событие.
      * Может быть null для системных событий.
      */
+    @Getter
     private final Long actorId;
 
     /**
      * Идентификатор цели — сущности, над которой выполнено действие.
      * Например, для уведомления о конце выборов — кандидат, получивший должность.
      */
+    @Getter
     private final Long targetId;
 
     /** Тип скоупа — область действия события (район, локация, персонаж и т.п.). */
     private final ScopeType scopeType;
 
     /** Идентификатор скоупа — конкретного района/локации/персонажа, к которому относится событие. */
+    @Getter
     private final Long scopeId;
 
     /** Произвольные дополнительные данные события в формате ключ-значение (опционально). */
+    @Getter
     private final Map<String, Object> payload;
 
     @JsonCreator
@@ -98,14 +104,4 @@ public abstract class DomainEvent implements Serializable {
 
     @JsonIgnore
     public UUID getEventId() { return eventId; }
-
-    @JsonIgnore
-    public Instant getOccurredAt() { return occurredAt; }
-
-    public EventType getType() { return type; }
-    public Long getActorId() { return actorId; }
-    public Long getTargetId() { return targetId; }
-    public ScopeType getScopeType() { return scopeType; }
-    public Long getScopeId() { return scopeId; }
-    public Map<String, Object> getPayload() { return payload; }
 }

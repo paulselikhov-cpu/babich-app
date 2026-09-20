@@ -1,10 +1,10 @@
-package com.platform.chat.modules.domainEvent.listener;
+package com.platform.chat.modules.domainEvent.listeners;
 
 import com.platform.chat.base.chatUser.entity.ChatUser;
 import com.platform.chat.base.chatUser.repository.ChatUserRepository;
-import com.platform.chat.modules.domainEvent.event.ApplicationResolvedEvent;
-import com.platform.chat.modules.domainEvent.event.ElectionClosedEvent;
-import com.platform.chat.modules.domainEvent.event.ElectionStartedEvent;
+import com.platform.chat.modules.domainEvent.events.ApplicationResolvedEvent;
+import com.platform.chat.modules.domainEvent.events.ElectionClosedEvent;
+import com.platform.chat.modules.domainEvent.events.ElectionStartedEvent;
 import com.platform.chat.core.modules.notification.dto.NotificationResponse;
 import com.platform.chat.core.modules.notification.entity.Notification;
 import com.platform.chat.core.modules.notification.service.NotificationService;

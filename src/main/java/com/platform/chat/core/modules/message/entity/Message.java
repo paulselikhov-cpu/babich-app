@@ -1,9 +1,12 @@
 package com.platform.chat.core.modules.message.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.platform.chat.base.chatUser.entity.ChatUser;
+
 import com.platform.chat.core.modules.message.enums.MessageType;
+
+import com.platform.chat.base.chatUser.entity.ChatUser;
 import com.platform.chat.base.room.entity.Room;
+
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;

@@ -1,7 +1,7 @@
 package com.platform.chat.core.modules.application.dto;
 
 import com.platform.chat.core.modules.application.models.ApplicationStatus;
-import com.platform.chat.core.modules.application.ApplicationType;
+import com.platform.chat.modules.application.ApplicationType;
 
 import java.time.LocalDateTime;
 

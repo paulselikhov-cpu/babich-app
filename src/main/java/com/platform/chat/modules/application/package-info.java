@@ -11,12 +11,12 @@
                 "auth::JwtService",
                 "auth::entityUser",
                 "auth::userRepository",
-                "chat.core",
-                "chat.modules.application",
+                "chat.base.chatUser",
+                "chat.core.modules.application",
                 "chat.modules.work"
         },
-        type = ApplicationModule.Type.OPEN
+        type = ApplicationModule.Type.CLOSED
 )
-package com.platform.chat;
+package com.platform.chat.modules.application;
 
 import org.springframework.modulith.ApplicationModule;

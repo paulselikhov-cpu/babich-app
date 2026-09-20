@@ -1,5 +1,7 @@
 package com.platform.chat.core.modules.message.dto;
+
 import com.platform.chat.base.chatUser.entity.ChatUser;
+
 import com.platform.chat.core.modules.message.entity.Message;
 import com.platform.chat.core.modules.message.enums.MessageActionType;
 import lombok.Data;

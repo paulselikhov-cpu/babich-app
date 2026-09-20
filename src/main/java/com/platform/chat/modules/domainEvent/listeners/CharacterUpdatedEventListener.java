@@ -1,7 +1,7 @@
-package com.platform.chat.modules.domainEvent.listener;
+package com.platform.chat.modules.domainEvent.listeners;
+import com.platform.chat.modules.domainEvent.events.CharacterUpdatedEvent;
 
 import com.platform.chat.base.chatUser.repository.ChatUserRepository;
-import com.platform.chat.modules.domainEvent.event.CharacterUpdatedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.modulith.events.ApplicationModuleListener;

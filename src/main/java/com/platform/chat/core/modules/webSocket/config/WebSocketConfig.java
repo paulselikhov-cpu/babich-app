@@ -1,6 +1,5 @@
 package com.platform.chat.core.modules.webSocket.config;
 
-import com.platform.chat.core.config.JwtChannelInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;

@@ -1,11 +1,11 @@
 package com.platform.chat.base.district.service;
 
 import com.platform.chat.base.district.dto.DistrictSettingsDto;
-import com.platform.chat.core.modules.poll.dto.PollSettingsDto;
 import com.platform.chat.base.district.entity.District;
 import com.platform.chat.base.district.entity.DistrictSettings;
 import com.platform.chat.base.district.repository.DistrictRepository;
 import com.platform.chat.base.district.repository.DistrictSettingsRepository;
+import com.platform.chat.core.modules.poll.dto.PollSettingsDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -8,7 +8,7 @@ import com.platform.chat.base.chatUser.repository.ChatUserRepository;
 import com.platform.chat.base.location.repository.LocationUserRepository;
 import com.platform.chat.base.location.repository.LocationRepository;
 import com.platform.chat.core.modules.domainEvent.EventType;
-import com.platform.chat.modules.domainEvent.event.PollClosedEvent;
+import com.platform.chat.modules.domainEvent.events.PollClosedEvent;
 import com.platform.chat.core.modules.poll.entity.Poll;
 import com.platform.chat.core.modules.poll.enums.PollType;
 import com.platform.chat.modules.governorElection.service.ElectionService;

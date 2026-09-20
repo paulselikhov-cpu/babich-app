@@ -1,8 +1,9 @@
 package com.platform.chat.core.modules.notification.service;
 
-import com.platform.chat.core.modules.notification.repository.NotificationRepository;
 import com.platform.chat.base.chatUser.entity.ChatUser;
 import com.platform.chat.base.chatUser.repository.ChatUserRepository;
+
+import com.platform.chat.core.modules.notification.repository.NotificationRepository;
 import com.platform.chat.core.modules.notification.entity.Notification;
 import com.platform.chat.core.modules.notification.dto.NotificationContextData;
 import lombok.RequiredArgsConstructor;
