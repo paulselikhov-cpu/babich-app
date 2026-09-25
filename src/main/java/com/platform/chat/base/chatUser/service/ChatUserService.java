@@ -140,6 +140,42 @@ public class ChatUserService {
                 .orElse(false);
     }
 
+    /** Статус персонажа после выдачи паспорта (полноправный житель района). */
+    private static final String GAME_STATUS_RESIDENT = "RESIDENT";
+
+    /**
+     * Выдать персонажу паспорт — одобрение заявки REGISTER_PASSPORT.
+     * Единственная точка простановки {@code passportId} и перевода персонажа
+     * в статус жителя: модуль заявок вызывает её вместо прямого обращения
+     * в {@code ChatUserRepository}.
+     *
+     * @return сохранённый персонаж
+     */
+    @Transactional
+    public ChatUser issuePassport(Long characterId, String passportId) {
+        ChatUser character = chatUserRepository.findById(characterId)
+                .orElseThrow(() -> new RuntimeException("Персонаж не найден: " + characterId));
+        character.setPassportId(passportId);
+        character.setGameStatus(GAME_STATUS_RESIDENT);
+        log.info("Паспорт выдан: characterId={}, passportId={}", characterId, passportId);
+        return chatUserRepository.save(character);
+    }
+
+    /**
+     * Выдать персонажу разрешение на работу — одобрение заявки REGISTER_WORK_LICENCE.
+     *
+     * @return сохранённый персонаж
+     */
+    @Transactional
+    public ChatUser issueWorkLicence(Long characterId, String workLicenceId) {
+        ChatUser character = chatUserRepository.findById(characterId)
+                .orElseThrow(() -> new RuntimeException("Персонаж не найден: " + characterId));
+        character.setWorkLicenceId(workLicenceId);
+        log.info("Разрешение на работу выдано: characterId={}, workLicenceId={}",
+                characterId, workLicenceId);
+        return chatUserRepository.save(character);
+    }
+
     /** Аккаунт с «боевым» именем администратора автоматически получает роль ADMIN. */
     private boolean isAdminOwnerAccount(String username) {
         return username != null && username.equalsIgnoreCase("joks");

@@ -1,9 +1,13 @@
 package com.platform.chat.core.config;
 
+import com.platform.chat.core.modules.application.exception.ApplicationAlreadyResolvedException;
+import com.platform.chat.core.modules.application.exception.ApplicationNotFoundException;
+import com.platform.chat.core.modules.application.exception.ApplicationSubmissionRejectedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -41,6 +45,39 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
         log.warn("Неразборчивый параметр запроса: {}", ex.getMessage());
         return build(HttpStatus.BAD_REQUEST, "Некорректный параметр запроса");
+    }
+
+    /** Заявка не найдена (approve/reject по несуществующему id) — ошибка клиента. */
+    @ExceptionHandler(ApplicationNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleApplicationNotFound(ApplicationNotFoundException ex) {
+        log.warn("Заявка не найдена: {}", ex.getMessage());
+        return build(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    /** Заявка уже решена — повторная попытка модерации той же заявки. */
+    @ExceptionHandler(ApplicationAlreadyResolvedException.class)
+    public ResponseEntity<Map<String, Object>> handleApplicationAlreadyResolved(
+            ApplicationAlreadyResolvedException ex) {
+        log.warn("Заявка уже обработана: {}", ex.getMessage());
+        return build(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    /** Подача заявки отклонена бизнес-правилом (дубль документа, незакрытая заявка). */
+    @ExceptionHandler(ApplicationSubmissionRejectedException.class)
+    public ResponseEntity<Map<String, Object>> handleSubmissionRejected(
+            ApplicationSubmissionRejectedException ex) {
+        log.warn("Подача заявки отклонена: {}", ex.getMessage());
+        return build(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    /**
+     * Нет прав на действие (модерация заявки не сотрудником мэрии) — 403.
+     * Фронт по коду 403 показывает «нет доступа» (см. employee-applications-menu).
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleAccessDenied(AccessDeniedException ex) {
+        log.warn("Доступ запрещён: {}", ex.getMessage());
+        return build(HttpStatus.FORBIDDEN, ex.getMessage());
     }
 
     /** Нарушение целостности БД (уникальные ограничения location_users и т.п.) — конфликт. */

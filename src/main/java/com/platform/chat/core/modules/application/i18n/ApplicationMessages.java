@@ -1,4 +1,4 @@
-package com.platform.chat.core.modules.application.utils;
+package com.platform.chat.core.modules.application.i18n;
 
 import com.platform.chat.core.modules.application.enums.ApplicationMessageKey;
 import lombok.RequiredArgsConstructor;
@@ -7,6 +7,12 @@ import org.springframework.stereotype.Component;
 
 import java.util.Locale;
 
+/**
+ * Инфраструктурный адаптер над {@link MessageSource} для текстов заявок.
+ * Живёт в ядре процесса: решением handler'а является ключ сообщения
+ * ({@link ApplicationMessageKey}), а человекочитаемый текст резолвит ядро
+ * и сохраняет в {@code Application.resultMessage}.
+ */
 @Component
 @RequiredArgsConstructor
 public class ApplicationMessages {

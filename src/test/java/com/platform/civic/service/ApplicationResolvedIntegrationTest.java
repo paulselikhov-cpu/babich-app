@@ -3,10 +3,13 @@ package com.platform.civic.service;
 import com.platform.chat.base.chatUser.entity.ChatUser;
 import com.platform.chat.core.modules.application.service.ApplicationService;
 import com.platform.chat.base.chatUser.repository.ChatUserRepository;
-import com.platform.chat.modules.application.ApplicationType;
+import com.platform.chat.core.modules.application.enums.ApplicationType;
 import com.platform.chat.modules.domainEvent.events.ApplicationResolvedEvent;
 import com.platform.chat.core.modules.notification.entity.Notification;
 import com.platform.chat.core.modules.notification.repository.NotificationRepository;
+import com.platform.chat.core.modules.application.entity.Application;
+import com.platform.chat.core.modules.application.enums.ApplicationStatus;
+import com.platform.chat.modules.domainEvent.events.CharacterUpdatedEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +17,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 
 import java.util.List;
 
@@ -26,6 +31,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  * (единственная точка перевода заявки в APPROVED/REJECTED) → доменное
  * событие ApplicationResolvedEvent → подписчик NotificationEventListener →
  * уведомление в Notification для заявителя.</p>
+ *
+ * <p>Сквозной тест {@link #approvePassportApplication_issuesPassportAndPublishesEvents()}
+ * дополнительно проверяет, что эффект применила стратегия (паспорт выдан,
+ * персонаж стал жителем), а событие-последствие CharacterUpdatedEvent приехало
+ * в подписчиков из решения стратегии — ядро его типа не знает.</p>
  *
  * <p>Публикация событий идёт через {@code DomainEventPublisher} с доставкой
  * подписчикам {@code @ApplicationModuleListener} через персистентный outbox
@@ -46,6 +56,9 @@ class ApplicationResolvedIntegrationTest {
 
     @Autowired
     private NotificationRepository notificationRepository;
+
+    @Autowired
+    private CharacterUpdatedEventCaptor characterUpdatedCaptor;
 
     /** Стартовый баланс тестового персонажа. */
     private static final long START_BALANCE = 1000L;
@@ -86,6 +99,8 @@ class ApplicationResolvedIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        characterUpdatedCaptor.clear();
+
         // id владельца персонажа (User.id) — произвольный, связь с users не
         // смоделирована FK, но уникальность (user_id, district_id) в БД есть:
         // генерим уникальные значения на каждый прогон, т.к. тест не
@@ -116,5 +131,62 @@ class ApplicationResolvedIntegrationTest {
                 1L, 2L, 3L, ApplicationType.REGISTER_WORK_LICENCE.name(), "APPROVED");
         int length = mapper.writeValueAsString(event).length();
         assertThat(length).isLessThanOrEqualTo(255);
+    }
+
+    @Test
+    @DisplayName("Сквозной путь: approve заявки на паспорт → документ выдан + уведомление + character-updated")
+    void approvePassportApplication_issuesPassportAndPublishesEvents() {
+        Application application = applicationService.createPendingApplication(
+                externalUserId, characterId, ApplicationType.REGISTER_PASSPORT, null);
+
+        Application approved = applicationService.approveApplication(application.getId());
+
+        // 1. Решение применено ядром: статус + текст результата
+        assertThat(approved.getStatus()).isEqualTo(ApplicationStatus.APPROVED);
+        assertThat(approved.getResultMessage()).contains("Паспорт выдан");
+        assertThat(approved.getProcessedAt()).isNotNull();
+
+        // 2. Эффект применён стратегией: паспорт выдан, персонаж стал жителем
+        ChatUser updated = chatUserRepository.findById(characterId).orElseThrow();
+        assertThat(updated.getPassportId()).isNotBlank();
+        assertThat(updated.getGameStatus()).isEqualTo("RESIDENT");
+
+        // 3. ApplicationResolvedEvent → NotificationEventListener → уведомление заявителю
+        List<Notification> notifications = awaitNotifications();
+        assertThat(notifications).isNotEmpty();
+        assertThat(notifications.get(0).getNotificationType()).isEqualTo("APPLICATION_RESULT");
+
+        // 4. CharacterUpdatedEvent приехал из решения стратегии (ядро его типа не знает)
+        assertThat(awaitCharacterUpdatedEvents())
+                .anyMatch(event -> characterId.equals(event.getCharacterId()));
+    }
+
+    /**
+     * Ожидает CharacterUpdatedEvent с таймаутом: событие доставляется подписчикам
+     * асинхронно через outbox, сразу после approve его ещё может не быть в списке.
+     */
+    private List<CharacterUpdatedEvent> awaitCharacterUpdatedEvents() {
+        long deadline = System.currentTimeMillis() + 5_000;
+        while (System.currentTimeMillis() < deadline) {
+            List<CharacterUpdatedEvent> events = characterUpdatedCaptor.getEvents();
+            if (!events.isEmpty()) {
+                return events;
+            }
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new IllegalStateException("Прервано ожидание character-updated", e);
+            }
+        }
+        return List.of();
+    }
+
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        CharacterUpdatedEventCaptor characterUpdatedEventCaptor() {
+            return new CharacterUpdatedEventCaptor();
+        }
     }
 }

@@ -10,7 +10,9 @@ import java.util.Map;
 
 /**
  * Событие разрешения гражданской заявки (APPROVED/REJECTED).
- * Публикуется ApplicationService после handler.handle() + save.
+ * Публикуется ApplicationService (ядро процесса) после того, как стратегия
+ * применила эффект и вернула решение (resolve), а ядро применило его к заявке
+ * и сохранило её.
  * Подписчик (NotificationEventListener) уведомляет заявителя о результате.
  *
  * <p>{@code userId} — ВНЕШНИЙ идентификатор владельца заявки (User.id, поле

@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *       соответствующих модулей — новые НЕЗАЯВЛЕННЫЕ направленные
  *       зависимости уронят тест;</li>
  *   <li>известный ЦИКЛ {@code chat ↔ economy} отфильтрован явно
- *       ({@link #KNOWN_CYCLE_PREFIX}) — Modulith детектит циклы отдельным
+ *       ({@link #KNOWN_CYCLE}) — Modulith детектит циклы отдельным
  *       механизмом, на который {@code allowedDependencies} не влияет.
  *       Фильтр завязан на точный текст конкретного цикла: любой НОВЫЙ
  *       цикл или новый участник этого цикла уронит тест.</li>
@@ -35,24 +35,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ModuleBoundaryTest {
 
     /**
-     * Префикс текста нарушения для известного предсуществующего цикла
-     * {@code chat ↔ economy}. Зафиксирован по фактическому выводу Modulith:
+     * Точный текст известного предсуществующего цикла {@code chat ↔ economy},
+     * зафиксированный по фактическому выводу Modulith:
      * «Cycle detected: Slice chat -> Slice economy -> Slice chat».
      *
-     * <p>Фильтруется ТОЛЬКО этот конкретный цикл. Всё остальное
-     * (включая циклы с новыми участниками) — падение теста.</p>
+     * <p>Фильтруется ТОЛЬКО этот цикл. Всё остальное — включая циклы с новыми
+     * участниками и любые другие циклы между {@code chat.*}-слайсами — падение
+     * теста. Раньше здесь стоял префикс «Cycle detected: Slice chat», который
+     * глушил ЛЮБОЙ цикл, начинающийся со слайса chat.* (например, цикл
+     * «ядро процесса заявки ↔ исполнители заявок»), из-за чего нарушение
+     * границ проходило бесшумно.</p>
      */
-    private static final String KNOWN_CYCLE_PREFIX = "Cycle detected: Slice chat";
+    private static final String KNOWN_CYCLE =
+            "Cycle detected: Slice chat -> Slice economy -> Slice chat";
 
     @Test
     void moduleStructureIsRecognized() {
         ApplicationModules modules = ApplicationModules.of(PlatformApplication.class);
-
-        // ВРЕМЕННЫЙ ДИАГНОСТИЧЕСКИЙ ВЫВОД — потом удалить
-        modules.forEach(m -> System.out.println(
-                "MODULE id=" + m.getIdentifier() +
-                        " basePackage=" + m.getBasePackage()
-        ));
 
         assertThat(modules).isNotNull();
         assertThat(modules.getModuleByName("chat.base.chatUser")).isPresent();
@@ -63,7 +62,7 @@ class ModuleBoundaryTest {
         ApplicationModules modules = ApplicationModules.of(PlatformApplication.class);
 
         Violations violations = modules.detectViolations()
-                .filter(v -> !v.hasMessageContaining(KNOWN_CYCLE_PREFIX));
+                .filter(v -> !v.hasMessageContaining(KNOWN_CYCLE));
 
         violations.throwIfPresent();
     }

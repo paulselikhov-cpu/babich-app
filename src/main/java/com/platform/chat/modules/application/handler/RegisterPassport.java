@@ -1,24 +1,33 @@
 package com.platform.chat.modules.application.handler;
-import com.platform.chat.modules.application.ApplicationType;
 
 import com.platform.chat.base.chatUser.entity.ChatUser;
-import com.platform.chat.base.chatUser.repository.ChatUserRepository;
+import com.platform.chat.base.chatUser.service.ChatUserService;
 
-import com.platform.chat.core.modules.application.models.ApplicationHandler;
 import com.platform.chat.core.modules.application.entity.Application;
 import com.platform.chat.core.modules.application.enums.ApplicationMessageKey;
-import com.platform.chat.core.modules.application.models.ApplicationStatus;
-import com.platform.chat.core.modules.application.utils.ApplicationIdGenerator;
-import com.platform.chat.core.modules.application.utils.ApplicationMessages;
+import com.platform.chat.core.modules.application.enums.ApplicationType;
+import com.platform.chat.core.modules.application.model.ApplicationDecision;
+import com.platform.chat.core.modules.application.model.ApplicationHandler;
+import com.platform.chat.core.modules.application.model.DocumentNumberGenerator;
+import com.platform.chat.modules.domainEvent.events.CharacterUpdatedEvent;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
+/**
+ * Стратегия заявки «регистрация паспорта»: выдаёт персонажу паспорт и переводит
+ * его в статус жителя. Эффект применяется через {@link ChatUserService} (API
+ * модуля персонажа, а не его репозиторий), решение о статусе заявки и текст
+ * результата возвращаются ядру — см. контракт {@link ApplicationHandler}.
+ */
 @Component
 @RequiredArgsConstructor
 public class RegisterPassport implements ApplicationHandler {
-    private final ChatUserRepository chatUserRepository;
-    private final ApplicationMessages messages;
+
+    private final ChatUserService chatUserService;
+    private final DocumentNumberGenerator documentNumberGenerator;
 
     @Override
     public ApplicationType getType() {
@@ -26,24 +35,21 @@ public class RegisterPassport implements ApplicationHandler {
     }
 
     @Override
-    public void handle(Application application) {
-        ChatUser user = chatUserRepository.findById(application.getCharacterId())
-                .orElseThrow(() -> new RuntimeException(
-                        messages.resolve(ApplicationMessageKey.CHARACTER_NOT_FOUND, application.getCharacterId())
-                ));
+    public ApplicationDecision resolve(Application application) {
+        ChatUser character = chatUserService.getChatUserById(application.getCharacterId());
 
-        if (user.getPassportId() != null) {
-            application.setStatus(ApplicationStatus.REJECTED);
-            application.setResultMessage(messages.resolve(ApplicationMessageKey.PASSPORT_ALREADY_EXISTS));
-            return;
+        if (character.getPassportId() != null) {
+            return ApplicationDecision.rejected(ApplicationMessageKey.PASSPORT_ALREADY_EXISTS);
         }
 
-        String passportId = ApplicationIdGenerator.generate(application.getType());
-        user.setPassportId(passportId);
-        user.setGameStatus("RESIDENT");
-        chatUserRepository.save(user);
+        String passportId = documentNumberGenerator.next(ApplicationType.REGISTER_PASSPORT);
+        chatUserService.issuePassport(character.getId(), passportId);
 
-        application.setStatus(ApplicationStatus.APPROVED);
-        application.setResultMessage(messages.resolve(ApplicationMessageKey.PASSPORT_ISSUED, passportId));
+        // Профиль персонажа изменился — фронт должен перезагрузить currentChatUser.
+        return ApplicationDecision.approved(
+                ApplicationMessageKey.PASSPORT_ISSUED,
+                List.of(new CharacterUpdatedEvent(character.getId())),
+                passportId);
     }
 }
+
