@@ -1,4 +1,4 @@
-package com.platform.chat.core.modules.webSocket.dto;
+package com.platform.chat.core.modules.chatRoom.dto;
 
 import com.platform.chat.core.modules.chatRoom.enums.MessageActionType;
 import lombok.Data;

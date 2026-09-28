@@ -1,8 +1,6 @@
 @ApplicationModule(
         allowedDependencies = {
-                "auth::JwtService",
-                "chat.base.chatUser",
-                "chat.core.modules.chatRoom"
+                "auth::JwtService"
         },
         type = ApplicationModule.Type.OPEN
 )

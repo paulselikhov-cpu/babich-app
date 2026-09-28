@@ -1,21 +1,20 @@
-package com.platform.chat.core.modules.webSocket.controller;
-import com.platform.chat.core.modules.webSocket.dto.ChatMessageRequest;
-import com.platform.chat.core.modules.webSocket.dto.ChatActionMessageRequest;
+package com.platform.chat.core.modules.chatRoom.controller;
 
-import com.platform.chat.base.chatUser.service.ChatUserService;
 import com.platform.chat.base.chatUser.entity.ChatUser;
-
+import com.platform.chat.base.chatUser.service.ChatUserService;
+import com.platform.chat.core.modules.chatRoom.dto.ChatActionMessageRequest;
+import com.platform.chat.core.modules.chatRoom.dto.ChatMessageRequest;
 import com.platform.chat.core.modules.chatRoom.dto.MessageResponse;
 import com.platform.chat.core.modules.chatRoom.enums.MessageActionType;
 import com.platform.chat.core.modules.chatRoom.service.MessageService;
-import com.platform.chat.core.modules.chatRoom.service.UnreadService;
 import com.platform.chat.core.modules.chatRoom.service.OnlineSessionService;
-
+import com.platform.chat.core.modules.chatRoom.service.UnreadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+
 import java.security.Principal;
 
 @Controller
@@ -58,12 +57,10 @@ public class ChatWebSocketController {
     public void joinChat(
             ChatActionMessageRequest messageParams,
             Principal principal,
-            SimpMessageHeaderAccessor headerAccessor // ← добавлен параметр, Spring сам его инжектит
+            SimpMessageHeaderAccessor headerAccessor
     ) {
         ChatUser chatUser = chatUserService.getChatUserByUserName(principal.getName());
 
-        // presence: обновляем "где юзер онлайн" + рассылаем событие в
-        // /topic/location.{id}.presence для LocationUsersMenu
         onlineSessionService.enterRoom(
                 headerAccessor.getSessionId(),
                 chatUser.getId(),
@@ -101,8 +98,6 @@ public class ChatWebSocketController {
     }
 
     // ─── heartbeat для presence ─────────────────────────────────────────────
-    // новый обработчик — фронт шлёт это раз в 10 сек, пока WS открыт.
-    // Не требует ChatMessageParams вообще — только sessionId из заголовков
     @MessageMapping("/presence.heartbeat")
     public void heartbeat(SimpMessageHeaderAccessor headerAccessor) {
         onlineSessionService.heartbeat(headerAccessor.getSessionId());

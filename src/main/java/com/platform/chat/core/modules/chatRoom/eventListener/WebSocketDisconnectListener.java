@@ -1,4 +1,4 @@
-package com.platform.chat.core.modules.webSocket.eventListener;
+package com.platform.chat.core.modules.chatRoom.eventListener;
 
 import com.platform.chat.core.modules.chatRoom.service.OnlineSessionService;
 import lombok.RequiredArgsConstructor;

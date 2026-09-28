@@ -1,4 +1,5 @@
-package com.platform.chat.core.modules.webSocket.dto;
+package com.platform.chat.core.modules.chatRoom.dto;
+
 import lombok.Data;
 
 @Data
