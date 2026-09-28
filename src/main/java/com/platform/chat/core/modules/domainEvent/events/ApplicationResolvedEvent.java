@@ -1,6 +1,8 @@
-package com.platform.chat.modules.domainEvent.events;
+package com.platform.chat.core.modules.domainEvent.events;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.platform.chat.core.modules.domainEvent.DomainEvent;
 import com.platform.chat.core.modules.domainEvent.EventType;
 import com.platform.chat.core.modules.domainEvent.enums.ScopeType;
@@ -23,14 +25,16 @@ import java.util.Map;
  *
  * <p>{@code applicationType} и {@code status} — строки (имена enum
  * {@code ApplicationType} / {@code ApplicationStatus}), а не сами enum:
- * событие живёт в {@code core.event} и не должно зависеть от модуля civic
- * (границы модулей). Подписчик формирует текст уведомления сам по статусу.</p>
+ * событие живёт в {@code core.modules.domainEvent} и не должно зависеть от
+ * модуля-исполнителя заявок (границы модулей). Подписчик формирует текст
+ * уведомления сам по статусу.</p>
  *
  * <p>Вычисляемые геттеры помечены {@code @JsonIgnore}: при сериализации события
- * в event_publication Modulith данные уходят в payload базового класса и при
- * replay восстанавливаются через конструктор {@link DomainEvent} — аналогично
- * {@link CoinsChangedEvent}. Внимание: сериализованный JSON ограничен длиной
- * колонки {@code event_publication.serialized_event} (varchar(255)), поэтому
+ * в event_publication Modulith данные уходят в payload базового класса, а при
+ * replay восстанавливаются через собственный {@code @JsonCreator} (Jackson не
+ * наследует creator базового класса) — аналогично {@link CoinsChangedEvent}.
+ * Внимание: сериализованный JSON ограничен длиной колонки
+ * {@code event_publication.serialized_event} (varchar(255)), поэтому
  * {@code resultMessage} в событие сознательно НЕ входит.</p>
  */
 public class ApplicationResolvedEvent extends DomainEvent {
@@ -54,6 +58,21 @@ public class ApplicationResolvedEvent extends DomainEvent {
         );
     }
 
+    /**
+     * Creator для replay из {@code event_publication}: Jackson не наследует
+     * {@code @JsonCreator} базового класса, поэтому у каждого факта объявлен
+     * свой — он восстанавливает поля конверта, а бизнес-данные лежат в payload.
+     */
+    @JsonCreator
+    protected ApplicationResolvedEvent(@JsonProperty("type") EventType type,
+                                       @JsonProperty("actorId") Long actorId,
+                                       @JsonProperty("targetId") Long targetId,
+                                       @JsonProperty("scopeType") ScopeType scopeType,
+                                       @JsonProperty("scopeId") Long scopeId,
+                                       @JsonProperty("payload") Map<String, Object> payload) {
+        super(type, actorId, targetId, scopeType, scopeId, payload);
+    }
+
     @JsonIgnore
     public Long getUserId() {
         return getActorId();
@@ -67,7 +86,7 @@ public class ApplicationResolvedEvent extends DomainEvent {
 
     @JsonIgnore
     public Long getApplicationId() {
-        return (Long) getPayload().get("applicationId");
+        return longPayload("applicationId");
     }
 
     @JsonIgnore

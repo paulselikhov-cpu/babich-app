@@ -1,5 +1,5 @@
 package com.platform.chat.modules.domainEvent.listeners;
-import com.platform.chat.modules.domainEvent.events.CharacterUpdatedEvent;
+import com.platform.chat.core.modules.domainEvent.events.CharacterUpdatedEvent;
 
 import com.platform.chat.base.chatUser.repository.ChatUserRepository;
 import lombok.RequiredArgsConstructor;

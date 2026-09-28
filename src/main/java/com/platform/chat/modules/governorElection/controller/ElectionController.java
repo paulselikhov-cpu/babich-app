@@ -22,7 +22,7 @@ import java.util.Map;
 
 /**
  * Слой 1. REST-контроллер выборов губернатора.
- * Принимает запросы от клиента (Angular), делегирует в ElectionFacade.
+ * Принимает запросы от клиента (Angular), делегирует в ElectionService.
  */
 @RestController
 @RequestMapping("/api/elections")

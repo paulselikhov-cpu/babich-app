@@ -1,6 +1,6 @@
 package com.platform.civic.service;
 
-import com.platform.chat.modules.domainEvent.events.CharacterUpdatedEvent;
+import com.platform.chat.core.modules.domainEvent.events.CharacterUpdatedEvent;
 import org.springframework.context.event.EventListener;
 
 import java.util.List;

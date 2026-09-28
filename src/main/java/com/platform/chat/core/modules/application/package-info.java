@@ -11,10 +11,8 @@
  */
 @ApplicationModule(
         allowedDependencies = {
-                "chat.core.modules.domainEvent",
-                "chat.modules.domainEvent" },
+                "chat.core.modules.domainEvent" },
         type = ApplicationModule.Type.OPEN
 )
 package com.platform.chat.core.modules.application;
-
 import org.springframework.modulith.ApplicationModule;

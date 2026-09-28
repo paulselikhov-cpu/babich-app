@@ -3,8 +3,8 @@ package com.platform.notification.listener;
 import com.platform.chat.base.chatUser.entity.ChatUser;
 import com.platform.chat.modules.domainEvent.listeners.NotificationEventListener;
 import com.platform.chat.base.chatUser.repository.ChatUserRepository;
-import com.platform.chat.modules.domainEvent.events.ElectionClosedEvent;
-import com.platform.chat.modules.domainEvent.events.ApplicationResolvedEvent;
+import com.platform.chat.core.modules.domainEvent.events.ElectionClosedEvent;
+import com.platform.chat.core.modules.domainEvent.events.ApplicationResolvedEvent;
 import com.platform.chat.core.modules.notification.dto.NotificationResponse;
 import com.platform.chat.core.modules.notification.dto.NotificationContextData;
 import com.platform.chat.core.modules.notification.entity.Notification;
@@ -29,7 +29,7 @@ import static org.mockito.Mockito.*;
 
 /**
  * Регрессия Этапа 2: NotificationEventListener реагирует на ElectionClosedEvent,
- * не требует прямого вызова из ElectionFacade.
+ * не требует прямого вызова из ElectionService.
  *
  * Проверяет: при получении события — сохраняется уведомление и шлётся WS-пуш
  * каждому жителю района. listener не падает на пустом районе.

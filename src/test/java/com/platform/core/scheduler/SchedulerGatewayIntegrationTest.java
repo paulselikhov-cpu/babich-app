@@ -31,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * DoD-тест Этапа 5 (SchedulerGateway).
  *
  * Сквозной путь: истечение dueAt в ScheduledCheck → onTick() (вручную) →
- * PollCloseCheckHandler → ElectionFacade.closeElection → ElectionClosedEvent →
+ * PollCloseCheckHandler → ElectionService.closeElection → ElectionClosedEvent →
  * NotificationEventListener → Notification жителю.
  */
 @SpringBootTest
@@ -65,13 +65,25 @@ class SchedulerGatewayIntegrationTest {
         characterId = chatUserRepository.save(user).getId();
     }
 
-    private List<Notification> awaitNotifications() {
+    /**
+     * Ожидает уведомление нужного типа у тестового персонажа.
+     *
+     * <p>Важно ждать именно ЗАДАННЫЙ тип: до него персонаж получает
+     * {@code ELECTION_STARTED} (событие инициации выборов доставляется
+     * асинхронно через outbox) — поэтому «любое непустое» уведомление
+     * возвращалось бы раньше, чем придёт {@code ELECTION_RESULT}, и тест
+     * падал на разнице числа получателей в районе.</p>
+     */
+    private List<Notification> awaitNotifications(String notificationType) {
         long deadline = System.currentTimeMillis() + 5_000;
         List<Notification> notifications = List.of();
         while (System.currentTimeMillis() < deadline) {
             notifications = notificationRepository
                     .findByRecipientCharacterIdOrderByCreatedAtDesc(characterId);
-            if (!notifications.isEmpty()) return notifications;
+            if (notifications.stream()
+                    .anyMatch(n -> notificationType.equals(n.getNotificationType()))) {
+                return notifications;
+            }
             try {
                 Thread.sleep(50);
             } catch (InterruptedException e) {
@@ -103,7 +115,7 @@ class SchedulerGatewayIntegrationTest {
         schedulerGateway.onTick();
 
         // 4. Сквозной путь: обработчик → closeElection → ElectionClosedEvent → Notification
-        List<Notification> notifications = awaitNotifications();
+        List<Notification> notifications = awaitNotifications("ELECTION_RESULT");
         assertThat(notifications).anySatisfy(n -> {
             assertThat(n.getRecipientCharacterId()).isEqualTo(characterId);
             assertThat(n.getNotificationType()).isEqualTo("ELECTION_RESULT");

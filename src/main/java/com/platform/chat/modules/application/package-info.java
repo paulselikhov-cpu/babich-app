@@ -18,7 +18,7 @@
                 "chat.base.chatUser",
                 "chat.core.modules.application",
                 "chat.core.modules.application::ApplicationType",
-                "chat.modules.domainEvent"
+                "chat.core.modules.domainEvent"
         },
         type = ApplicationModule.Type.CLOSED
 )

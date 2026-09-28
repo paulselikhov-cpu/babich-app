@@ -27,8 +27,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  *       цикл или новый участник этого цикла уронит тест.</li>
  * </ol>
  *
- * <p>Подробности техдолга и план разбора — в
- * {@code documentation/architecture/event/event-migration-plan.md} (Этап 1.5).</p>
+ * <p>Границы слайсов доменных событий (ядро шины ↔ реакции) описаны в
+ * {@code documentation/architecture/event/domain-event-module-layers.md}.</p>
  *
  * <p>Не требует БД — это статический анализ структуры пакетов.</p>
  */

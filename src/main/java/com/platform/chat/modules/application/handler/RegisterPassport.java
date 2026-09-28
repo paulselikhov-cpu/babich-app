@@ -9,7 +9,7 @@ import com.platform.chat.core.modules.application.enums.ApplicationType;
 import com.platform.chat.core.modules.application.model.ApplicationDecision;
 import com.platform.chat.core.modules.application.model.ApplicationHandler;
 import com.platform.chat.core.modules.application.model.DocumentNumberGenerator;
-import com.platform.chat.modules.domainEvent.events.CharacterUpdatedEvent;
+import com.platform.chat.core.modules.domainEvent.events.CharacterUpdatedEvent;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

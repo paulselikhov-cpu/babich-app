@@ -1,6 +1,8 @@
-package com.platform.chat.modules.domainEvent.events;
+package com.platform.chat.core.modules.domainEvent.events;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.platform.chat.core.modules.domainEvent.DomainEvent;
 import com.platform.chat.core.modules.domainEvent.EventType;
 import com.platform.chat.core.modules.domainEvent.enums.ScopeType;
@@ -10,8 +12,8 @@ import java.util.Map;
 
 /**
  * Событие старта выборов губернатора.
- * Публикуется ElectionFacade после инициации голосования (Слой 3).
- * Подписчик (Слой 4, NotificationEventListener) уведомляет жителей района
+ * Публикуется ElectionService после инициации голосования.
+ * Подписчик (NotificationEventListener) уведомляет жителей района
  * о начале выборов и шлёт WS-пуш.
  *
  * <p>{@code initiatorCharacterId} — персонаж, выдвинувший кандидатуру
@@ -35,9 +37,23 @@ public class ElectionStartedEvent extends DomainEvent {
         );
     }
 
+    /**
+     * Creator для replay из {@code event_publication}: Jackson не наследует
+     * {@code @JsonCreator} базового класса — id голосования берётся из payload.
+     */
+    @JsonCreator
+    protected ElectionStartedEvent(@JsonProperty("type") EventType type,
+                                   @JsonProperty("actorId") Long actorId,
+                                   @JsonProperty("targetId") Long targetId,
+                                   @JsonProperty("scopeType") ScopeType scopeType,
+                                   @JsonProperty("scopeId") Long scopeId,
+                                   @JsonProperty("payload") Map<String, Object> payload) {
+        super(type, actorId, targetId, scopeType, scopeId, payload);
+    }
+
     @JsonIgnore
     public Long getPollId() {
-        return (Long) getPayload().get("pollId");
+        return longPayload("pollId");
     }
 
     @JsonIgnore

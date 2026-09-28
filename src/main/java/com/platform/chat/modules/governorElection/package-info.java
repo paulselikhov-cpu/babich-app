@@ -6,7 +6,6 @@
                 "chat.base.chatUser",
                 "chat.base.location",
                 "chat.base.district",
-                "chat.modules.domainEvent",
         },
         type = ApplicationModule.Type.OPEN
 )

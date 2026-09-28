@@ -1,17 +1,19 @@
-package com.platform.chat.modules.domainEvent.events;
+package com.platform.chat.core.modules.domainEvent.events;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.platform.chat.core.modules.domainEvent.DomainEvent;
 import com.platform.chat.core.modules.domainEvent.EventType;
 import com.platform.chat.core.modules.domainEvent.enums.ScopeType;
-import com.platform.chat.modules.coin.enums.CoinUpdateReason;
+import com.platform.chat.core.modules.transactionLog.enums.CoinUpdateReason;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Событие изменения опыта (XP) персонажа.
- * Публикуется RewardService при giveXp.
+ * Публикуется CoinService при giveXp.
  * Подписчик (TransactionLogEventListener) пишет аудит-запись в TransactionLog.
  *
  * <p>Аналогично {@link CoinsChangedEvent}: вычисляемые геттеры помечены
@@ -31,6 +33,21 @@ public class XpChangedEvent extends DomainEvent {
         );
     }
 
+    /**
+     * Creator для replay из {@code event_publication}: Jackson не наследует
+     * {@code @JsonCreator} базового класса — сумму и причину восстанавливаем
+     * из payload (числа читаются через {@link #longPayload(String)}).
+     */
+    @JsonCreator
+    protected XpChangedEvent(@JsonProperty("type") EventType type,
+                             @JsonProperty("actorId") Long actorId,
+                             @JsonProperty("targetId") Long targetId,
+                             @JsonProperty("scopeType") ScopeType scopeType,
+                             @JsonProperty("scopeId") Long scopeId,
+                             @JsonProperty("payload") Map<String, Object> payload) {
+        super(type, actorId, targetId, scopeType, scopeId, payload);
+    }
+
     @JsonIgnore
     public Long getCharacterId() {
         return getActorId();
@@ -38,7 +55,7 @@ public class XpChangedEvent extends DomainEvent {
 
     @JsonIgnore
     public Long getAmount() {
-        return (Long) getPayload().get("amount");
+        return longPayload("amount");
     }
 
     @JsonIgnore
@@ -49,7 +66,7 @@ public class XpChangedEvent extends DomainEvent {
 
     @JsonIgnore
     public Long getRelatedEntityId() {
-        return (Long) getPayload().get("relatedEntityId");
+        return longPayload("relatedEntityId");
     }
 
     private static Map<String, Object> buildPayload(Long amount, CoinUpdateReason reason, Long relatedEntityId) {

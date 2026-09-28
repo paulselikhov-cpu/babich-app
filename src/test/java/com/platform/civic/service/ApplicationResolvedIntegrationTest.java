@@ -4,12 +4,12 @@ import com.platform.chat.base.chatUser.entity.ChatUser;
 import com.platform.chat.core.modules.application.service.ApplicationService;
 import com.platform.chat.base.chatUser.repository.ChatUserRepository;
 import com.platform.chat.core.modules.application.enums.ApplicationType;
-import com.platform.chat.modules.domainEvent.events.ApplicationResolvedEvent;
+import com.platform.chat.core.modules.domainEvent.events.ApplicationResolvedEvent;
 import com.platform.chat.core.modules.notification.entity.Notification;
 import com.platform.chat.core.modules.notification.repository.NotificationRepository;
 import com.platform.chat.core.modules.application.entity.Application;
 import com.platform.chat.core.modules.application.enums.ApplicationStatus;
-import com.platform.chat.modules.domainEvent.events.CharacterUpdatedEvent;
+import com.platform.chat.core.modules.domainEvent.events.CharacterUpdatedEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -66,7 +66,7 @@ class ApplicationResolvedIntegrationTest {
     /** Внутренний id персонажа (ChatUser.id). */
     private Long characterId;
 
-    /** Внешний id владельца (User.id), нужен ApplicationService/BuyFirstLocationHandler. */
+    /** Внешний id владельца (User.id) — заявка подаётся по нему (поле Application.userId). */
     private Long externalUserId;
 
     /**

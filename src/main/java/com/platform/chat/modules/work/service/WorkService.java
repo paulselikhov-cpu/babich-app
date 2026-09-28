@@ -7,7 +7,7 @@ import com.platform.chat.base.chatUser.repository.ChatUserRepository;
 import com.platform.chat.base.chatUser.enums.Profession;
 
 import com.platform.chat.modules.coin.service.CoinService;
-import com.platform.chat.modules.coin.enums.CoinUpdateReason;
+import com.platform.chat.core.modules.transactionLog.enums.CoinUpdateReason;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

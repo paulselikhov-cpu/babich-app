@@ -15,7 +15,7 @@ import com.platform.chat.base.location.repository.LocationTemplateRepository;
 import com.platform.chat.base.room.entity.Room;
 import com.platform.chat.base.room.repository.RoomReadStatusRepository;
 import com.platform.chat.base.room.repository.RoomRepository;
-import com.platform.chat.modules.coin.enums.CoinUpdateReason;
+import com.platform.chat.core.modules.transactionLog.enums.CoinUpdateReason;
 import com.platform.chat.modules.coin.service.CoinService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -247,7 +247,7 @@ public class LocationService {
             );
         }
 
-        // проверяем баланс и списываем Coin через RewardService
+        // проверяем баланс и списываем Coin через CoinService
         Long price = template.getExtendPriceCoin();
         if (price != null && price > 0) {
             ChatUser character = chatUserRepository.findById(characterId)

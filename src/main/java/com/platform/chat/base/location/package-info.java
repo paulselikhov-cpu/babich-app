@@ -5,6 +5,7 @@
                 "chat.base.district",
                 "chat.core.modules.message",
                 "chat.core.modules.onlineSession",
+                "chat.core.modules.transactionLog",
                 "chat.modules.coin",
                 "chat.modules.gang",
         },

@@ -9,7 +9,7 @@ import com.platform.chat.core.modules.application.i18n.ApplicationMessages;
 import com.platform.chat.core.modules.application.model.ApplicationDecision;
 import com.platform.chat.core.modules.application.repository.ApplicationRepository;
 import com.platform.chat.core.modules.domainEvent.service.DomainEventPublisher;
-import com.platform.chat.modules.domainEvent.events.ApplicationResolvedEvent;
+import com.platform.chat.core.modules.domainEvent.events.ApplicationResolvedEvent;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

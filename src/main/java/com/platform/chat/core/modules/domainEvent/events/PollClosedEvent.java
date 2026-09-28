@@ -1,6 +1,8 @@
-package com.platform.chat.modules.domainEvent.events;
+package com.platform.chat.core.modules.domainEvent.events;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.platform.chat.core.modules.domainEvent.DomainEvent;
 import com.platform.chat.core.modules.domainEvent.EventType;
 import com.platform.chat.core.modules.domainEvent.enums.ScopeType;
@@ -9,10 +11,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Событие закрытия голосования (этап 6 плана миграции событий).
+ * Событие закрытия голосования — общий факт для ЛЮБОГО типа голосования
+ * (выборы, обычный опрос, отзыв и т.п.).
  * <p>
  * Публикуется {@code PollResultDispatcher} после завершения обработки результата
- * (Слой 4) для ЛЮБОГО типа голосования — выборов, обычного опроса, отзыва и т.п.
+ * для ЛЮБОГО типа голосования — выборов, обычного опроса, отзыва и т.п.
  * Подписчики (например {@code NotificationEventListener}) могут использовать
  * {@link #getPollType()} и {@link #getScopeTypeName()} для собственной логики —
  * единого обработчика последствий больше нет.
@@ -34,9 +37,24 @@ public class PollClosedEvent extends DomainEvent {
         );
     }
 
+    /**
+     * Creator для replay из {@code event_publication}: Jackson не наследует
+     * {@code @JsonCreator} базового класса — тип голосования восстанавливается
+     * из payload.
+     */
+    @JsonCreator
+    protected PollClosedEvent(@JsonProperty("type") EventType type,
+                              @JsonProperty("actorId") Long actorId,
+                              @JsonProperty("targetId") Long targetId,
+                              @JsonProperty("scopeType") ScopeType scopeType,
+                              @JsonProperty("scopeId") Long scopeId,
+                              @JsonProperty("payload") Map<String, Object> payload) {
+        super(type, actorId, targetId, scopeType, scopeId, payload);
+    }
+
     @JsonIgnore
     public Long getPollId() {
-        return (Long) getPayload().get("pollId");
+        return longPayload("pollId");
     }
 
     @JsonIgnore

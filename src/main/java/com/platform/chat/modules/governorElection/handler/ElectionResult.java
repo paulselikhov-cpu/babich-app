@@ -37,7 +37,7 @@ import java.util.Set;
  * кандидатам и назначает победителя на единоличную должность (GOVERNOR) в
  * системных локациях района. Зарегистрирован как {@link PollResultHandler} для
  * {@link PollType#ELECTION} — {@link PollResultDispatcher} находит его по типу
- * голосования, {@code ElectionFacade} больше не знает про конкретного
+ * голосования, {@code ElectionService} больше не знает про конкретного
  * обработчика.
  */
 @Component

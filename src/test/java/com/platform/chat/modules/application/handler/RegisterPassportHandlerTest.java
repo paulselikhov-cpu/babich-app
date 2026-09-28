@@ -8,7 +8,7 @@ import com.platform.chat.core.modules.application.enums.ApplicationStatus;
 import com.platform.chat.core.modules.application.enums.ApplicationType;
 import com.platform.chat.core.modules.application.model.ApplicationDecision;
 import com.platform.chat.core.modules.application.model.DocumentNumberGenerator;
-import com.platform.chat.modules.domainEvent.events.CharacterUpdatedEvent;
+import com.platform.chat.core.modules.domainEvent.events.CharacterUpdatedEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

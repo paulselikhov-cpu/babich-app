@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.platform.chat.core.modules.domainEvent.enums.ScopeType;
-import com.platform.chat.modules.domainEvent.events.*;
+import com.platform.chat.core.modules.domainEvent.events.*;
 import lombok.Getter;
 
 import java.io.Serial;
@@ -16,15 +16,20 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Абстрактный базовый класс доменного события.
- * Не хранится в БД — это транспортный объект для событийной шины.
+ * Абстрактный базовый класс доменного события — «конверт» для событийной шины.
+ * Живёт в ядре событий: реестр подтипов ({@code @JsonSubTypes}) перечисляет
+ * факты самого ядра, поэтому ядро не зависит от фич-слайса подписчиков.
+ * Не хранится в БД как бизнес-сущность — это транспортный объект.
  *
  * <p>Сериализация для персистентного event registry Modulith: событие пишется
  * в event_publication в той же транзакции, что и бизнес-изменение, и
- * десериализуется обратно при replay после рестарта. {@code Serializable} —
- * базовый путь (JDK serialization, используется Modulith по умолчанию);
- * Jackson-аннотации покрывают вариант с ObjectMapper, когда он доступен в
- * контексте (Modulith выбирает JSON-сериализацию).</p>
+ * десериализуется обратно при replay после рестарта. В проекте Modulith берёт
+ * Jackson-сериализатор ({@code JacksonEventSerializer} над Spring
+ * {@code ObjectMapper}), поэтому подтип восстанавливается по логическому имени из
+ * {@code @JsonTypeInfo}/{@code @JsonSubTypes} (не по FQCN), а собственный
+ * {@code @JsonCreator} у каждого факта обязателен — Jackson не наследует
+ * creator базового класса. {@code Serializable} оставлен запасным путём
+ * (JDK serialization).</p>
  *
  * <p>{@code eventId} и {@code occurredAt} помечены {@code @JsonIgnore} и не
  * сериализуются: это технические поля транспорта, при десериализации они
@@ -70,6 +75,7 @@ public abstract class DomainEvent implements Serializable {
     private final Long targetId;
 
     /** Тип скоупа — область действия события (район, локация, персонаж и т.п.). */
+    @Getter
     private final ScopeType scopeType;
 
     /** Идентификатор скоупа — конкретного района/локации/персонажа, к которому относится событие. */
@@ -104,4 +110,20 @@ public abstract class DomainEvent implements Serializable {
 
     @JsonIgnore
     public UUID getEventId() { return eventId; }
+
+    /**
+     * Числовое поле payload в едином типе {@code Long}.
+     *
+     * <p>Нужно из-за replay: Modulith сериализует событие в JSON
+     * ({@code JacksonEventSerializer}), а Jackson восстанавливает
+     * {@code Map<String, Object>} без типовой информации — целые приходят
+     * обратно как {@code Integer}. Прямой каст {@code (Long) payload.get(...)}
+     * на переигранном событии падал бы с {@code ClassCastException}. Политика
+     * «любое число в payload читаем как Long» живёт здесь, в конверте, а не
+     * дублируется в каждом событии.</p>
+     */
+    protected Long longPayload(String key) {
+        Object value = payload == null ? null : payload.get(key);
+        return value instanceof Number number ? number.longValue() : null;
+    }
 }

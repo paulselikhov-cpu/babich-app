@@ -1,13 +1,13 @@
 package com.platform.chat.core.modules.transactionLog.entity;
 
-import com.platform.chat.modules.coin.enums.CoinUpdateReason;
+import com.platform.chat.core.modules.transactionLog.enums.CoinUpdateReason;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
  * Лог всех начислений/списаний монет и XP.
- * Пишется исключительно через RewardService — нужен для анти-фрод
+ * Пишется исключительно через CoinService — нужен для анти-фрод
  * анализа и постфактум-балансировки экономики (см. babichchat_concept.md, раздел 9).
  */
 @Data

@@ -13,8 +13,8 @@ import com.platform.chat.core.modules.domainEvent.service.DomainEventPublisher;
 import com.platform.chat.base.chatUser.repository.ChatUserRepository;
 import com.platform.chat.base.district.service.DistrictSettingsService;
 
-import com.platform.chat.modules.domainEvent.events.ElectionClosedEvent;
-import com.platform.chat.modules.domainEvent.events.ElectionStartedEvent;
+import com.platform.chat.core.modules.domainEvent.events.ElectionClosedEvent;
+import com.platform.chat.core.modules.domainEvent.events.ElectionStartedEvent;
 
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

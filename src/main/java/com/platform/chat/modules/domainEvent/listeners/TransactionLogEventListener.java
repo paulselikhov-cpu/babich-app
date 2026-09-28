@@ -1,10 +1,10 @@
 package com.platform.chat.modules.domainEvent.listeners;
 
 import com.platform.chat.core.modules.transactionLog.repository.TransactionLogRepository;
-import com.platform.chat.modules.domainEvent.events.CoinsChangedEvent;
-import com.platform.chat.modules.domainEvent.events.XpChangedEvent;
+import com.platform.chat.core.modules.domainEvent.events.CoinsChangedEvent;
+import com.platform.chat.core.modules.domainEvent.events.XpChangedEvent;
 import com.platform.chat.core.modules.transactionLog.entity.TransactionLog;
-import com.platform.chat.modules.coin.enums.CoinUpdateReason;
+import com.platform.chat.core.modules.transactionLog.enums.CoinUpdateReason;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * <p>Amount приходит из события уже с нужным знаком: начисление — положительное,
  * списание (takeCoins) — отрицательное. Почему аудит не пишется синхронно в
- * RewardService — см. event/event-migration-plan.md, Этап 3.</p>
+ * CoinService — см. documentation/architecture/event/domain-event-module-layers.md.</p>
  *
  * <p>@ApplicationModuleListener — Modulith-обёртка над AFTER_COMMIT
  * (TransactionalEventApplicationListener), но с outbox-гарантиями: событие

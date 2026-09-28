@@ -2,9 +2,8 @@ package com.platform.economy;
 
 import com.platform.chat.base.chatUser.entity.ChatUser;
 import com.platform.chat.base.chatUser.repository.ChatUserRepository;
-import com.platform.chat.core.modules.application.service.ApplicationService;
 import com.platform.chat.core.modules.transactionLog.entity.TransactionLog;
-import com.platform.chat.modules.coin.enums.CoinUpdateReason;
+import com.platform.chat.core.modules.transactionLog.enums.CoinUpdateReason;
 import com.platform.chat.core.modules.transactionLog.repository.TransactionLogRepository;
 import com.platform.chat.modules.coin.service.CoinService;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * DoD-тесты Этапа 3 (event-driven экономика).
  *
- * Проверяют сквозной путь: RewardService (единственная точка входа изменения
+ * Проверяют сквозной путь: CoinService (единственная точка входа изменения
  * монет/XP) → доменное событие (CoinsChangedEvent/XpChangedEvent) →
  * подписчик TransactionLogEventListener → аудит-запись в TransactionLog.
  *
@@ -35,13 +34,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * {@code TransactionLog}, которую пишет подписчик события на AFTER_COMMIT;
  * появление записи ожидается с таймаутом (см. {@link #awaitAuditLogs}).</p>
  *
- * <p>Scenario «покупка первой платной локации» идёт через реальный
- * ApplicationService → BuyFirstLocationHandler → LocationService →
- * RewardService.takeCoins: списание монет, публикация CoinsChangedEvent и
- * аудит-запись с RewardReason.LOCATION_CREATE (платный шаблон PRIVATE_HOUSE
- * из data.sql, цена 100 Coin). Обработчик ищет персонажа по внешнему
- * User.id (поле userId), поэтому submit вызывается с внешним id, а баланс и
- * аудит проверяются по внутреннему ChatUser.id.</p>
+ * <p>Четыре сценария прямого вызова {@code CoinService}: {@code giveCoins}
+ * (начисление, reason WORK_SHIFT), {@code takeCoins} (списание, reason
+ * LOCATION_CREATE + relatedEntityId), {@code takeCoins} при недостатке баланса
+ * (IllegalStateException, событие не публикуется — аудита нет) и {@code giveXp}
+ * (аудит XP_USER). Баланс/XP проверяются по персонажу (ChatUser.id), аудит —
+ * в {@code TransactionLog}.</p>
  */
 @SpringBootTest
 class RewardServiceAuditIntegrationTest {
@@ -55,9 +53,6 @@ class RewardServiceAuditIntegrationTest {
     @Autowired
     private TransactionLogRepository transactionLogRepository;
 
-    @Autowired
-    private ApplicationService applicationService;
-
     /** Стартовый баланс/XP тестового персонажа. */
     private static final long START_BALANCE = 1000L;
     private static final long START_XP = 50L;
@@ -65,15 +60,12 @@ class RewardServiceAuditIntegrationTest {
     /** Внутренний id персонажа (ChatUser.id). */
     private Long characterId;
 
-    /** Внешний id владельца (User.id), нужен ApplicationService/BuyFirstLocationHandler. */
-    private Long externalUserId;
-
     /**
      * Ожидает появления аудит-записи с таймаутом.
      *
      * <p>Событие (CoinsChangedEvent/XpChangedEvent) доставляется подписчику
      * асинхронно через outbox (event_publication), поэтому сразу после вызова
-     * RewardService запись может ещё не появиться. Хелпер поллит с интервалом
+     * CoinService-подписчик запись может ещё не появиться. Хелпер поллит с интервалом
      * 50 мс до 5 с — этого достаточно, чтобы подписчик успел записать аудит.</p>
      */
     private List<TransactionLog> awaitAuditLogs(Long userId, CoinUpdateReason reason) {
@@ -114,7 +106,6 @@ class RewardServiceAuditIntegrationTest {
         user.setGameStatus("HOMELESS");
         ChatUser saved = chatUserRepository.save(user);
         characterId = saved.getId();
-        externalUserId = userId;
     }
 
     @Test

@@ -2,7 +2,7 @@
         allowedDependencies = {
                 "chat.base.chatUser",
                 "chat.core.modules.domainEvent",
-                "chat.modules.domainEvent",
+                "chat.core.modules.transactionLog",
         },
         type = ApplicationModule.Type.OPEN
 )
