@@ -2,8 +2,6 @@
         allowedDependencies = {
                 "chat.base.location",
                 "chat.base.chatUser",
-                "chat.core.modules.message",
-                "chat.core.modules.onlineSession",
         },
         type = ApplicationModule.Type.OPEN
 )

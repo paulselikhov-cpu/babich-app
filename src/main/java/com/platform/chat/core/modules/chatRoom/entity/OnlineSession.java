@@ -1,4 +1,4 @@
-package com.platform.chat.core.modules.onlineSession.entity;
+package com.platform.chat.core.modules.chatRoom.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.platform.chat.base.chatUser.entity.ChatUser;
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
  * Одна запись НА ПЕРСОНАЖА (character_id уникален), а не на сессию/локацию.
  * Если персонаж открывает вторую вкладку — она просто перезаписывает эту
  * же строку новым sessionId. Первая вкладка становится "немой" и сама
- * протухнет по heartbeat-таймауту (см. PresenceService.cleanupStalePresences).
+ * протухнет по heartbeat-таймауту (см. {@code OnlineSessionService.onTick}).
  *
  * room_id NOT NULL — по бизнес-правилу пользователь online всегда находится
  * в какой-то комнате (минимум — в дефолтной "прихожей" локации).
@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 @Data
 @Entity
 @Table(name = "character_presence")
-public class onlineSessions {
+public class OnlineSession {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

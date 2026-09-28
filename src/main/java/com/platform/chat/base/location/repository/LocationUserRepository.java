@@ -59,7 +59,7 @@ public interface LocationUserRepository extends JpaRepository<LocationUser, Long
             Long locationId, SystemRoleType systemRole, Long characterId);
 
     /**
-     * LEFT JOIN на CharacterPresence — если записи нет, presenceId будет null
+     * LEFT JOIN на OnlineSession (присутствие, слайс chat.core.modules.chatRoom) — если записи нет, presenceId будет null
      * (значит офлайн). Онлайн — всегда первыми в списке, дальше по алфавиту.
      */
     @Query("""
@@ -73,7 +73,7 @@ public interface LocationUserRepository extends JpaRepository<LocationUser, Long
         lm.systemRole
     )
     FROM LocationUser lm
-    LEFT JOIN onlineSessions cp
+    LEFT JOIN OnlineSession cp
         ON cp.character.id = lm.character.id AND cp.location.id = lm.location.id
     LEFT JOIN cp.room r
     WHERE lm.location.id = :locationId

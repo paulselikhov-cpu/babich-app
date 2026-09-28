@@ -1,6 +1,6 @@
 package com.platform.chat.core.modules.webSocket.eventListener;
 
-import com.platform.chat.core.modules.onlineSession.service.OnlineSessionService;
+import com.platform.chat.core.modules.chatRoom.service.OnlineSessionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;

@@ -1,4 +1,4 @@
-package com.platform.chat.core.modules.message.enums;
+package com.platform.chat.core.modules.chatRoom.enums;
 
 /**
  * Тип сообщения в чате.

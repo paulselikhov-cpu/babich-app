@@ -1,4 +1,4 @@
-package com.platform.chat.core.modules.message.dto;
+package com.platform.chat.core.modules.chatRoom.dto;
 
 public record UnreadUpdateResponse(
         Long roomId,

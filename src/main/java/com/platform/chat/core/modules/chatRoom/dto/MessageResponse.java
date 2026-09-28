@@ -1,9 +1,9 @@
-package com.platform.chat.core.modules.message.dto;
+package com.platform.chat.core.modules.chatRoom.dto;
 
 import com.platform.chat.base.chatUser.entity.ChatUser;
 
-import com.platform.chat.core.modules.message.entity.Message;
-import com.platform.chat.core.modules.message.enums.MessageActionType;
+import com.platform.chat.core.modules.chatRoom.entity.Message;
+import com.platform.chat.core.modules.chatRoom.enums.MessageActionType;
 import lombok.Data;
 import java.time.LocalDateTime;
 

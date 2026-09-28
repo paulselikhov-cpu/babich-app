@@ -13,6 +13,7 @@ import com.platform.chat.base.location.repository.LocationUserRepository;
 import com.platform.chat.base.location.repository.LocationRepository;
 import com.platform.chat.base.location.repository.LocationTemplateRepository;
 import com.platform.chat.base.room.entity.Room;
+import com.platform.chat.base.room.port.RoomContentCleaner;
 import com.platform.chat.base.room.repository.RoomReadStatusRepository;
 import com.platform.chat.base.room.repository.RoomRepository;
 import com.platform.chat.core.modules.transactionLog.enums.CoinUpdateReason;
@@ -42,6 +43,7 @@ public class LocationService {
     private final LocationUserRepository locationUserRepository;
     private final RoomReadStatusRepository roomReadStatusRepository;
     private final RoomRepository roomRepository;
+    private final RoomContentCleaner roomContentCleaner;
     private final ChatUserRepository chatUserRepository;
     private final DistrictRepository districtRepository;
     private final CoinService coinService;
@@ -360,21 +362,26 @@ public class LocationService {
         List<Room> rooms = roomRepository.findByLocationIdOrderByOrderIndex(locationId);
         List<Long> roomIds = rooms.stream().map(Room::getId).toList();
 
-        // 2. Удаляем room_read_status для всех комнат (иначе FK нарушается)
+        // 2. Чистим содержимое комнат (сообщения). Владелец данных — слайс
+        // chat.core.modules.chatRoom, поэтому работаем через его имплементацию
+        // Обязательно ДО удаления rooms — иначе FK messages.room_id → rooms.id.
+        roomContentCleaner.cleanRooms(roomIds);
+
+        // 3. Удаляем room_read_status для всех комнат (иначе FK нарушается)
         if (!roomIds.isEmpty()) {
             roomReadStatusRepository.deleteByRoomIdIn(roomIds);
         }
 
-        // 3. Удаляем сообщения комнат (у них cascade = ALL на Room)
+        // 4. Удаляем комнаты
         roomRepository.deleteAll(rooms);
 
-        // 4. Удаляем участников локации
+        // 5. Удаляем участников локации
         List<LocationUser> members = locationUserRepository.findByLocationId(locationId);
         if (!members.isEmpty()) {
             locationUserRepository.deleteAll(members);
         }
 
-        // 5. Удаляем саму локацию
+        // 6. Удаляем саму локацию
         locationRepository.deleteById(locationId);
     }
 }

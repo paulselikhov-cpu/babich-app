@@ -1,10 +1,10 @@
-package com.platform.chat.core.modules.message.service;
+package com.platform.chat.core.modules.chatRoom.service;
 
-import com.platform.chat.core.modules.message.dto.MessageResponse;
-import com.platform.chat.core.modules.message.dto.RoomHistoryResponse;
-import com.platform.chat.core.modules.message.entity.Message;
-import com.platform.chat.core.modules.message.enums.MessageType;
-import com.platform.chat.core.modules.message.repository.MessageRepository;
+import com.platform.chat.core.modules.chatRoom.dto.MessageResponse;
+import com.platform.chat.core.modules.chatRoom.dto.RoomHistoryResponse;
+import com.platform.chat.core.modules.chatRoom.entity.Message;
+import com.platform.chat.core.modules.chatRoom.enums.MessageType;
+import com.platform.chat.core.modules.chatRoom.repository.MessageRepository;
 
 import com.platform.chat.base.chatUser.repository.ChatUserRepository;
 import com.platform.chat.base.location.repository.LocationUserRepository;

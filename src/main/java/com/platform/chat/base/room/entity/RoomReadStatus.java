@@ -9,7 +9,13 @@ import java.time.LocalDateTime;
 /**
  * Отметка "персонаж X прочитал комнату Y до момента T".
  * Непрочитанные = сообщения комнаты с created_at > lastReadAt (и не от самого персонажа).
- * Обновляется автоматически при входе в комнату — см. PresenceService.enterRoom.
+ *
+ * <p>Пишется и читается сервисами слайса чата комнаты
+ * ({@code chat.core.modules.chatRoom}): {@code MessageService.getHistoryAndMarkRead}
+ * при открытии комнаты, STOMP {@code /chat.read}, {@code UnreadService.markRead}.
+ * Сущность живёт в базовой модели комнаты, поэтому каскадная чистка при
+ * удалении комнат выполняется в {@code LocationService.deleteLocation}
+ * (FK room_read_status.room_id → rooms.id).</p>
  */
 @Data
 @Entity

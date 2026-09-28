@@ -1,4 +1,4 @@
-package com.platform.chat.core.modules.onlineSession.dto;
+package com.platform.chat.core.modules.chatRoom.dto;
 
 /**
  * Событие presence, рассылаемое через /topic/location.{id}.presence.

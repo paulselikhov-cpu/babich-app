@@ -5,11 +5,11 @@ import com.platform.chat.core.modules.webSocket.dto.ChatActionMessageRequest;
 import com.platform.chat.base.chatUser.service.ChatUserService;
 import com.platform.chat.base.chatUser.entity.ChatUser;
 
-import com.platform.chat.core.modules.message.dto.MessageResponse;
-import com.platform.chat.core.modules.message.enums.MessageActionType;
-import com.platform.chat.core.modules.message.service.MessageService;
-import com.platform.chat.core.modules.message.service.UnreadService;
-import com.platform.chat.core.modules.onlineSession.service.OnlineSessionService;
+import com.platform.chat.core.modules.chatRoom.dto.MessageResponse;
+import com.platform.chat.core.modules.chatRoom.enums.MessageActionType;
+import com.platform.chat.core.modules.chatRoom.service.MessageService;
+import com.platform.chat.core.modules.chatRoom.service.UnreadService;
+import com.platform.chat.core.modules.chatRoom.service.OnlineSessionService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -53,7 +53,7 @@ public class ChatWebSocketController {
     // ─── вошёл в комнату ─────────────────────────────────────────────────
     // добавлен вызов presenceService.enterRoom — одно STOMP-сообщение теперь
     // и шлёт системное сообщение "X вошёл в комнату" (как раньше),
-    // и обновляет CharacterPresence (где юзер сейчас online)
+    // и обновляет OnlineSession (presence: где юзер сейчас online)
     @MessageMapping("/chat.join")
     public void joinChat(
             ChatActionMessageRequest messageParams,

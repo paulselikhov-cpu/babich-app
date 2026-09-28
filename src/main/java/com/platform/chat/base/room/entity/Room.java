@@ -3,17 +3,21 @@ package com.platform.chat.base.room.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.platform.chat.base.location.entity.Location;
 import com.platform.chat.base.room.enums.RoomCode;
-import com.platform.chat.core.modules.message.entity.Message;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * Комната внутри локации — место где происходит чат.
  * Каждая локация содержит минимум одну комнату.
  * Базовые комнаты создаются автоматически из TemplateRoom при создании локации.
  * В расширяемых локациях владелец может добавлять свои комнаты за Coin.
+ *
+ * <p>История сообщений комнаты (entity {@code Message} слайса
+ * {@code chat.core.modules.chatRoom}) здесь не отображается: обратной связи
+ * {@code messages} нет сознательно — она не использовалась, а базовый модуль
+ * комнат не должен зависеть от модуля чата. Сообщения удаляются вместе с
+ * комнатой через cascade внутри самого слайса чата.</p>
  */
 @Data
 @Entity
@@ -80,17 +84,6 @@ public class Room {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-    /**
-     * Сообщения этой комнаты.
-     * Загружаются только если storeHistory = true.
-     * FetchType.LAZY = не загружать автоматически — только по запросу.
-     * Это критично для производительности: у активной комнаты
-     * могут быть тысячи сообщений.
-     */
-    @JsonIgnore
-    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Message> messages;
 
     @PrePersist
     public void prePersist() {

@@ -1,4 +1,4 @@
-package com.platform.chat.core.modules.message.service;
+package com.platform.chat.core.modules.chatRoom.service;
 
 import com.platform.chat.base.location.entity.LocationUser;
 import com.platform.chat.base.room.entity.Room;
@@ -8,9 +8,9 @@ import com.platform.chat.base.location.repository.LocationUserRepository;
 import com.platform.chat.base.room.repository.RoomReadStatusRepository;
 import com.platform.chat.base.room.repository.RoomRepository;
 
-import com.platform.chat.core.modules.message.repository.MessageRepository;
-import com.platform.chat.core.modules.onlineSession.repository.CharacterPresenceRepository;
-import com.platform.chat.core.modules.message.dto.UnreadUpdateResponse;
+import com.platform.chat.core.modules.chatRoom.repository.MessageRepository;
+import com.platform.chat.core.modules.chatRoom.repository.OnlineSessionRepository;
+import com.platform.chat.core.modules.chatRoom.dto.UnreadUpdateResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,7 @@ public class UnreadService {
     private final RoomRepository roomRepository;
     private final LocationUserRepository locationUserRepository;
     private final SimpMessagingTemplate messagingTemplate;
-    private final CharacterPresenceRepository characterPresenceRepository;
+    private final OnlineSessionRepository onlineSessionRepository;
     private final ChatUserRepository chatUserRepository;
 
     private static final LocalDateTime EPOCH = LocalDateTime.of(1970, 1, 1, 0, 0);
@@ -87,7 +87,7 @@ public class UnreadService {
 
             // если участник прямо сейчас находится в этой же комнате — он и так видит
             // сообщение вживую через свою открытую ChatArea, бейдж ему прибавлять не нужно
-            boolean isCurrentlyInThisRoom = characterPresenceRepository.findByCharacterId(characterId)
+            boolean isCurrentlyInThisRoom = onlineSessionRepository.findByCharacterId(characterId)
                     .map(p -> p.getRoom() != null && p.getRoom().getId().equals(roomId))
                     .orElse(false);
             if (isCurrentlyInThisRoom) {

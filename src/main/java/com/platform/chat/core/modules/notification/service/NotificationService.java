@@ -1,8 +1,5 @@
 package com.platform.chat.core.modules.notification.service;
 
-import com.platform.chat.base.chatUser.entity.ChatUser;
-import com.platform.chat.base.chatUser.repository.ChatUserRepository;
-
 import com.platform.chat.core.modules.notification.repository.NotificationRepository;
 import com.platform.chat.core.modules.notification.entity.Notification;
 import com.platform.chat.core.modules.notification.dto.NotificationContextData;
@@ -22,7 +19,6 @@ import java.util.Map;
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
-    private final ChatUserRepository chatUserRepository;
 
     /**
      * Отправить уведомление одному персонажу (без контекстных данных).
@@ -50,34 +46,6 @@ public class NotificationService {
         notification.setRelatedEntityId(relatedEntityId);
         notification.setData(NotificationContextData.toText(data));
         return notificationRepository.save(notification);
-    }
-
-    /**
-     * Отправить уведомление с требованием действия (подтвердить/отказаться).
-     */
-    @Transactional
-    public Notification notifyWithAction(Long recipientCharacterId, String title, String body,
-                                         String notificationType, Long relatedEntityId) {
-        Notification notification = new Notification();
-        notification.setRecipientCharacterId(recipientCharacterId);
-        notification.setTitle(title);
-        notification.setBody(body);
-        notification.setNotificationType(notificationType);
-        notification.setRelatedEntityId(relatedEntityId);
-        notification.setRequiresAction(true);
-        return notificationRepository.save(notification);
-    }
-
-    /**
-     * Разослать уведомление всем жителям района.
-     */
-    @Transactional
-    public void notifyDistrict(Long districtId, String title, String body,
-                               String notificationType, Long relatedEntityId) {
-        List<ChatUser> residents = chatUserRepository.findByDistrictId(districtId);
-        for (ChatUser resident : residents) {
-            notify(resident.getId(), title, body, notificationType, relatedEntityId);
-        }
     }
 
     /**

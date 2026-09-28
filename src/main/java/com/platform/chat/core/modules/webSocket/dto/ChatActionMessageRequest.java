@@ -1,6 +1,6 @@
 package com.platform.chat.core.modules.webSocket.dto;
 
-import com.platform.chat.core.modules.message.enums.MessageActionType;
+import com.platform.chat.core.modules.chatRoom.enums.MessageActionType;
 import lombok.Data;
 
 @Data

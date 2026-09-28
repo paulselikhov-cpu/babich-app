@@ -2,8 +2,7 @@
         allowedDependencies = {
                 "auth::JwtService",
                 "chat.base.chatUser",
-                "chat.core.modules.message",
-                "chat.core.modules.onlineSession"
+                "chat.core.modules.chatRoom"
         },
         type = ApplicationModule.Type.OPEN
 )

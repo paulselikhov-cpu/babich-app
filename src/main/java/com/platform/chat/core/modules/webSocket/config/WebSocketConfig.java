@@ -22,7 +22,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         // сервер и клиент проверяют друг друга каждые 10 сек на уровне
         // самого протокола STOMP — если клиент не ответил дважды подряд,
         // Spring сам инициирует SessionDisconnectEvent, не дожидаясь
-        // 45-секундного backstop-таймера в PresenceService
+        // 45-секундного backstop-таймера в OnlineSessionService
         .setHeartbeatValue(new long[]{10_000, 10_000})
         .setTaskScheduler(heartbeatScheduler());
         // префикс для сообщений от клиента к серверу

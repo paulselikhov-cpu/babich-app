@@ -1,10 +1,9 @@
-package com.platform.chat.core.modules.onlineSession.service;
+package com.platform.chat.core.modules.chatRoom.service;
 
-import com.platform.chat.core.modules.onlineSession.repository.CharacterPresenceRepository;
-import com.platform.chat.core.modules.onlineSession.dto.OnlineSessionsCountResponse;
-import com.platform.chat.core.modules.onlineSession.dto.OnlineSessionsResponse;
-import com.platform.chat.core.modules.onlineSession.entity.onlineSessions;
-import com.platform.chat.core.modules.message.service.UnreadService;
+import com.platform.chat.core.modules.chatRoom.repository.OnlineSessionRepository;
+import com.platform.chat.core.modules.chatRoom.dto.OnlineSessionsCountResponse;
+import com.platform.chat.core.modules.chatRoom.dto.OnlineSessionsResponse;
+import com.platform.chat.core.modules.chatRoom.entity.OnlineSession;
 import com.platform.chat.core.modules.scheduledCheck.models.TickHandler;
 
 import com.platform.chat.base.chatUser.entity.ChatUser;
@@ -33,11 +32,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OnlineSessionService implements TickHandler {
 
-    private final CharacterPresenceRepository presenceRepository;
+    private final OnlineSessionRepository onlineSessionRepository;
     private final ChatUserRepository chatUserRepository;
     private final LocationRepository locationRepository;
     private final RoomRepository roomRepository;
-    private final UnreadService unreadService;
     private final SimpMessagingTemplate messagingTemplate;
 
     // держим с запасом ~4.5x от интервала heartbeat клиента (10 сек) —
@@ -58,7 +56,7 @@ public class OnlineSessionService implements TickHandler {
     @EventListener(ApplicationReadyEvent.class)
     @Transactional
     public void clearStalePresenceOnStartup() {
-        presenceRepository.deleteAllPresences();
+        onlineSessionRepository.deleteAllPresences();
         log.info("Очищены все presence-записи после рестарта сервера");
     }
 
@@ -67,10 +65,13 @@ public class OnlineSessionService implements TickHandler {
      * Вызывается только по явному клику пользователя на конкретную комнату —
      * автовыбора дефолтной комнаты при входе в локацию больше нет (см. leaveRoom
      * для симметричного явного выхода).
-     * Делает 3 вещи одним вызовом:
+     * Делает 2 вещи одним вызовом:
      *  1) обновляет/создаёт единственную presence-запись персонажа;
-     *  2) отмечает комнату как прочитанную (вход = прочтение);
-     *  3) рассылает presence-событие всем, кто смотрит на эту локацию.
+     *  2) рассылает presence-событие всем, кто смотрит на эту локацию.
+     *
+     * <p>Отметку «прочитано» этот метод НЕ делает (вход в комнату сам по себе
+     * её не двигает): её обновляют {@code MessageService.getHistoryAndMarkRead}
+     * (загрузка истории при открытии комнаты) и STOMP {@code /chat.read}.</p>
      */
     @Transactional
     public void enterRoom(String sessionId, Long characterId, Long locationId, Long roomId) {
@@ -81,8 +82,8 @@ public class OnlineSessionService implements TickHandler {
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("Комната не найдена: " + roomId));
 
-        onlineSessions presence = presenceRepository.findByCharacterId(characterId)
-                .orElseGet(onlineSessions::new);
+        OnlineSession presence = onlineSessionRepository.findByCharacterId(characterId)
+                .orElseGet(OnlineSession::new);
 
         Long previousLocationId = presence.getLocation() != null ? presence.getLocation().getId() : null;
         // ключевой момент: смена комнаты внутри той же локации — это НЕ вход в новую локацию
@@ -94,7 +95,7 @@ public class OnlineSessionService implements TickHandler {
         presence.setLocation(location);
         presence.setRoom(room);
         presence.setLastHeartbeatAt(LocalDateTime.now());
-        presenceRepository.save(presence);
+        onlineSessionRepository.save(presence);
 
         // детальное событие — шлём ВСЕГДА, участники локации должны видеть смену комнаты
         broadcastPresenceDetail(locationId, characterId, true, roomId);
@@ -114,7 +115,7 @@ public class OnlineSessionService implements TickHandler {
     /** Heartbeat от клиента (раз в 10 сек) — просто продлевает "жизнь" сессии. */
     @Transactional
     public void heartbeat(String sessionId) {
-        int updated = presenceRepository.touchHeartbeat(sessionId, LocalDateTime.now());
+        int updated = onlineSessionRepository.touchHeartbeat(sessionId, LocalDateTime.now());
         if (updated == 0) {
             // не ошибка — просто эта сессия уже "перехвачена" другой вкладкой
             // того же персонажа, её heartbeat больше никого не продлевает
@@ -127,7 +128,7 @@ public class OnlineSessionService implements TickHandler {
      */
     @Transactional
     public void handleDisconnect(String sessionId) {
-        presenceRepository.findBySessionId(sessionId).ifPresent(presence -> {
+        onlineSessionRepository.findBySessionId(sessionId).ifPresent(presence -> {
             // защита от гонки двух вкладок: если у персонажа уже открыта вторая
             // вкладка, она успела перезаписать sessionId в этой же строке через
             // enterRoom. Тогда findBySessionId(старый_sessionId) ничего не найдёт —
@@ -135,7 +136,7 @@ public class OnlineSessionService implements TickHandler {
             Long locationId = presence.getLocation().getId();
             Long characterId = presence.getCharacter().getId();
 
-            presenceRepository.deleteBySessionId(sessionId);
+            onlineSessionRepository.deleteBySessionId(sessionId);
             broadcastPresenceDetail(locationId, characterId, false, null);
             broadcastPresenceCount(locationId, false);
         });
@@ -155,13 +156,13 @@ public class OnlineSessionService implements TickHandler {
     @Transactional
     public void onTick() {
         LocalDateTime threshold = LocalDateTime.now().minusSeconds(HEARTBEAT_TIMEOUT_SECONDS);
-        var stale = presenceRepository.findByLastHeartbeatAtBefore(threshold);
+        var stale = onlineSessionRepository.findByLastHeartbeatAtBefore(threshold);
         if (stale.isEmpty()) return;
 
-        for (onlineSessions presence : stale) {
+        for (OnlineSession presence : stale) {
             Long locationId = presence.getLocation().getId();
             Long characterId = presence.getCharacter().getId();
-            presenceRepository.delete(presence);
+            onlineSessionRepository.delete(presence);
             broadcastPresenceDetail(locationId, characterId, false, null);
             broadcastPresenceCount(locationId, false);
         }
@@ -192,11 +193,11 @@ public class OnlineSessionService implements TickHandler {
     }
 
     public long getOnlineCount(@PathVariable Long locationId) {
-        return presenceRepository.countByLocationId(locationId);
+        return onlineSessionRepository.countByLocationId(locationId);
     }
 
     public List<Long> getOnlineCharacterIds(@PathVariable Long locationId) {
-        return presenceRepository.findCharacterIdsByLocationId(locationId);
+        return onlineSessionRepository.findCharacterIdsByLocationId(locationId);
     }
 
     //Получение активных пользователей для списка локаций в сайдбаре
@@ -206,7 +207,7 @@ public class OnlineSessionService implements TickHandler {
         Map<Long, Long> result = new HashMap<>();
         locationIds.forEach(id -> result.put(id, 0L)); // локации без онлайна тоже должны быть в ответе с 0
 
-        presenceRepository.countByLocationIdIn(locationIds)
+        onlineSessionRepository.countByLocationIdIn(locationIds)
                 .forEach(row -> result.put(row.getLocationId(), row.getCount()));
 
         return result;
@@ -222,7 +223,7 @@ public class OnlineSessionService implements TickHandler {
      */
     @Transactional
     public void leaveRoom(Long characterId, Long locationId, Long roomId) {
-        presenceRepository.findByCharacterId(characterId).ifPresent(presence -> {
+        onlineSessionRepository.findByCharacterId(characterId).ifPresent(presence -> {
             boolean isSameRoom = presence.getRoom() != null && presence.getRoom().getId().equals(roomId);
             boolean isSameLocation = presence.getLocation() != null && presence.getLocation().getId().equals(locationId);
 
@@ -231,7 +232,7 @@ public class OnlineSessionService implements TickHandler {
                 return;
             }
 
-            presenceRepository.delete(presence);
+            onlineSessionRepository.delete(presence);
             broadcastPresenceDetail(locationId, characterId, false, null);
             broadcastPresenceCount(locationId, false);
         });

@@ -1,7 +1,7 @@
-package com.platform.chat.core.modules.message.controller;
+package com.platform.chat.core.modules.chatRoom.controller;
 
-import com.platform.chat.core.modules.message.dto.RoomHistoryResponse;
-import com.platform.chat.core.modules.message.service.MessageService;
+import com.platform.chat.core.modules.chatRoom.dto.RoomHistoryResponse;
+import com.platform.chat.core.modules.chatRoom.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
