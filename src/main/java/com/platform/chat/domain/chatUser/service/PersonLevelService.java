@@ -4,10 +4,6 @@ import com.platform.chat.domain.chatUser.entity.ChatUser;
 import com.platform.chat.domain.chatUser.enums.PersonLevel;
 import org.springframework.stereotype.Service;
 
-/**
- * Слой 1 (Интерфейсы). Сервис уровней персонажа.
- * Вычисляет PersonLevel из xpUser и проверяет пороговые условия.
- */
 @Service
 public class PersonLevelService {
 

@@ -7,7 +7,7 @@ import com.platform.chat.engines.poll.service.PollResultDispatcher;
 import java.util.Set;
 
 /**
- * Обработчик результата голосования (Слой 4).
+ * Обработчик результата голосования.
  * <p>
  * Каждая реализация отвечает за свой набор типов голосования
  * ({@link #supportedTypes()}) и выполняет последствия закрытия голосования:

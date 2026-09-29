@@ -8,7 +8,7 @@ import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Component;
 
 /**
- * Слой 4 (Доставка). Реагирует на {@link CharacterUpdatedEvent} и шлёт WS-пуш
+ * Реагирует на {@link CharacterUpdatedEvent} и шлёт WS-пуш
  * владельцу конкретного персонажа, чтобы тот перезагрузил {@code currentChatUser}
  * без F5 (паспорт/лицензия одобрены, админ поправил поля и т.п.).
  *

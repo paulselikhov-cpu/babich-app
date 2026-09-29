@@ -14,7 +14,6 @@ import java.security.Principal;
 import java.util.List;
 
 /**
- * Слой 1 (Интерфейсы). REST-доступ к уведомлениям текущего персонажа.
  * Нужен модалке уведомлений (колокольчик): история при заходе + отметки
  * прочитанным/подтверждение действий. Живые события приходят по WS
  * (/user/{username}/queue/notifications) — см. NotificationEventListener.

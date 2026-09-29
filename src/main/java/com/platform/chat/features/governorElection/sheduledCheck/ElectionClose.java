@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * Слой 4 (автоматизация). Обработчик отложенных проверок «закрыть Poll».
+ * Обработчик отложенных проверок «закрыть Poll».
  *
  * закрытие выборов по истечении {@code endsAt} инициируется явной записью в реестре {@link ScheduledCheck}
  * (checkType = {@value #CHECK_TYPE}), которую регистрирует PollService при
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
  * что и ручное закрытие: closePoll → подсчёт голосов → ElectionResultHandlerAdapter
  * (найден PollResultDispatcher по типу голосования) → публикация
  * ElectionClosedEvent (уведомления жителям района уходят через
- * NotificationEventListener, Слой 4).</p>
+ * NotificationEventListener).</p>
  */
 @Component
 @RequiredArgsConstructor

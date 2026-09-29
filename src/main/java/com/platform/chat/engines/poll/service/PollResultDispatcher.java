@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Диспетчер обработчиков результатов голосования (Слой 4).
+ * Диспетчер обработчиков результатов голосования.
  * <p>
  * Spring собирает все реализации {@link PollResultHandler} в список и передаёт
  * сюда. Диспетчер строит карту {@code PollType → PollResultHandler} и выбирает

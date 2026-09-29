@@ -6,7 +6,7 @@ import com.platform.chat.engines.scheduledCheck.entity.ScheduledCheck;
 /**
  * Обработчик отложенных проверок ({@link ScheduledCheck}) единого планировщика.
  *
- * <p>Слой 4 (автоматизация). Реализация обрабатывает строку из реестра
+ * <p> Реализация обрабатывает строку из реестра
  * {@code scheduled_checks}: Spring собирает {@code List<ScheduledCheckHandler>},
  * а {@link SchedulerGateway} диспетчеризует проверку обработчику по
  * {@link #checkType()}.</p>

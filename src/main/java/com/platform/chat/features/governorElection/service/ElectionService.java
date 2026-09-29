@@ -28,13 +28,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Слой 2 (Сценарии).
  * ElectionService — оркестратор выборов губернатора.
  * Собирает шаги сценария "Выборы губернатора" в один вызов, понятный клиенту.
- * Не содержит бизнес-логики — делегирует в Слой 3 (PollService).
+ * Не содержит бизнес-логики — делегирует в PollService.
  * После закрытия голосования результат обрабатывает PollResultDispatcher
- * (Слой 4, выбирает реализацию по PollType) и публикует ElectionClosedEvent —
- * уведомления жителям района и WS-пуш делает независимый подписчик (Слой 4),
+ * (выбирает реализацию по PollType) и публикует ElectionClosedEvent —
+ * уведомления жителям района и WS-пуш делает независимый подписчик,
  * а не этот фасад напрямую.
  */
 @Service
@@ -56,7 +55,7 @@ public class ElectionService {
      * Остальные 4 слота пустые — ждут кандидатов.
      *
      * <p>Публикует ElectionStartedEvent — жителей района уведомляет
-     * NotificationEventListener (Слой 4) через Notification + WS-пуш.</p>
+     * NotificationEventListener через Notification + WS-пуш.</p>
      */
     @Transactional
     public Poll initiateElection(Long districtId, Long initiatorCharacterId) {
@@ -99,7 +98,7 @@ public class ElectionService {
         Map<Long, Integer> votes = pollService.countVotes(pollId);
         log.info("Vote results for poll {}: {}", pollId, votes);
 
-        // Обработать результат через диспетчер (Слой 4): назначает должности,
+        // Обработать результат через диспетчер: назначает должности,
         // каскад голосований и публикует PollClosedEvent.
         pollResultDispatcher.dispatch(closed);
 
@@ -113,7 +112,7 @@ public class ElectionService {
     /**
      * Публикует ElectionClosedEvent после закрытия выборов.
      * Подписчик (NotificationEventListener) разошлёт уведомления жителям района
-     * и сделает WS-пуш — фасад больше не знает про Слой 4.
+     * и сделает WS-пуш — фасад больше не знает про.
      */
     private void publishElectionClosed(Poll closed) { //TODO: есть PollClosedEvent - нужен ли нам ElectionClosedEvent?
         String winnerName = resolveWinnerName(closed.getId());
