@@ -1,8 +1,8 @@
-package com.platform.chat.core.modules.chatRoom.controller;
+package com.platform.chat.engines.chatRoom.controller;
 
-import com.platform.chat.core.modules.chatRoom.service.OnlineSessionService;
-import com.platform.chat.core.modules.chatRoom.service.UnreadService;
-import com.platform.chat.core.modules.chatRoom.service.UnreadService.LocationUnreadSummary;
+import com.platform.chat.engines.chatRoom.service.OnlineSessionService;
+import com.platform.chat.engines.chatRoom.service.UnreadService;
+import com.platform.chat.engines.chatRoom.service.UnreadService.LocationUnreadSummary;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

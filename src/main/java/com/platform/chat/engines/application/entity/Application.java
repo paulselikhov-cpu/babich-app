@@ -1,7 +1,7 @@
-package com.platform.chat.core.modules.application.entity;
+package com.platform.chat.engines.application.entity;
 
-import com.platform.chat.core.modules.application.enums.ApplicationStatus;
-import com.platform.chat.core.modules.application.enums.ApplicationType;
+import com.platform.chat.engines.application.enums.ApplicationStatus;
+import com.platform.chat.engines.application.enums.ApplicationType;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;

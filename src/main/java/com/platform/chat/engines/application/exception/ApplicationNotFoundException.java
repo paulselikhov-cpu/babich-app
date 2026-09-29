@@ -1,4 +1,4 @@
-package com.platform.chat.core.modules.application.exception;
+package com.platform.chat.engines.application.exception;
 
 /**
  * Заявка с таким id не найдена (команда approve/reject по несуществующему id).

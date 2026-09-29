@@ -1,11 +1,11 @@
 @ApplicationModule(
         allowedDependencies = {
-                "chat.base.chatUser",
-                "chat.base.room",
-                "chat.base.district",
+                "chat.domain.chatUser",
+                "chat.domain.room",
+                "chat.domain.district",
         },
         type = ApplicationModule.Type.OPEN
 )
-package com.platform.chat.base.location;
+package com.platform.chat.domain.location;
 
 import org.springframework.modulith.ApplicationModule;

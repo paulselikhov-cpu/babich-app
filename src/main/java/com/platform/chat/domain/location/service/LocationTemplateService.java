@@ -1,8 +1,8 @@
-package com.platform.chat.base.location.service;
+package com.platform.chat.domain.location.service;
 
-import com.platform.chat.base.location.entity.LocationTemplate;
-import com.platform.chat.base.room.entity.TemplateRoom;
-import com.platform.chat.base.location.repository.LocationTemplateRepository;
+import com.platform.chat.domain.location.entity.LocationTemplate;
+import com.platform.chat.domain.room.entity.TemplateRoom;
+import com.platform.chat.domain.location.repository.LocationTemplateRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

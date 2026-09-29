@@ -1,13 +1,13 @@
-package com.platform.chat.base.location.controller;
+package com.platform.chat.domain.location.controller;
 
-import com.platform.chat.base.location.dto.LocationSystemRoleView;
-import com.platform.chat.base.location.dto.LocationUserResponse;
-import com.platform.chat.base.location.dto.LocationUsersPagedResponse;
-import com.platform.chat.base.location.entity.LocationUser;
-import com.platform.chat.base.location.service.LocationUsersService;
-import com.platform.chat.base.chatUser.entity.ChatUser;
-import com.platform.chat.base.chatUser.enums.SystemRoleType;
-import com.platform.chat.base.chatUser.repository.ChatUserRepository;
+import com.platform.chat.domain.location.dto.LocationSystemRoleView;
+import com.platform.chat.domain.location.dto.LocationUserResponse;
+import com.platform.chat.domain.location.dto.LocationUsersPagedResponse;
+import com.platform.chat.domain.location.entity.LocationUser;
+import com.platform.chat.domain.location.service.LocationUsersService;
+import com.platform.chat.domain.chatUser.entity.ChatUser;
+import com.platform.chat.domain.chatUser.enums.SystemRoleType;
+import com.platform.chat.domain.chatUser.repository.ChatUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +19,7 @@ import java.util.List;
  *
  * <p>Состояние комнат (непрочитанное и присутствие) здесь больше не раздаётся:
  * эти ручки переехали в слайс-владелец данных
- * ({@code chat.core.modules.chatRoom.controller.RoomStateController}) и живут под
+ * ({@code chat.engines.chatRoom.controller.RoomStateController}) и живут под
  * тем же URL-префиксом, поэтому контракт с фронтом не менялся.</p>
  */
 @RestController

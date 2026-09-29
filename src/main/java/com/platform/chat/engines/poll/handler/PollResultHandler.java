@@ -1,8 +1,8 @@
-package com.platform.chat.core.modules.poll.handler;
+package com.platform.chat.engines.poll.handler;
 
-import com.platform.chat.core.modules.poll.entity.Poll;
-import com.platform.chat.core.modules.poll.enums.PollType;
-import com.platform.chat.core.modules.poll.service.PollResultDispatcher;
+import com.platform.chat.engines.poll.entity.Poll;
+import com.platform.chat.engines.poll.enums.PollType;
+import com.platform.chat.engines.poll.service.PollResultDispatcher;
 
 import java.util.Set;
 

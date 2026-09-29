@@ -1,7 +1,7 @@
-package com.platform.chat.core.modules.scheduledCheck.repository;
+package com.platform.chat.engines.scheduledCheck.repository;
 
-import com.platform.chat.core.modules.scheduledCheck.entity.ScheduledCheck;
-import com.platform.chat.core.modules.scheduledCheck.enums.ScheduledCheckStatus;
+import com.platform.chat.engines.scheduledCheck.entity.ScheduledCheck;
+import com.platform.chat.engines.scheduledCheck.enums.ScheduledCheckStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,11 +1,11 @@
-package com.platform.chat.core.modules.domainEvent.events;
+package com.platform.chat.engines.domainEvent.events;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.platform.chat.core.modules.domainEvent.DomainEvent;
-import com.platform.chat.core.modules.domainEvent.EventType;
-import com.platform.chat.core.modules.domainEvent.enums.ScopeType;
+import com.platform.chat.engines.domainEvent.DomainEvent;
+import com.platform.chat.engines.domainEvent.EventType;
+import com.platform.chat.engines.domainEvent.enums.ScopeType;
 
 import java.util.Map;
 

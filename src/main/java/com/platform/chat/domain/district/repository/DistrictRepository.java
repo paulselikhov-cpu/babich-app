@@ -1,6 +1,6 @@
-package com.platform.chat.base.district.repository;
+package com.platform.chat.domain.district.repository;
 
-import com.platform.chat.base.district.entity.District;
+import com.platform.chat.domain.district.entity.District;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

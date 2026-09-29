@@ -1,8 +1,8 @@
-package com.platform.chat.modules.coin.adapter;
+package com.platform.chat.engines.economy.adapter;
 
-import com.platform.chat.base.location.port.LocationPaymentPort;
-import com.platform.chat.core.modules.transactionLog.enums.CoinUpdateReason;
-import com.platform.chat.modules.coin.service.CoinService;
+import com.platform.chat.domain.location.port.LocationPaymentPort;
+import com.platform.chat.engines.transactionLog.enums.CoinUpdateReason;
+import com.platform.chat.engines.economy.service.CoinService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

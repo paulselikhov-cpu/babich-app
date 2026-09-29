@@ -1,4 +1,4 @@
-package com.platform.chat.base.location.dto;
+package com.platform.chat.domain.location.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

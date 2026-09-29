@@ -1,6 +1,6 @@
-package com.platform.chat.core.modules.notification.dto;
+package com.platform.chat.engines.notification.dto;
 
-import com.platform.chat.core.modules.notification.entity.Notification;
+import com.platform.chat.engines.notification.entity.Notification;
 import java.time.Instant;
 import java.util.Map;
 

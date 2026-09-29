@@ -1,6 +1,6 @@
-package com.platform.chat.core.modules.chatRoom.eventListener;
+package com.platform.chat.engines.chatRoom.eventListener;
 
-import com.platform.chat.core.modules.chatRoom.service.OnlineSessionService;
+import com.platform.chat.engines.chatRoom.service.OnlineSessionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;

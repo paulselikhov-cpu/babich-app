@@ -1,15 +1,15 @@
-package com.platform.chat.modules.governorElection.controller;
-import com.platform.chat.modules.governorElection.service.ElectionService;
+package com.platform.chat.features.governorElection.controller;
+import com.platform.chat.features.governorElection.service.ElectionService;
 
-import com.platform.chat.base.chatUser.entity.ChatUser;
-import com.platform.chat.base.chatUser.enums.PersonLevel;
-import com.platform.chat.base.chatUser.service.ChatUserService;
-import com.platform.chat.base.chatUser.service.PersonLevelService;
+import com.platform.chat.domain.chatUser.entity.ChatUser;
+import com.platform.chat.domain.chatUser.enums.PersonLevel;
+import com.platform.chat.domain.chatUser.service.ChatUserService;
+import com.platform.chat.domain.chatUser.service.PersonLevelService;
 
-import com.platform.chat.core.modules.poll.dto.DistrictElectionView;
-import com.platform.chat.core.modules.poll.entity.Poll;
-import com.platform.chat.core.modules.poll.entity.PollCandidate;
-import com.platform.chat.core.modules.poll.entity.PollVote;
+import com.platform.chat.engines.poll.dto.DistrictElectionView;
+import com.platform.chat.engines.poll.entity.Poll;
+import com.platform.chat.engines.poll.entity.PollCandidate;
+import com.platform.chat.engines.poll.entity.PollVote;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

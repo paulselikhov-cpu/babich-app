@@ -1,8 +1,8 @@
-package com.platform.chat.base.location.dto;
+package com.platform.chat.domain.location.dto;
 
-import com.platform.chat.base.location.entity.Location;
-import com.platform.chat.base.location.enums.LocationUserRole;
-import com.platform.chat.base.location.enums.PublicLocationType;
+import com.platform.chat.domain.location.entity.Location;
+import com.platform.chat.domain.location.enums.LocationUserRole;
+import com.platform.chat.domain.location.enums.PublicLocationType;
 import lombok.Data;
 import java.time.LocalDateTime;
 

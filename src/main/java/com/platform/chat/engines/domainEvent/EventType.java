@@ -1,4 +1,4 @@
-package com.platform.chat.core.modules.domainEvent;
+package com.platform.chat.engines.domainEvent;
 
 /**
  * Реестр всех событий. Подумай: что произошло — одно именованное событие. Не «что я хочу сделать

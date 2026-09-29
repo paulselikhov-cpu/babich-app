@@ -1,7 +1,7 @@
-package com.platform.chat.base.district.dto;
+package com.platform.chat.domain.district.dto;
 
-import com.platform.chat.base.district.entity.District;
-import com.platform.chat.base.location.dto.LocationResponse;
+import com.platform.chat.domain.district.entity.District;
+import com.platform.chat.domain.location.dto.LocationResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

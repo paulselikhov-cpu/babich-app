@@ -1,24 +1,24 @@
-package com.platform.chat.core.modules.chatRoom;
+package com.platform.chat.engines.chatRoom;
 
-import com.platform.chat.base.chatUser.entity.ChatUser;
-import com.platform.chat.base.chatUser.repository.ChatUserRepository;
-import com.platform.chat.base.district.entity.District;
-import com.platform.chat.base.district.repository.DistrictRepository;
-import com.platform.chat.base.location.entity.Location;
-import com.platform.chat.base.location.entity.LocationUser;
-import com.platform.chat.base.location.enums.LocationCategoryType;
-import com.platform.chat.base.location.enums.LocationUserRole;
-import com.platform.chat.base.location.repository.LocationRepository;
-import com.platform.chat.base.location.repository.LocationUserRepository;
-import com.platform.chat.base.location.service.LocationService;
-import com.platform.chat.base.room.entity.Room;
-import com.platform.chat.base.room.repository.RoomReadStatusRepository;
-import com.platform.chat.base.room.repository.RoomRepository;
-import com.platform.chat.core.modules.chatRoom.repository.MessageRepository;
-import com.platform.chat.core.modules.chatRoom.repository.OnlineSessionRepository;
-import com.platform.chat.core.modules.chatRoom.service.MessageService;
-import com.platform.chat.core.modules.chatRoom.service.OnlineSessionService;
-import com.platform.chat.core.modules.chatRoom.service.UnreadService;
+import com.platform.chat.domain.chatUser.entity.ChatUser;
+import com.platform.chat.domain.chatUser.repository.ChatUserRepository;
+import com.platform.chat.domain.district.entity.District;
+import com.platform.chat.domain.district.repository.DistrictRepository;
+import com.platform.chat.domain.location.entity.Location;
+import com.platform.chat.domain.location.entity.LocationUser;
+import com.platform.chat.domain.location.enums.LocationCategoryType;
+import com.platform.chat.domain.location.enums.LocationUserRole;
+import com.platform.chat.domain.location.repository.LocationRepository;
+import com.platform.chat.domain.location.repository.LocationUserRepository;
+import com.platform.chat.domain.location.service.LocationService;
+import com.platform.chat.domain.room.entity.Room;
+import com.platform.chat.domain.room.repository.RoomReadStatusRepository;
+import com.platform.chat.domain.room.repository.RoomRepository;
+import com.platform.chat.engines.chatRoom.repository.MessageRepository;
+import com.platform.chat.engines.chatRoom.repository.OnlineSessionRepository;
+import com.platform.chat.engines.chatRoom.service.MessageService;
+import com.platform.chat.engines.chatRoom.service.OnlineSessionService;
+import com.platform.chat.engines.chatRoom.service.UnreadService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ import org.springframework.data.domain.PageRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Сквозные тесты слайса «чат комнаты» ({@code chat.core.modules.chatRoom}).
+ * Сквозные тесты слайса «чат комнаты» ({@code chat.engines.chatRoom}).
  *
  * <p>Покрывают то, что раньше было вообще без тестов (два раздельных слайса
  * message/onlineSession): непрочитанное, отметку чтения, присутствие и связку

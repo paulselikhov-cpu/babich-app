@@ -1,9 +1,9 @@
-package com.platform.chat.modules.application.dto;
+package com.platform.chat.features.application.dto;
 
 import com.platform.auth.service.UserService;
-import com.platform.chat.core.modules.application.dto.ApplicationSummary;
-import com.platform.chat.core.modules.application.enums.ApplicationStatus;
-import com.platform.chat.core.modules.application.enums.ApplicationType;
+import com.platform.chat.engines.application.dto.ApplicationSummary;
+import com.platform.chat.engines.application.enums.ApplicationStatus;
+import com.platform.chat.engines.application.enums.ApplicationType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

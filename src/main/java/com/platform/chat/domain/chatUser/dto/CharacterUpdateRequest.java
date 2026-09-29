@@ -1,7 +1,7 @@
-package com.platform.chat.base.chatUser.dto;
+package com.platform.chat.domain.chatUser.dto;
 
-import com.platform.chat.base.chatUser.enums.ChatRole;
-import com.platform.chat.base.chatUser.enums.Profession;
+import com.platform.chat.domain.chatUser.enums.ChatRole;
+import com.platform.chat.domain.chatUser.enums.Profession;
 
 /**
  * Обновление полей персонажа из админской таблицы «Персонажи района».

@@ -1,7 +1,7 @@
-package com.platform.chat.base.location.entity;
+package com.platform.chat.domain.location.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.platform.chat.base.room.entity.TemplateRoom;
+import com.platform.chat.domain.room.entity.TemplateRoom;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.platform.chat.core.modules.application.exception;
+package com.platform.chat.engines.application.exception;
 
 /**
  * Подача заявки отклонена бизнес-правилом: у персонажа уже есть такой документ

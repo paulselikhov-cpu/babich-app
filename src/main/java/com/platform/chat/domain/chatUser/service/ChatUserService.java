@@ -1,12 +1,12 @@
-package com.platform.chat.base.chatUser.service;
+package com.platform.chat.domain.chatUser.service;
 
 import com.platform.auth.repository.UserRepository;
-import com.platform.chat.base.chatUser.entity.ChatUser;
-import com.platform.chat.base.chatUser.dto.CreateChatUserRequest;
-import com.platform.chat.base.chatUser.dto.CharacterUpdateRequest;
-import com.platform.chat.base.chatUser.enums.ChatRole;
-import com.platform.chat.base.chatUser.enums.Profession;
-import com.platform.chat.base.chatUser.repository.ChatUserRepository;
+import com.platform.chat.domain.chatUser.entity.ChatUser;
+import com.platform.chat.domain.chatUser.dto.CreateChatUserRequest;
+import com.platform.chat.domain.chatUser.dto.CharacterUpdateRequest;
+import com.platform.chat.domain.chatUser.enums.ChatRole;
+import com.platform.chat.domain.chatUser.enums.Profession;
+import com.platform.chat.domain.chatUser.repository.ChatUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -234,6 +234,19 @@ public class ChatUserService {
     // топ персонажей по рейтингу
     public List<ChatUser> getTopChatUsers() {
         return chatUserRepository.findAllByOrderByRatingDesc();
+    }
+
+    /** Имя персонажа по его id (Optional, если персонаж не найден). */
+    public Optional<String> findCharacterNameById(Long characterId) {
+        return chatUserRepository.findById(characterId).map(ChatUser::getCharacterName);
+    }
+
+    /**
+     * Сколько персонажей района виделись после указанного момента
+     * (используется для расчёта кворума выборов).
+     */
+    public long countSeenInDistrictAfter(Long districtId, LocalDateTime since) {
+        return chatUserRepository.countByDistrictIdAndLastSeenAfter(districtId, since);
     }
 
 }

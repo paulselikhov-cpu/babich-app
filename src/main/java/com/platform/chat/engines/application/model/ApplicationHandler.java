@@ -1,7 +1,7 @@
-package com.platform.chat.core.modules.application.model;
+package com.platform.chat.engines.application.model;
 
-import com.platform.chat.core.modules.application.entity.Application;
-import com.platform.chat.core.modules.application.enums.ApplicationType;
+import com.platform.chat.engines.application.entity.Application;
+import com.platform.chat.engines.application.enums.ApplicationType;
 
 /**
  * Стратегия обработки заявки конкретного типа.

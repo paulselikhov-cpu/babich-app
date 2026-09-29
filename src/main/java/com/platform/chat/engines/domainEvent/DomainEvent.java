@@ -1,12 +1,12 @@
-package com.platform.chat.core.modules.domainEvent;
+package com.platform.chat.engines.domainEvent;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.platform.chat.core.modules.domainEvent.enums.ScopeType;
-import com.platform.chat.core.modules.domainEvent.events.*;
+import com.platform.chat.engines.domainEvent.enums.ScopeType;
+import com.platform.chat.engines.domainEvent.events.*;
 import lombok.Getter;
 
 import java.io.Serial;

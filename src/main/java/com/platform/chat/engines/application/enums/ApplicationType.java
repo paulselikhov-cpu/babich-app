@@ -1,4 +1,4 @@
-package com.platform.chat.core.modules.application.enums;
+package com.platform.chat.engines.application.enums;
 
 import lombok.Getter;
 
@@ -7,7 +7,7 @@ import org.springframework.modulith.NamedInterface;
 /**
  * Тип гражданской заявки. Каждый тип обрабатывается своим
  * {@code ApplicationHandler} (стратегия) — см. пакет
- * {@code com.platform.chat.modules.application.handler}.
+ * {@code com.platform.chat.features.application.handler}.
  * Список открыт для расширения по мере роста платформы
  * (вступление в группировку, покупка бизнеса, назначение на роль и т.д.).
  *

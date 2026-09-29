@@ -1,6 +1,6 @@
-package com.platform.chat.core.modules.application.exception;
+package com.platform.chat.engines.application.exception;
 
-import com.platform.chat.core.modules.application.enums.ApplicationStatus;
+import com.platform.chat.engines.application.enums.ApplicationStatus;
 
 /**
  * Заявка уже решена (повторный approve/reject по не-PENDING заявке).

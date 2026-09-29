@@ -1,7 +1,7 @@
-package com.platform.chat.base.chatUser.service;
+package com.platform.chat.domain.chatUser.service;
 
-import com.platform.chat.base.chatUser.entity.ChatUser;
-import com.platform.chat.base.chatUser.repository.ChatUserRepository;
+import com.platform.chat.domain.chatUser.entity.ChatUser;
+import com.platform.chat.domain.chatUser.repository.ChatUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

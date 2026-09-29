@@ -1,11 +1,11 @@
-package com.platform.chat.core.modules.poll.service;
+package com.platform.chat.engines.poll.service;
 
-import com.platform.chat.core.modules.poll.entity.Poll;
-import com.platform.chat.core.modules.poll.enums.PollType;
-import com.platform.chat.core.modules.poll.handler.PollResultHandler;
-import com.platform.chat.core.modules.domainEvent.service.DomainEventPublisher;
-import com.platform.chat.core.modules.domainEvent.events.ElectionClosedEvent;
-import com.platform.chat.core.modules.domainEvent.events.PollClosedEvent;
+import com.platform.chat.engines.poll.entity.Poll;
+import com.platform.chat.engines.poll.enums.PollType;
+import com.platform.chat.engines.poll.handler.PollResultHandler;
+import com.platform.chat.engines.domainEvent.service.DomainEventPublisher;
+import com.platform.chat.engines.domainEvent.events.ElectionClosedEvent;
+import com.platform.chat.engines.domainEvent.events.PollClosedEvent;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

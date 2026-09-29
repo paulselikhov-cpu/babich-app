@@ -1,7 +1,7 @@
-package com.platform.chat.core.modules.chatRoom.service;
+package com.platform.chat.engines.chatRoom.service;
 
-import com.platform.chat.base.room.port.RoomContentCleaner;
-import com.platform.chat.core.modules.chatRoom.repository.MessageRepository;
+import com.platform.chat.domain.room.port.RoomContentCleaner;
+import com.platform.chat.engines.chatRoom.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

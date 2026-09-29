@@ -1,6 +1,6 @@
-package com.platform.chat.core.modules.scheduledCheck.entity;
+package com.platform.chat.engines.scheduledCheck.entity;
 
-import com.platform.chat.core.modules.scheduledCheck.enums.ScheduledCheckStatus;
+import com.platform.chat.engines.scheduledCheck.enums.ScheduledCheckStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

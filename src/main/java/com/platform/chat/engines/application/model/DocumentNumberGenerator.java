@@ -1,6 +1,6 @@
-package com.platform.chat.core.modules.application.model;
+package com.platform.chat.engines.application.model;
 
-import com.platform.chat.core.modules.application.enums.ApplicationType;
+import com.platform.chat.engines.application.enums.ApplicationType;
 
 /**
  * Порт генератора номеров документов, выдаваемых по заявке (паспорт, разрешение

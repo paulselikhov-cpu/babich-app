@@ -1,6 +1,6 @@
-package com.platform.chat.core.modules.chatRoom.dto;
+package com.platform.chat.engines.chatRoom.dto;
 
-import com.platform.chat.core.modules.chatRoom.enums.MessageActionType;
+import com.platform.chat.engines.chatRoom.enums.MessageActionType;
 import lombok.Data;
 
 @Data

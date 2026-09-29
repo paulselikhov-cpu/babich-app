@@ -1,6 +1,6 @@
-package com.platform.chat.base.location.repository;
+package com.platform.chat.domain.location.repository;
 
-import com.platform.chat.base.location.entity.LocationTemplate;
+import com.platform.chat.domain.location.entity.LocationTemplate;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.List;

@@ -1,12 +1,12 @@
-package com.platform.chat.core.modules.domainEvent.events;
+package com.platform.chat.engines.domainEvent.events;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.platform.chat.core.modules.domainEvent.DomainEvent;
-import com.platform.chat.core.modules.domainEvent.EventType;
-import com.platform.chat.core.modules.domainEvent.enums.ScopeType;
-import com.platform.chat.core.modules.transactionLog.enums.CoinUpdateReason;
+import com.platform.chat.engines.domainEvent.DomainEvent;
+import com.platform.chat.engines.domainEvent.EventType;
+import com.platform.chat.engines.domainEvent.enums.ScopeType;
+import com.platform.chat.engines.transactionLog.enums.CoinUpdateReason;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +18,7 @@ import java.util.Map;
  *
  * <p>Словарь причин — {@link CoinUpdateReason} — живёт в ядре аудита
  * ({@code core.modules.transactionLog}): событие не должно зависеть от
- * фича-модуля кошелька ({@code chat.modules.coin}).</p>
+ * фича-модуля кошелька ({@code chat.engines.economy}).</p>
  *
  * <p>Вычисляемые геттеры {@code getCharacterId()}, {@code getAmount()},
  * {@code getReason()}, {@code getRelatedEntityId()} помечены {@code @JsonIgnore}:

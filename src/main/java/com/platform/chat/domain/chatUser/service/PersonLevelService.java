@@ -1,7 +1,7 @@
-package com.platform.chat.base.chatUser.service;
+package com.platform.chat.domain.chatUser.service;
 
-import com.platform.chat.base.chatUser.entity.ChatUser;
-import com.platform.chat.base.chatUser.enums.PersonLevel;
+import com.platform.chat.domain.chatUser.entity.ChatUser;
+import com.platform.chat.domain.chatUser.enums.PersonLevel;
 import org.springframework.stereotype.Service;
 
 /**

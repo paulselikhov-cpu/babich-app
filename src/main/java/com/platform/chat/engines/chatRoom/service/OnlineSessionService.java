@@ -1,17 +1,17 @@
-package com.platform.chat.core.modules.chatRoom.service;
+package com.platform.chat.engines.chatRoom.service;
 
-import com.platform.chat.core.modules.chatRoom.repository.OnlineSessionRepository;
-import com.platform.chat.core.modules.chatRoom.dto.OnlineSessionsCountResponse;
-import com.platform.chat.core.modules.chatRoom.dto.OnlineSessionsResponse;
-import com.platform.chat.core.modules.chatRoom.entity.OnlineSession;
-import com.platform.chat.core.modules.scheduledCheck.models.TickHandler;
+import com.platform.chat.engines.chatRoom.repository.OnlineSessionRepository;
+import com.platform.chat.engines.chatRoom.dto.OnlineSessionsCountResponse;
+import com.platform.chat.engines.chatRoom.dto.OnlineSessionsResponse;
+import com.platform.chat.engines.chatRoom.entity.OnlineSession;
+import com.platform.chat.engines.scheduledCheck.models.TickHandler;
 
-import com.platform.chat.base.chatUser.entity.ChatUser;
-import com.platform.chat.base.chatUser.repository.ChatUserRepository;
-import com.platform.chat.base.location.entity.Location;
-import com.platform.chat.base.location.repository.LocationRepository;
-import com.platform.chat.base.room.entity.Room;
-import com.platform.chat.base.room.repository.RoomRepository;
+import com.platform.chat.domain.chatUser.entity.ChatUser;
+import com.platform.chat.domain.chatUser.repository.ChatUserRepository;
+import com.platform.chat.domain.location.entity.Location;
+import com.platform.chat.domain.location.repository.LocationRepository;
+import com.platform.chat.domain.room.entity.Room;
+import com.platform.chat.domain.room.repository.RoomRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

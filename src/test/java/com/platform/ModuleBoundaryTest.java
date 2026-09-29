@@ -54,7 +54,7 @@ class ModuleBoundaryTest {
         ApplicationModules modules = ApplicationModules.of(PlatformApplication.class);
 
         assertThat(modules).isNotNull();
-        assertThat(modules.getModuleByName("chat.base.chatUser")).isPresent();
+        assertThat(modules.getModuleByName("chat.domain.chatUser")).isPresent();
     }
 
     @Test

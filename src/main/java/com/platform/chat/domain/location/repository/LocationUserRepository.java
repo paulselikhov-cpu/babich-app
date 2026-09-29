@@ -1,9 +1,9 @@
-package com.platform.chat.base.location.repository;
+package com.platform.chat.domain.location.repository;
 
-import com.platform.chat.base.location.dto.LocationUserProjection;
-import com.platform.chat.base.location.entity.LocationUser;
-import com.platform.chat.base.location.enums.LocationUserRole;
-import com.platform.chat.base.chatUser.enums.SystemRoleType;
+import com.platform.chat.domain.location.dto.LocationUserProjection;
+import com.platform.chat.domain.location.entity.LocationUser;
+import com.platform.chat.domain.location.enums.LocationUserRole;
+import com.platform.chat.domain.chatUser.enums.SystemRoleType;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -59,11 +59,11 @@ public interface LocationUserRepository extends JpaRepository<LocationUser, Long
             Long locationId, SystemRoleType systemRole, Long characterId);
 
     /**
-     * LEFT JOIN на OnlineSession (присутствие, слайс chat.core.modules.chatRoom) — если записи нет, presenceId будет null
+     * LEFT JOIN на OnlineSession (присутствие, слайс chat.engines.chatRoom) — если записи нет, presenceId будет null
      * (значит офлайн). Онлайн — всегда первыми в списке, дальше по алфавиту.
      */
     @Query("""
-    SELECT new com.platform.chat.base.location.dto.LocationUserProjection(
+    SELECT new com.platform.chat.domain.location.dto.LocationUserProjection(
         lm.character.id,
         lm.character.characterName,
         lm.character.lastSeen,

@@ -1,4 +1,4 @@
-package com.platform.chat.core.modules.poll.enums;
+package com.platform.chat.engines.poll.enums;
 
 /**
  * Область действия голосования.

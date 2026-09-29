@@ -1,4 +1,4 @@
-package com.platform.chat.core.modules.webSocket.config;
+package com.platform.chat.engines.webSocket.config;
 
 import com.platform.auth.service.JwtService;
 import io.jsonwebtoken.ExpiredJwtException;

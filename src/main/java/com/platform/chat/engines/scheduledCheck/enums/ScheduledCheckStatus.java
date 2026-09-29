@@ -1,6 +1,6 @@
-package com.platform.chat.core.modules.scheduledCheck.enums;
+package com.platform.chat.engines.scheduledCheck.enums;
 
-import com.platform.chat.core.modules.scheduledCheck.entity.ScheduledCheck;
+import com.platform.chat.engines.scheduledCheck.entity.ScheduledCheck;
 
 /**
  * Статус отложенной проверки {@link ScheduledCheck}.

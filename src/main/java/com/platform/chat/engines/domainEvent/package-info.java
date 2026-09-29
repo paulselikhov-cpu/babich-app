@@ -9,7 +9,7 @@
  * если бы события лежали в фиче, каждое ядро тянуло бы фич-слайс — это
  * направленный цикл между ядром и исполнителями (тот же дефект, что был с
  * {@code ApplicationType}). Сейчас зависимость строго однонаправленная:
- * {@code chat.modules.domainEvent → chat.core.modules.domainEvent}.
+ * {@code chat.features.domainEvent → chat.engines.domainEvent}.
  *
  * <p>Ядро не знает ни про подписчиков, ни про {@code ChatUser}, ни про web —
  * только про факты и их доставку.
@@ -23,10 +23,10 @@
  */
 @ApplicationModule(
         allowedDependencies = {
-                "chat.core.modules.transactionLog"
+                "chat.engines.transactionLog"
         },
         type = ApplicationModule.Type.OPEN
 )
-package com.platform.chat.core.modules.domainEvent;
+package com.platform.chat.engines.domainEvent;
 
 import org.springframework.modulith.ApplicationModule;

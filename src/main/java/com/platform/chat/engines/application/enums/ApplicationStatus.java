@@ -1,4 +1,4 @@
-package com.platform.chat.core.modules.application.enums;
+package com.platform.chat.engines.application.enums;
 
 /**
  * Статус гражданской заявки: {@code PENDING} — на рассмотрении,

@@ -1,10 +1,10 @@
-package com.platform.chat.base.district.controller;
+package com.platform.chat.domain.district.controller;
 
-import com.platform.chat.base.district.dto.DistrictResponse;
-import com.platform.chat.base.district.service.DistrictService;
-import com.platform.chat.base.location.dto.LocationResponse;
-import com.platform.chat.base.district.entity.District;
-import com.platform.chat.base.location.entity.Location;
+import com.platform.chat.domain.district.dto.DistrictResponse;
+import com.platform.chat.domain.district.service.DistrictService;
+import com.platform.chat.domain.location.dto.LocationResponse;
+import com.platform.chat.domain.district.entity.District;
+import com.platform.chat.domain.location.entity.Location;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

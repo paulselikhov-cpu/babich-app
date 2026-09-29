@@ -1,11 +1,11 @@
 package com.platform.economy;
 
-import com.platform.chat.base.chatUser.entity.ChatUser;
-import com.platform.chat.base.chatUser.repository.ChatUserRepository;
-import com.platform.chat.core.modules.transactionLog.entity.TransactionLog;
-import com.platform.chat.core.modules.transactionLog.enums.CoinUpdateReason;
-import com.platform.chat.core.modules.transactionLog.repository.TransactionLogRepository;
-import com.platform.chat.modules.coin.service.CoinService;
+import com.platform.chat.domain.chatUser.entity.ChatUser;
+import com.platform.chat.domain.chatUser.repository.ChatUserRepository;
+import com.platform.chat.engines.transactionLog.entity.TransactionLog;
+import com.platform.chat.engines.transactionLog.enums.CoinUpdateReason;
+import com.platform.chat.engines.transactionLog.repository.TransactionLogRepository;
+import com.platform.chat.engines.economy.service.CoinService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

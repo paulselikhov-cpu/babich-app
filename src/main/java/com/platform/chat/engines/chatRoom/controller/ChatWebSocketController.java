@@ -1,14 +1,14 @@
-package com.platform.chat.core.modules.chatRoom.controller;
+package com.platform.chat.engines.chatRoom.controller;
 
-import com.platform.chat.base.chatUser.entity.ChatUser;
-import com.platform.chat.base.chatUser.service.ChatUserService;
-import com.platform.chat.core.modules.chatRoom.dto.ChatActionMessageRequest;
-import com.platform.chat.core.modules.chatRoom.dto.ChatMessageRequest;
-import com.platform.chat.core.modules.chatRoom.dto.MessageResponse;
-import com.platform.chat.core.modules.chatRoom.enums.MessageActionType;
-import com.platform.chat.core.modules.chatRoom.service.MessageService;
-import com.platform.chat.core.modules.chatRoom.service.OnlineSessionService;
-import com.platform.chat.core.modules.chatRoom.service.UnreadService;
+import com.platform.chat.domain.chatUser.entity.ChatUser;
+import com.platform.chat.domain.chatUser.service.ChatUserService;
+import com.platform.chat.engines.chatRoom.dto.ChatActionMessageRequest;
+import com.platform.chat.engines.chatRoom.dto.ChatMessageRequest;
+import com.platform.chat.engines.chatRoom.dto.MessageResponse;
+import com.platform.chat.engines.chatRoom.enums.MessageActionType;
+import com.platform.chat.engines.chatRoom.service.MessageService;
+import com.platform.chat.engines.chatRoom.service.OnlineSessionService;
+import com.platform.chat.engines.chatRoom.service.UnreadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;

@@ -1,13 +1,13 @@
-package com.platform.chat.modules.domainEvent.listeners;
+package com.platform.chat.features.domainEvent.listeners;
 
-import com.platform.chat.base.chatUser.entity.ChatUser;
-import com.platform.chat.base.chatUser.repository.ChatUserRepository;
-import com.platform.chat.core.modules.domainEvent.events.ApplicationResolvedEvent;
-import com.platform.chat.core.modules.domainEvent.events.ElectionClosedEvent;
-import com.platform.chat.core.modules.domainEvent.events.ElectionStartedEvent;
-import com.platform.chat.core.modules.notification.dto.NotificationResponse;
-import com.platform.chat.core.modules.notification.entity.Notification;
-import com.platform.chat.core.modules.notification.service.NotificationService;
+import com.platform.chat.domain.chatUser.entity.ChatUser;
+import com.platform.chat.domain.chatUser.repository.ChatUserRepository;
+import com.platform.chat.engines.domainEvent.events.ApplicationResolvedEvent;
+import com.platform.chat.engines.domainEvent.events.ElectionClosedEvent;
+import com.platform.chat.engines.domainEvent.events.ElectionStartedEvent;
+import com.platform.chat.engines.notification.dto.NotificationResponse;
+import com.platform.chat.engines.notification.entity.Notification;
+import com.platform.chat.engines.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

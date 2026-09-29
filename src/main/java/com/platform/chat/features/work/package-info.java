@@ -1,8 +1,8 @@
 @ApplicationModule(allowedDependencies = {
-        "chat.modules.coin",
-        "chat.core.modules.transactionLog",
-        "chat.base.chatUser",
+        "chat.engines.economy",
+        "chat.engines.transactionLog",
+        "chat.domain.chatUser",
 }, type = ApplicationModule.Type.OPEN)
-package com.platform.chat.modules.work;
+package com.platform.chat.features.work;
 
 import org.springframework.modulith.ApplicationModule;

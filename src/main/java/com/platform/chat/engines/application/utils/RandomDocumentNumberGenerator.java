@@ -1,7 +1,7 @@
-package com.platform.chat.core.modules.application.utils;
+package com.platform.chat.engines.application.utils;
 
-import com.platform.chat.core.modules.application.enums.ApplicationType;
-import com.platform.chat.core.modules.application.model.DocumentNumberGenerator;
+import com.platform.chat.engines.application.enums.ApplicationType;
+import com.platform.chat.engines.application.model.DocumentNumberGenerator;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;

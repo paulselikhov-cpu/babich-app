@@ -1,8 +1,8 @@
-package com.platform.chat.core.modules.application.repository;
+package com.platform.chat.engines.application.repository;
 
-import com.platform.chat.core.modules.application.entity.Application;
-import com.platform.chat.core.modules.application.enums.ApplicationStatus;
-import com.platform.chat.core.modules.application.enums.ApplicationType;
+import com.platform.chat.engines.application.entity.Application;
+import com.platform.chat.engines.application.enums.ApplicationStatus;
+import com.platform.chat.engines.application.enums.ApplicationType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.List;

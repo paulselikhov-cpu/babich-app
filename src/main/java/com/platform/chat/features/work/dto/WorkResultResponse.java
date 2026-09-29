@@ -1,4 +1,4 @@
-package com.platform.chat.modules.work.dto;
+package com.platform.chat.features.work.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

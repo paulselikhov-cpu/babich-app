@@ -1,10 +1,10 @@
 @ApplicationModule(
         allowedDependencies = {
-                "chat.base.location",
+                "chat.domain.location",
                 "auth::userRepository",
         },
         type = ApplicationModule.Type.OPEN
 )
-package com.platform.chat.base.chatUser;
+package com.platform.chat.domain.chatUser;
 
 import org.springframework.modulith.ApplicationModule;

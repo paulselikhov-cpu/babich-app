@@ -1,10 +1,10 @@
-package com.platform.chat.base.district.service;
+package com.platform.chat.domain.district.service;
 
-import com.platform.chat.base.district.entity.District;
-import com.platform.chat.base.location.entity.Location;
-import com.platform.chat.base.location.enums.PublicLocationType;
-import com.platform.chat.base.district.repository.DistrictRepository;
-import com.platform.chat.base.location.repository.LocationRepository;
+import com.platform.chat.domain.district.entity.District;
+import com.platform.chat.domain.location.entity.Location;
+import com.platform.chat.domain.location.enums.PublicLocationType;
+import com.platform.chat.domain.district.repository.DistrictRepository;
+import com.platform.chat.domain.location.repository.LocationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

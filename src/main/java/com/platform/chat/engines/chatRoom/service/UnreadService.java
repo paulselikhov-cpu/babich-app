@@ -1,16 +1,16 @@
-package com.platform.chat.core.modules.chatRoom.service;
+package com.platform.chat.engines.chatRoom.service;
 
-import com.platform.chat.base.location.entity.LocationUser;
-import com.platform.chat.base.room.entity.Room;
-import com.platform.chat.base.room.entity.RoomReadStatus;
-import com.platform.chat.base.chatUser.repository.ChatUserRepository;
-import com.platform.chat.base.location.repository.LocationUserRepository;
-import com.platform.chat.base.room.repository.RoomReadStatusRepository;
-import com.platform.chat.base.room.repository.RoomRepository;
+import com.platform.chat.domain.location.entity.LocationUser;
+import com.platform.chat.domain.room.entity.Room;
+import com.platform.chat.domain.room.entity.RoomReadStatus;
+import com.platform.chat.domain.chatUser.repository.ChatUserRepository;
+import com.platform.chat.domain.location.repository.LocationUserRepository;
+import com.platform.chat.domain.room.repository.RoomReadStatusRepository;
+import com.platform.chat.domain.room.repository.RoomRepository;
 
-import com.platform.chat.core.modules.chatRoom.repository.MessageRepository;
-import com.platform.chat.core.modules.chatRoom.repository.OnlineSessionRepository;
-import com.platform.chat.core.modules.chatRoom.dto.UnreadUpdateResponse;
+import com.platform.chat.engines.chatRoom.repository.MessageRepository;
+import com.platform.chat.engines.chatRoom.repository.OnlineSessionRepository;
+import com.platform.chat.engines.chatRoom.dto.UnreadUpdateResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;

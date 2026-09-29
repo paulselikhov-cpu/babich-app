@@ -1,13 +1,13 @@
-package com.platform.chat.modules.coin.service;
-import com.platform.chat.core.modules.transactionLog.enums.CoinUpdateReason;
+package com.platform.chat.engines.economy.service;
+import com.platform.chat.engines.transactionLog.enums.CoinUpdateReason;
 
-import com.platform.chat.base.chatUser.entity.ChatUser;
-import com.platform.chat.base.chatUser.repository.ChatUserRepository;
+import com.platform.chat.domain.chatUser.entity.ChatUser;
+import com.platform.chat.domain.chatUser.repository.ChatUserRepository;
 
-import com.platform.chat.core.modules.domainEvent.service.DomainEventPublisher;
+import com.platform.chat.engines.domainEvent.service.DomainEventPublisher;
 
-import com.platform.chat.core.modules.domainEvent.events.CoinsChangedEvent;
-import com.platform.chat.core.modules.domainEvent.events.XpChangedEvent;
+import com.platform.chat.engines.domainEvent.events.CoinsChangedEvent;
+import com.platform.chat.engines.domainEvent.events.XpChangedEvent;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

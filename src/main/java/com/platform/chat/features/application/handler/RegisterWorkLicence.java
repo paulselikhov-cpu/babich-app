@@ -1,15 +1,15 @@
-package com.platform.chat.modules.application.handler;
+package com.platform.chat.features.application.handler;
 
-import com.platform.chat.base.chatUser.entity.ChatUser;
-import com.platform.chat.base.chatUser.service.ChatUserService;
+import com.platform.chat.domain.chatUser.entity.ChatUser;
+import com.platform.chat.domain.chatUser.service.ChatUserService;
 
-import com.platform.chat.core.modules.application.entity.Application;
-import com.platform.chat.core.modules.application.enums.ApplicationMessageKey;
-import com.platform.chat.core.modules.application.enums.ApplicationType;
-import com.platform.chat.core.modules.application.model.ApplicationDecision;
-import com.platform.chat.core.modules.application.model.ApplicationHandler;
-import com.platform.chat.core.modules.application.model.DocumentNumberGenerator;
-import com.platform.chat.core.modules.domainEvent.events.CharacterUpdatedEvent;
+import com.platform.chat.engines.application.entity.Application;
+import com.platform.chat.engines.application.enums.ApplicationMessageKey;
+import com.platform.chat.engines.application.enums.ApplicationType;
+import com.platform.chat.engines.application.model.ApplicationDecision;
+import com.platform.chat.engines.application.model.ApplicationHandler;
+import com.platform.chat.engines.application.model.DocumentNumberGenerator;
+import com.platform.chat.engines.domainEvent.events.CharacterUpdatedEvent;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

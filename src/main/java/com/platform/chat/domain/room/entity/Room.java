@@ -1,8 +1,8 @@
-package com.platform.chat.base.room.entity;
+package com.platform.chat.domain.room.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.platform.chat.base.location.entity.Location;
-import com.platform.chat.base.room.enums.RoomCode;
+import com.platform.chat.domain.location.entity.Location;
+import com.platform.chat.domain.room.enums.RoomCode;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
  * В расширяемых локациях владелец может добавлять свои комнаты за Coin.
  *
  * <p>История сообщений комнаты (entity {@code Message} слайса
- * {@code chat.core.modules.chatRoom}) здесь не отображается: обратной связи
+ * {@code chat.engines.chatRoom}) здесь не отображается: обратной связи
  * {@code messages} нет сознательно — она не использовалась, а базовый модуль
  * комнат не должен зависеть от модуля чата. Сообщения удаляются вместе с
  * комнатой через cascade внутри самого слайса чата.</p>

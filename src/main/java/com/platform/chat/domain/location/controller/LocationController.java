@@ -1,13 +1,13 @@
-package com.platform.chat.base.location.controller;
+package com.platform.chat.domain.location.controller;
 
-import com.platform.chat.base.location.dto.AddRoomRequest;
-import com.platform.chat.base.location.dto.CreateLocationRequest;
-import com.platform.chat.base.location.service.LocationService;
-import com.platform.chat.base.location.dto.LocationResponse;
-import com.platform.chat.base.location.entity.Location;
-import com.platform.chat.base.location.entity.LocationUser;
-import com.platform.chat.base.room.entity.Room;
-import com.platform.chat.base.room.service.RoomService;
+import com.platform.chat.domain.location.dto.AddRoomRequest;
+import com.platform.chat.domain.location.dto.CreateLocationRequest;
+import com.platform.chat.domain.location.service.LocationService;
+import com.platform.chat.domain.location.dto.LocationResponse;
+import com.platform.chat.domain.location.entity.Location;
+import com.platform.chat.domain.location.entity.LocationUser;
+import com.platform.chat.domain.room.entity.Room;
+import com.platform.chat.domain.room.service.RoomService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -4,6 +4,6 @@
         },
         type = ApplicationModule.Type.OPEN
 )
-package com.platform.chat.modules.gang;
+package com.platform.chat.features.gang;
 
 import org.springframework.modulith.ApplicationModule;

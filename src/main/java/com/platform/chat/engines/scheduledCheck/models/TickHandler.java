@@ -1,6 +1,6 @@
-package com.platform.chat.core.modules.scheduledCheck.models;
+package com.platform.chat.engines.scheduledCheck.models;
 
-import com.platform.chat.core.modules.scheduledCheck.service.SchedulerGateway;
+import com.platform.chat.engines.scheduledCheck.service.SchedulerGateway;
 
 /**
  * Периодическая задача единого планировщика {@link SchedulerGateway}.

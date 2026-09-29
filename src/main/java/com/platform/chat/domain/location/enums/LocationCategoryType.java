@@ -1,4 +1,4 @@
-package com.platform.chat.base.location.enums;
+package com.platform.chat.domain.location.enums;
 
 /**
  * Категория локации. В отличие от {@link PublicLocationType} (системные типы),

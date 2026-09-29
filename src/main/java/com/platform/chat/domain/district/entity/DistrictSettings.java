@@ -1,4 +1,4 @@
-package com.platform.chat.base.district.entity;
+package com.platform.chat.domain.district.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

@@ -1,4 +1,4 @@
-package com.platform.chat.base.chatUser.enums;
+package com.platform.chat.domain.chatUser.enums;
 
 /**
  * Должность персонажа в системной локации (SystemRole). Бывший LocationPostType:

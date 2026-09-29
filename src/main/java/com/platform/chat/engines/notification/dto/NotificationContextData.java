@@ -1,6 +1,6 @@
-package com.platform.chat.core.modules.notification.dto;
+package com.platform.chat.engines.notification.dto;
 
-import com.platform.chat.core.modules.notification.service.NotificationService;
+import com.platform.chat.engines.notification.service.NotificationService;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

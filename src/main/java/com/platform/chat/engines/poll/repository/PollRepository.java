@@ -1,7 +1,7 @@
-package com.platform.chat.core.modules.poll.repository;
+package com.platform.chat.engines.poll.repository;
 
-import com.platform.chat.core.modules.poll.entity.Poll;
-import com.platform.chat.core.modules.poll.enums.ScopeType;
+import com.platform.chat.engines.poll.entity.Poll;
+import com.platform.chat.engines.poll.enums.ScopeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.List;

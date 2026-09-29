@@ -1,10 +1,10 @@
-package com.platform.chat.modules.domainEvent.listeners;
+package com.platform.chat.features.domainEvent.listeners;
 
-import com.platform.chat.core.modules.transactionLog.repository.TransactionLogRepository;
-import com.platform.chat.core.modules.domainEvent.events.CoinsChangedEvent;
-import com.platform.chat.core.modules.domainEvent.events.XpChangedEvent;
-import com.platform.chat.core.modules.transactionLog.entity.TransactionLog;
-import com.platform.chat.core.modules.transactionLog.enums.CoinUpdateReason;
+import com.platform.chat.engines.transactionLog.repository.TransactionLogRepository;
+import com.platform.chat.engines.domainEvent.events.CoinsChangedEvent;
+import com.platform.chat.engines.domainEvent.events.XpChangedEvent;
+import com.platform.chat.engines.transactionLog.entity.TransactionLog;
+import com.platform.chat.engines.transactionLog.enums.CoinUpdateReason;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

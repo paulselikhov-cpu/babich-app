@@ -1,20 +1,20 @@
-package com.platform.chat.modules.governorElection.service;
+package com.platform.chat.features.governorElection.service;
 
-import com.platform.chat.core.modules.poll.entity.Poll;
-import com.platform.chat.core.modules.poll.service.PollService;
-import com.platform.chat.core.modules.poll.dto.DistrictElectionView;
-import com.platform.chat.core.modules.poll.entity.PollCandidate;
-import com.platform.chat.core.modules.poll.entity.PollVote;
-import com.platform.chat.core.modules.poll.enums.PollStatus;
-import com.platform.chat.core.modules.poll.enums.PollType;
-import com.platform.chat.core.modules.poll.service.PollResultDispatcher;
-import com.platform.chat.core.modules.domainEvent.service.DomainEventPublisher;
+import com.platform.chat.engines.poll.entity.Poll;
+import com.platform.chat.engines.poll.service.PollService;
+import com.platform.chat.engines.poll.dto.DistrictElectionView;
+import com.platform.chat.engines.poll.entity.PollCandidate;
+import com.platform.chat.engines.poll.entity.PollVote;
+import com.platform.chat.engines.poll.enums.PollStatus;
+import com.platform.chat.engines.poll.enums.PollType;
+import com.platform.chat.engines.poll.service.PollResultDispatcher;
+import com.platform.chat.engines.domainEvent.service.DomainEventPublisher;
 
-import com.platform.chat.base.chatUser.repository.ChatUserRepository;
-import com.platform.chat.base.district.service.DistrictSettingsService;
+import com.platform.chat.domain.chatUser.service.ChatUserService;
+import com.platform.chat.domain.district.service.DistrictSettingsService;
 
-import com.platform.chat.core.modules.domainEvent.events.ElectionClosedEvent;
-import com.platform.chat.core.modules.domainEvent.events.ElectionStartedEvent;
+import com.platform.chat.engines.domainEvent.events.ElectionClosedEvent;
+import com.platform.chat.engines.domainEvent.events.ElectionStartedEvent;
 
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -46,7 +46,7 @@ public class ElectionService {
     private final PollService pollService;
     private final PollResultDispatcher pollResultDispatcher;
     private final DomainEventPublisher eventPublisher;
-    private final ChatUserRepository chatUserRepository;
+    private final ChatUserService chatUserService;
     private final DistrictSettingsService districtSettingsService;
 
     /**
@@ -128,8 +128,7 @@ public class ElectionService {
         if (winner == null) {
             return "не определён";
         }
-        return chatUserRepository.findById(winner.getCharacterId())
-                .map(u -> u.getCharacterName())
+        return chatUserService.findCharacterNameById(winner.getCharacterId())
                 .orElse("неизвестный");
     }
 
@@ -187,14 +186,14 @@ public class ElectionService {
         List<DistrictElectionView.CandidateView> views = candidates.stream().map(c -> {
             Long charId = c.getCharacterId();
             String name = charId == null ? null
-                    : chatUserRepository.findById(charId).map(u -> u.getCharacterName()).orElse(null);
+                    : chatUserService.findCharacterNameById(charId).orElse(null);
             long count = charId == null ? 0L : (long) votes.getOrDefault(c.getId(), 0);
             return new DistrictElectionView.CandidateView(c.getSlotNumber(), c.getId(), charId, name, count);
         }).toList();
 
         int totalVoted = pollService.totalVoteCount(relevant.getId());
         int aliveWindowDays = districtSettingsService.getSettings(districtId).electionAliveWindowDays();
-        long alive = chatUserRepository.countByDistrictIdAndLastSeenAfter(
+        long alive = chatUserService.countSeenInDistrictAfter(
                 districtId, LocalDateTime.now().minusDays(aliveWindowDays));
         int quorum = relevant.getQuorumThreshold();
         String winnerName = relevant.getStatus() == PollStatus.CLOSED ? resolveWinnerName(relevant.getId()) : null;

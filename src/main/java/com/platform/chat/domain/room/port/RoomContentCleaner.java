@@ -1,4 +1,4 @@
-package com.platform.chat.base.room.port;
+package com.platform.chat.domain.room.port;
 
 import java.util.List;
 
@@ -6,7 +6,7 @@ import java.util.List;
  * Порт: удаление контента комнат, которым владеет другой слайс.
  *
  * <p>Комната — базовая сущность, но её содержимое (сообщения чата) принадлежит
- * слайсу {@code chat.core.modules.chatRoom}. Раньше это выражалось обратной
+ * слайсу {@code chat.engines.chatRoom}. Раньше это выражалось обратной
  * связью {@code Room.messages} с {@code cascade = ALL} — то есть базовый модуль
  * комнат импортировал entity чата (и держал ленивую коллекцию на тысячи строк),
  * хотя сама связь нигде не читалась. Теперь связь убрана, а база объявляет

@@ -1,15 +1,15 @@
-package com.platform.chat.modules.application.controller;
+package com.platform.chat.features.application.controller;
 
-import com.platform.chat.base.chatUser.entity.ChatUser;
-import com.platform.chat.base.chatUser.service.ChatUserService;
+import com.platform.chat.domain.chatUser.entity.ChatUser;
+import com.platform.chat.domain.chatUser.service.ChatUserService;
 
-import com.platform.chat.core.modules.application.dto.ApplicationSummary;
-import com.platform.chat.core.modules.application.service.ApplicationQueryService;
-import com.platform.chat.core.modules.application.service.ApplicationService;
+import com.platform.chat.engines.application.dto.ApplicationSummary;
+import com.platform.chat.engines.application.service.ApplicationQueryService;
+import com.platform.chat.engines.application.service.ApplicationService;
 
-import com.platform.chat.modules.application.dto.ApplicationView;
-import com.platform.chat.modules.application.dto.ApplicationViewAssembler;
-import com.platform.chat.modules.application.service.ApplicationSubmissionService;
+import com.platform.chat.features.application.dto.ApplicationView;
+import com.platform.chat.features.application.dto.ApplicationViewAssembler;
+import com.platform.chat.features.application.service.ApplicationSubmissionService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

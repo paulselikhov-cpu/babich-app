@@ -1,7 +1,7 @@
-package com.platform.chat.core.modules.chatRoom.repository;
+package com.platform.chat.engines.chatRoom.repository;
 
-import com.platform.chat.core.modules.chatRoom.entity.OnlineSession;
-import com.platform.chat.core.modules.chatRoom.repository.projection.LocationOnlineCountProjection;
+import com.platform.chat.engines.chatRoom.entity.OnlineSession;
+import com.platform.chat.engines.chatRoom.repository.projection.LocationOnlineCountProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

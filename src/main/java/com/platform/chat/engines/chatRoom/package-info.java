@@ -13,12 +13,12 @@
  *
  * <p>Что осознанно НЕ здесь: {@code Room}/{@code RoomCode}/{@code TemplateRoom} —
  * базовая модель комнаты; {@code RoomReadStatus} — тоже остаётся в
- * {@code chat.base.room}, потому что каскадная чистка «прочитано» при удалении
+ * {@code chat.domain.room}, потому что каскадная чистка «прочитано» при удалении
  * комнат должна идти в одной транзакции с их удалением (FK
  * {@code room_read_status.room_id → rooms.id}); сервисы слайса работают с этой
  * сущностью как с общей базовой моделью. Сообщения же — данные слайса, поэтому
  * их чистку база запрашивает через свой порт
- * {@code chat.base.room.port.RoomContentPurger}.</p>
+ * {@code chat.domain.room.port.RoomContentPurger}.</p>
  *
  * <p>Внешние контракты (не менять без необходимости): STOMP-маппинги
  * {@code /chat.history.send}, {@code /chat.join}, {@code /chat.typing},
@@ -37,13 +37,13 @@
  */
 @ApplicationModule(
         allowedDependencies = {
-                "chat.base.chatUser",
-                "chat.base.room",
-                "chat.base.location",
-                "chat.core.modules.scheduledCheck",
+                "chat.domain.chatUser",
+                "chat.domain.room",
+                "chat.domain.location",
+                "chat.engines.scheduledCheck",
         },
         type = ApplicationModule.Type.OPEN
 )
-package com.platform.chat.core.modules.chatRoom;
+package com.platform.chat.engines.chatRoom;
 
 import org.springframework.modulith.ApplicationModule;

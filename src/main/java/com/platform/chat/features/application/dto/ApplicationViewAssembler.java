@@ -1,7 +1,7 @@
-package com.platform.chat.modules.application.dto;
+package com.platform.chat.features.application.dto;
 
 import com.platform.auth.service.UserService;
-import com.platform.chat.core.modules.application.dto.ApplicationSummary;
+import com.platform.chat.engines.application.dto.ApplicationSummary;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

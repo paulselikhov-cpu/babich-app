@@ -1,10 +1,10 @@
-package com.platform.chat.base.chatUser.controller;
+package com.platform.chat.domain.chatUser.controller;
 
-import com.platform.chat.base.chatUser.entity.ChatUser;
-import com.platform.chat.base.chatUser.service.ChatUserService;
-import com.platform.chat.base.chatUser.dto.CharacterUpdateRequest;
-import com.platform.chat.base.chatUser.dto.CreateChatUserRequest;
-import com.platform.chat.base.chatUser.dto.RoleUpdateRequest;
+import com.platform.chat.domain.chatUser.entity.ChatUser;
+import com.platform.chat.domain.chatUser.service.ChatUserService;
+import com.platform.chat.domain.chatUser.dto.CharacterUpdateRequest;
+import com.platform.chat.domain.chatUser.dto.CreateChatUserRequest;
+import com.platform.chat.domain.chatUser.dto.RoleUpdateRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

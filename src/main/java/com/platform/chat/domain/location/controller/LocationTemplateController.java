@@ -1,7 +1,7 @@
-package com.platform.chat.base.location.controller;
+package com.platform.chat.domain.location.controller;
 
-import com.platform.chat.base.location.service.LocationTemplateService;
-import com.platform.chat.base.location.entity.LocationTemplate;
+import com.platform.chat.domain.location.service.LocationTemplateService;
+import com.platform.chat.domain.location.entity.LocationTemplate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;

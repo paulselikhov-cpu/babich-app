@@ -1,14 +1,14 @@
 @ApplicationModule(
         allowedDependencies = {
-                "chat.core.modules.poll",
-                "chat.core.modules.scheduledCheck",
-                "chat.core.modules.domainEvent",
-                "chat.base.chatUser",
-                "chat.base.location",
-                "chat.base.district",
+                "chat.engines.poll",
+                "chat.engines.scheduledCheck",
+                "chat.engines.domainEvent",
+                "chat.domain.chatUser",
+                "chat.domain.location",
+                "chat.domain.district",
         },
         type = ApplicationModule.Type.OPEN
 )
-package com.platform.chat.modules.governorElection;
+package com.platform.chat.features.governorElection;
 
 import org.springframework.modulith.ApplicationModule;

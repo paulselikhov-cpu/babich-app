@@ -1,7 +1,7 @@
-package com.platform.chat.base.district.entity;
+package com.platform.chat.domain.district.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.platform.chat.base.location.entity.Location;
+import com.platform.chat.domain.location.entity.Location;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.util.List;

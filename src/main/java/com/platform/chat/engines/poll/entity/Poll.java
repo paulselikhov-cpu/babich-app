@@ -1,9 +1,9 @@
-package com.platform.chat.core.modules.poll.entity;
+package com.platform.chat.engines.poll.entity;
 
-import com.platform.chat.core.modules.poll.enums.WeightStrategy;
-import com.platform.chat.core.modules.poll.enums.PollStatus;
-import com.platform.chat.core.modules.poll.enums.PollType;
-import com.platform.chat.core.modules.poll.enums.ScopeType;
+import com.platform.chat.engines.poll.enums.WeightStrategy;
+import com.platform.chat.engines.poll.enums.PollStatus;
+import com.platform.chat.engines.poll.enums.PollType;
+import com.platform.chat.engines.poll.enums.ScopeType;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.Instant;

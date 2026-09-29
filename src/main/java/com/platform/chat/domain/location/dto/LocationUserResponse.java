@@ -1,6 +1,6 @@
-package com.platform.chat.base.location.dto;
+package com.platform.chat.domain.location.dto;
 
-import com.platform.chat.base.chatUser.enums.SystemRoleType;
+import com.platform.chat.domain.chatUser.enums.SystemRoleType;
 
 import java.time.LocalDateTime;
 

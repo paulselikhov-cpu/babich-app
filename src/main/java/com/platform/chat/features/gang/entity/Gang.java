@@ -1,4 +1,4 @@
-package com.platform.chat.modules.gang.entity;
+package com.platform.chat.features.gang.entity;
 
 import jakarta.persistence.*;
 

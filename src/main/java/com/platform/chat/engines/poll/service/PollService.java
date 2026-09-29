@@ -1,31 +1,31 @@
-package com.platform.chat.core.modules.poll.service;
+package com.platform.chat.engines.poll.service;
 
-import com.platform.chat.core.modules.poll.repository.PollCandidateRepository;
-import com.platform.chat.core.modules.poll.repository.PollRepository;
-import com.platform.chat.core.modules.poll.repository.PollVoteRepository;
-import com.platform.chat.core.modules.poll.dto.PollSettingsDto;
-import com.platform.chat.core.modules.poll.entity.Poll;
-import com.platform.chat.core.modules.poll.entity.PollCandidate;
-import com.platform.chat.core.modules.poll.entity.PollVote;
-import com.platform.chat.core.modules.poll.enums.PollStatus;
-import com.platform.chat.core.modules.poll.enums.PollType;
-import com.platform.chat.core.modules.poll.enums.ScopeType;
-import com.platform.chat.core.modules.poll.enums.WeightStrategy;
+import com.platform.chat.engines.poll.repository.PollCandidateRepository;
+import com.platform.chat.engines.poll.repository.PollRepository;
+import com.platform.chat.engines.poll.repository.PollVoteRepository;
+import com.platform.chat.engines.poll.dto.PollSettingsDto;
+import com.platform.chat.engines.poll.entity.Poll;
+import com.platform.chat.engines.poll.entity.PollCandidate;
+import com.platform.chat.engines.poll.entity.PollVote;
+import com.platform.chat.engines.poll.enums.PollStatus;
+import com.platform.chat.engines.poll.enums.PollType;
+import com.platform.chat.engines.poll.enums.ScopeType;
+import com.platform.chat.engines.poll.enums.WeightStrategy;
 
-import com.platform.chat.core.modules.scheduledCheck.service.ScheduledCheckService;
+import com.platform.chat.engines.scheduledCheck.service.ScheduledCheckService;
 
-import com.platform.chat.base.location.entity.Location;
-import com.platform.chat.base.location.enums.PublicLocationType;
-import com.platform.chat.base.location.repository.LocationUserRepository;
-import com.platform.chat.base.location.repository.LocationRepository;
-import com.platform.chat.base.chatUser.enums.SystemRoleType;
-import com.platform.chat.base.chatUser.repository.ChatUserRepository;
-import com.platform.chat.base.district.dto.DistrictSettingsDto;
-import com.platform.chat.base.district.repository.DistrictRepository;
-import com.platform.chat.base.district.service.DistrictSettingsService;
+import com.platform.chat.domain.location.entity.Location;
+import com.platform.chat.domain.location.enums.PublicLocationType;
+import com.platform.chat.domain.location.repository.LocationUserRepository;
+import com.platform.chat.domain.location.repository.LocationRepository;
+import com.platform.chat.domain.chatUser.enums.SystemRoleType;
+import com.platform.chat.domain.chatUser.repository.ChatUserRepository;
+import com.platform.chat.domain.district.dto.DistrictSettingsDto;
+import com.platform.chat.domain.district.repository.DistrictRepository;
+import com.platform.chat.domain.district.service.DistrictSettingsService;
 
 
-import com.platform.chat.modules.governorElection.sheduledCheck.ElectionClose;
+import com.platform.chat.features.governorElection.sheduledCheck.ElectionClose;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

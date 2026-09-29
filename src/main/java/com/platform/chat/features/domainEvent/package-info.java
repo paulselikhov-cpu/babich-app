@@ -4,7 +4,7 @@
  * уведомление жителю/заявителю, WS-пуш об изменении персонажа, аудит-запись
  * в {@code TransactionLog}.
  *
- * <p>Модуль знает только про ядро событий ({@code chat.core.modules.domainEvent})
+ * <p>Модуль знает только про ядро событий ({@code chat.engines.domainEvent})
  * и про модули, чьи эффекты он применяет. Про публикаторов он не знает ничего:
  * ни один сервис-издатель не импортирует этот слайс — подписка идёт по факту
  * события. Событий-классов здесь нет: они часть словаря ядра.
@@ -18,13 +18,13 @@
  */
 @ApplicationModule(
         allowedDependencies = {
-                "chat.base.chatUser",
-                "chat.core.modules.domainEvent",
-                "chat.core.modules.transactionLog",
-                "chat.core.modules.notification",
+                "chat.domain.chatUser",
+                "chat.engines.domainEvent",
+                "chat.engines.transactionLog",
+                "chat.engines.notification",
         },
         type = ApplicationModule.Type.OPEN
 )
-package com.platform.chat.modules.domainEvent;
+package com.platform.chat.features.domainEvent;
 
 import org.springframework.modulith.ApplicationModule;

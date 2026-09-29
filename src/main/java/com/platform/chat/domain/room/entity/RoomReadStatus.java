@@ -1,7 +1,7 @@
-package com.platform.chat.base.room.entity;
+package com.platform.chat.domain.room.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.platform.chat.base.chatUser.entity.ChatUser;
+import com.platform.chat.domain.chatUser.entity.ChatUser;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
  * Непрочитанные = сообщения комнаты с created_at > lastReadAt (и не от самого персонажа).
  *
  * <p>Пишется и читается сервисами слайса чата комнаты
- * ({@code chat.core.modules.chatRoom}): {@code MessageService.getHistoryAndMarkRead}
+ * ({@code chat.engines.chatRoom}): {@code MessageService.getHistoryAndMarkRead}
  * при открытии комнаты, STOMP {@code /chat.read}, {@code UnreadService.markRead}.
  * Сущность живёт в базовой модели комнаты, поэтому каскадная чистка при
  * удалении комнат выполняется в {@code LocationService.deleteLocation}

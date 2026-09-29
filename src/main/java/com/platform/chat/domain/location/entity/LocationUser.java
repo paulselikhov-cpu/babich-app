@@ -1,9 +1,9 @@
-package com.platform.chat.base.location.entity;
+package com.platform.chat.domain.location.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.platform.chat.base.chatUser.entity.ChatUser;
-import com.platform.chat.base.location.enums.LocationUserRole;
-import com.platform.chat.base.chatUser.enums.SystemRoleType;
+import com.platform.chat.domain.chatUser.entity.ChatUser;
+import com.platform.chat.domain.location.enums.LocationUserRole;
+import com.platform.chat.domain.chatUser.enums.SystemRoleType;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;

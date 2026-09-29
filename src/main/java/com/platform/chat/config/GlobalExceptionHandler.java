@@ -1,8 +1,8 @@
-package com.platform.chat.core.config;
+package com.platform.chat.config;
 
-import com.platform.chat.core.modules.application.exception.ApplicationAlreadyResolvedException;
-import com.platform.chat.core.modules.application.exception.ApplicationNotFoundException;
-import com.platform.chat.core.modules.application.exception.ApplicationSubmissionRejectedException;
+import com.platform.chat.engines.application.exception.ApplicationAlreadyResolvedException;
+import com.platform.chat.engines.application.exception.ApplicationNotFoundException;
+import com.platform.chat.engines.application.exception.ApplicationSubmissionRejectedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;

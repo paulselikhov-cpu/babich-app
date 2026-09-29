@@ -1,8 +1,8 @@
-package com.platform.chat.core.modules.application.dto;
+package com.platform.chat.engines.application.dto;
 
-import com.platform.chat.core.modules.application.entity.Application;
-import com.platform.chat.core.modules.application.enums.ApplicationStatus;
-import com.platform.chat.core.modules.application.enums.ApplicationType;
+import com.platform.chat.engines.application.entity.Application;
+import com.platform.chat.engines.application.enums.ApplicationStatus;
+import com.platform.chat.engines.application.enums.ApplicationType;
 
 import java.time.LocalDateTime;
 

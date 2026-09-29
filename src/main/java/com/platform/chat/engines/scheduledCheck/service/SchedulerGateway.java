@@ -1,10 +1,10 @@
-package com.platform.chat.core.modules.scheduledCheck.service;
+package com.platform.chat.engines.scheduledCheck.service;
 
-import com.platform.chat.core.modules.scheduledCheck.entity.ScheduledCheck;
-import com.platform.chat.core.modules.scheduledCheck.models.ScheduledCheckHandler;
-import com.platform.chat.core.modules.scheduledCheck.models.TickHandler;
-import com.platform.chat.core.modules.scheduledCheck.repository.ScheduledCheckRepository;
-import com.platform.chat.core.modules.scheduledCheck.enums.ScheduledCheckStatus;
+import com.platform.chat.engines.scheduledCheck.entity.ScheduledCheck;
+import com.platform.chat.engines.scheduledCheck.models.ScheduledCheckHandler;
+import com.platform.chat.engines.scheduledCheck.models.TickHandler;
+import com.platform.chat.engines.scheduledCheck.repository.ScheduledCheckRepository;
+import com.platform.chat.engines.scheduledCheck.enums.ScheduledCheckStatus;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

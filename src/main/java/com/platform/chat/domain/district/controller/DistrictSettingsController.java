@@ -1,10 +1,10 @@
-package com.platform.chat.base.district.controller;
+package com.platform.chat.domain.district.controller;
 
-import com.platform.chat.base.district.service.DistrictSettingsService;
-import com.platform.chat.base.district.dto.DistrictSettingsDto;
-import com.platform.chat.base.chatUser.entity.ChatUser;
-import com.platform.chat.base.chatUser.enums.ChatRole;
-import com.platform.chat.base.chatUser.repository.ChatUserRepository;
+import com.platform.chat.domain.district.service.DistrictSettingsService;
+import com.platform.chat.domain.district.dto.DistrictSettingsDto;
+import com.platform.chat.domain.chatUser.entity.ChatUser;
+import com.platform.chat.domain.chatUser.enums.ChatRole;
+import com.platform.chat.domain.chatUser.repository.ChatUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

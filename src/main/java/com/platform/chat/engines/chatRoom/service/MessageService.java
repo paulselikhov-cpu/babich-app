@@ -1,19 +1,19 @@
-package com.platform.chat.core.modules.chatRoom.service;
+package com.platform.chat.engines.chatRoom.service;
 
-import com.platform.chat.core.modules.chatRoom.dto.MessageResponse;
-import com.platform.chat.core.modules.chatRoom.dto.RoomHistoryResponse;
-import com.platform.chat.core.modules.chatRoom.entity.Message;
-import com.platform.chat.core.modules.chatRoom.enums.MessageType;
-import com.platform.chat.core.modules.chatRoom.repository.MessageRepository;
+import com.platform.chat.engines.chatRoom.dto.MessageResponse;
+import com.platform.chat.engines.chatRoom.dto.RoomHistoryResponse;
+import com.platform.chat.engines.chatRoom.entity.Message;
+import com.platform.chat.engines.chatRoom.enums.MessageType;
+import com.platform.chat.engines.chatRoom.repository.MessageRepository;
 
-import com.platform.chat.base.chatUser.repository.ChatUserRepository;
-import com.platform.chat.base.location.repository.LocationUserRepository;
-import com.platform.chat.base.room.repository.RoomReadStatusRepository;
-import com.platform.chat.base.room.repository.RoomRepository;
-import com.platform.chat.base.room.entity.Room;
-import com.platform.chat.base.chatUser.entity.ChatUser;
-import com.platform.chat.base.room.entity.RoomReadStatus;
-import com.platform.chat.base.location.enums.LocationUserRole;
+import com.platform.chat.domain.chatUser.repository.ChatUserRepository;
+import com.platform.chat.domain.location.repository.LocationUserRepository;
+import com.platform.chat.domain.room.repository.RoomReadStatusRepository;
+import com.platform.chat.domain.room.repository.RoomRepository;
+import com.platform.chat.domain.room.entity.Room;
+import com.platform.chat.domain.chatUser.entity.ChatUser;
+import com.platform.chat.domain.room.entity.RoomReadStatus;
+import com.platform.chat.domain.location.enums.LocationUserRole;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

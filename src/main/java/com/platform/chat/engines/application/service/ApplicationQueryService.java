@@ -1,7 +1,7 @@
-package com.platform.chat.core.modules.application.service;
+package com.platform.chat.engines.application.service;
 
-import com.platform.chat.core.modules.application.dto.ApplicationSummary;
-import com.platform.chat.core.modules.application.repository.ApplicationRepository;
+import com.platform.chat.engines.application.dto.ApplicationSummary;
+import com.platform.chat.engines.application.repository.ApplicationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

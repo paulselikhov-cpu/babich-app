@@ -1,4 +1,4 @@
-package com.platform.chat.core.modules.transactionLog.enums;
+package com.platform.chat.engines.transactionLog.enums;
 
 /**
  * Причина начисления/списания монет или XP.
@@ -8,10 +8,10 @@ package com.platform.chat.core.modules.transactionLog.enums;
  *
  * <p>Словарь живёт в ядре аудита ({@code core.modules.transactionLog}), а не в
  * фича-модуле кошелька: колонка {@code transaction_logs.reason} (entity
- * {@link com.platform.chat.core.modules.transactionLog.entity.TransactionLog})
+ * {@link com.platform.chat.engines.transactionLog.entity.TransactionLog})
  * типизирована этим enum, а события {@code CoinsChangedEvent}/
  * {@code XpChangedEvent} несут причину в payload. Иначе ядро зависело бы от
- * фичи (было {@code chat.modules.coin.enums.CoinUpdateReason}).</p>
+ * фичи (было {@code chat.engines.economy.enums.CoinUpdateReason}).</p>
  */
 public enum CoinUpdateReason {
     WORK_SHIFT,             // заработок за смену/тап-фарм (профессия)

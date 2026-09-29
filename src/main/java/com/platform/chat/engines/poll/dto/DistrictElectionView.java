@@ -1,4 +1,4 @@
-package com.platform.chat.core.modules.poll.dto;
+package com.platform.chat.engines.poll.dto;
 
 import java.util.List;
 

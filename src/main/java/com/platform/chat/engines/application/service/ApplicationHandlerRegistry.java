@@ -1,9 +1,9 @@
-package com.platform.chat.core.modules.application.service;
+package com.platform.chat.engines.application.service;
 
-import com.platform.chat.core.modules.application.enums.ApplicationType;
-import com.platform.chat.core.modules.application.exception.ApplicationHandlerMissingException;
-import com.platform.chat.core.modules.application.exception.DuplicateApplicationHandlerException;
-import com.platform.chat.core.modules.application.model.ApplicationHandler;
+import com.platform.chat.engines.application.enums.ApplicationType;
+import com.platform.chat.engines.application.exception.ApplicationHandlerMissingException;
+import com.platform.chat.engines.application.exception.DuplicateApplicationHandlerException;
+import com.platform.chat.engines.application.model.ApplicationHandler;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

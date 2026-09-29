@@ -1,11 +1,11 @@
-package com.platform.chat.core.modules.notification.controller;
+package com.platform.chat.engines.notification.controller;
 
-import com.platform.chat.core.modules.notification.dto.NotificationResponse;
-import com.platform.chat.core.modules.notification.entity.Notification;
-import com.platform.chat.core.modules.notification.service.NotificationService;
+import com.platform.chat.engines.notification.dto.NotificationResponse;
+import com.platform.chat.engines.notification.entity.Notification;
+import com.platform.chat.engines.notification.service.NotificationService;
 
-import com.platform.chat.base.chatUser.entity.ChatUser;
-import com.platform.chat.base.chatUser.repository.ChatUserRepository;
+import com.platform.chat.domain.chatUser.entity.ChatUser;
+import com.platform.chat.domain.chatUser.repository.ChatUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

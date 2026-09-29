@@ -1,4 +1,4 @@
-package com.platform.chat.base.district.dto;
+package com.platform.chat.domain.district.dto;
 
 /**
  * DTO настроек района для админской панели (GET/PUT /api/districts/{id}/settings).

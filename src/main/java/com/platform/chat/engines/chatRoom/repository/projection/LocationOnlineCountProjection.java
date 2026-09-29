@@ -1,4 +1,4 @@
-package com.platform.chat.core.modules.chatRoom.repository.projection;
+package com.platform.chat.engines.chatRoom.repository.projection;
 
 public interface LocationOnlineCountProjection {
     Long getLocationId();

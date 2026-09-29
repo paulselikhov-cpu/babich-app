@@ -1,15 +1,15 @@
 package com.platform.civic.service;
 
-import com.platform.chat.base.chatUser.entity.ChatUser;
-import com.platform.chat.core.modules.application.service.ApplicationService;
-import com.platform.chat.base.chatUser.repository.ChatUserRepository;
-import com.platform.chat.core.modules.application.enums.ApplicationType;
-import com.platform.chat.core.modules.domainEvent.events.ApplicationResolvedEvent;
-import com.platform.chat.core.modules.notification.entity.Notification;
-import com.platform.chat.core.modules.notification.repository.NotificationRepository;
-import com.platform.chat.core.modules.application.entity.Application;
-import com.platform.chat.core.modules.application.enums.ApplicationStatus;
-import com.platform.chat.core.modules.domainEvent.events.CharacterUpdatedEvent;
+import com.platform.chat.domain.chatUser.entity.ChatUser;
+import com.platform.chat.engines.application.service.ApplicationService;
+import com.platform.chat.domain.chatUser.repository.ChatUserRepository;
+import com.platform.chat.engines.application.enums.ApplicationType;
+import com.platform.chat.engines.domainEvent.events.ApplicationResolvedEvent;
+import com.platform.chat.engines.notification.entity.Notification;
+import com.platform.chat.engines.notification.repository.NotificationRepository;
+import com.platform.chat.engines.application.entity.Application;
+import com.platform.chat.engines.application.enums.ApplicationStatus;
+import com.platform.chat.engines.domainEvent.events.CharacterUpdatedEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;

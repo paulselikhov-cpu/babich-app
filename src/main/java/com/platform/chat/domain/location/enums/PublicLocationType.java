@@ -1,4 +1,4 @@
-package com.platform.chat.base.location.enums;
+package com.platform.chat.domain.location.enums;
 
 /**
  * Типы системных общественных локаций района (согласно концепции, раздел 8).

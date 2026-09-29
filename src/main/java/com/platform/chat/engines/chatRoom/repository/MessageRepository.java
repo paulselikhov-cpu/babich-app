@@ -1,6 +1,6 @@
-package com.platform.chat.core.modules.chatRoom.repository;
+package com.platform.chat.engines.chatRoom.repository;
 
-import com.platform.chat.core.modules.chatRoom.entity.Message;
+import com.platform.chat.engines.chatRoom.entity.Message;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,7 +1,7 @@
-package com.platform.chat.base.location.repository;
+package com.platform.chat.domain.location.repository;
 
-import com.platform.chat.base.location.entity.Location;
-import com.platform.chat.base.location.enums.PublicLocationType;
+import com.platform.chat.domain.location.entity.Location;
+import com.platform.chat.domain.location.enums.PublicLocationType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

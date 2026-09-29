@@ -1,4 +1,4 @@
-package com.platform.chat.base.chatUser.enums;
+package com.platform.chat.domain.chatUser.enums;
 
 import lombok.Getter;
 

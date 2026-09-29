@@ -1,8 +1,8 @@
-package com.platform.chat.modules.governorElection.sheduledCheck;
+package com.platform.chat.features.governorElection.sheduledCheck;
 
-import com.platform.chat.core.modules.scheduledCheck.entity.ScheduledCheck;
-import com.platform.chat.core.modules.scheduledCheck.models.ScheduledCheckHandler;
-import com.platform.chat.modules.governorElection.service.ElectionService;
+import com.platform.chat.engines.scheduledCheck.entity.ScheduledCheck;
+import com.platform.chat.engines.scheduledCheck.models.ScheduledCheckHandler;
+import com.platform.chat.features.governorElection.service.ElectionService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

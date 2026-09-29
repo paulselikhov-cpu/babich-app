@@ -1,7 +1,7 @@
 # Модуль реакций на доменные события (подписчики)
 
-Слайс `chat.modules.domainEvent` — «Слой 4: Доставка»: тут живут подписчики на
-факты из ядра событий (`chat.core.modules.domainEvent`). Самих событий здесь нет —
+Слайс `chat.features.domainEvent` — «Слой 4: Доставка»: тут живут подписчики на
+факты из ядра событий (`chat.engines.domainEvent`). Самих событий здесь нет —
 их словарь часть ядра (см. `documentation/architecture/event/domain-event-module-layers.md`).
 
 ## Когда добавлять подписчика сюда
@@ -26,7 +26,7 @@
 
 ## Границы
 
-`allowedDependencies`: `chat.base.chatUser`, `chat.core.modules.domainEvent`,
-`chat.core.modules.notification`, `chat.core.modules.transactionLog`.
+`allowedDependencies`: `chat.domain.chatUser`, `chat.engines.domainEvent`,
+`chat.engines.notification`, `chat.engines.transactionLog`.
 Обратных импортов нет — ни один публикатор событий этот слайс не импортирует,
 поэтому цикла «ядро ↔ реакции» не возникает.

@@ -1,6 +1,6 @@
-package com.platform.chat.core.modules.application.exception;
+package com.platform.chat.engines.application.exception;
 
-import com.platform.chat.core.modules.application.enums.ApplicationType;
+import com.platform.chat.engines.application.enums.ApplicationType;
 
 /**
  * Для типа заявки не зарегистрирована стратегия обработки.

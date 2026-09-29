@@ -1,6 +1,6 @@
-package com.platform.chat.core.modules.domainEvent.service;
+package com.platform.chat.engines.domainEvent.service;
 
-import com.platform.chat.core.modules.domainEvent.DomainEvent;
+import com.platform.chat.engines.domainEvent.DomainEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;

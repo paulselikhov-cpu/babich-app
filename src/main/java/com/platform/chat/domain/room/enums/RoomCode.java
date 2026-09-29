@@ -1,4 +1,4 @@
-package com.platform.chat.base.room.enums;
+package com.platform.chat.domain.room.enums;
 
 public enum RoomCode {
     DEFAULT,

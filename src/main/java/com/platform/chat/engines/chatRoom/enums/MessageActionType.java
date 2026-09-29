@@ -1,4 +1,4 @@
-package com.platform.chat.core.modules.chatRoom.enums;
+package com.platform.chat.engines.chatRoom.enums;
 
 public enum MessageActionType {
     CHAT,

@@ -1,6 +1,6 @@
-package com.platform.chat.core.modules.transactionLog.entity;
+package com.platform.chat.engines.transactionLog.entity;
 
-import com.platform.chat.core.modules.transactionLog.enums.CoinUpdateReason;
+import com.platform.chat.engines.transactionLog.enums.CoinUpdateReason;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;

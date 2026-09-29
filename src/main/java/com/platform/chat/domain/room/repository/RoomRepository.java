@@ -1,6 +1,6 @@
-package com.platform.chat.base.room.repository;
+package com.platform.chat.domain.room.repository;
 
-import com.platform.chat.base.room.entity.Room;
+import com.platform.chat.domain.room.entity.Room;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.List;

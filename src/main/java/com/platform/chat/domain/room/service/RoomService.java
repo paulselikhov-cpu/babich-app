@@ -1,7 +1,7 @@
-package com.platform.chat.base.room.service;
+package com.platform.chat.domain.room.service;
 
-import com.platform.chat.base.room.entity.Room;
-import com.platform.chat.base.room.repository.RoomRepository;
+import com.platform.chat.domain.room.entity.Room;
+import com.platform.chat.domain.room.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;

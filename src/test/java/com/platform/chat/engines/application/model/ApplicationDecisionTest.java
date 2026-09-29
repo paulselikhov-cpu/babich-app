@@ -1,8 +1,8 @@
-package com.platform.chat.core.modules.application.model;
+package com.platform.chat.engines.application.model;
 
-import com.platform.chat.core.modules.application.enums.ApplicationMessageKey;
-import com.platform.chat.core.modules.application.enums.ApplicationStatus;
-import com.platform.chat.core.modules.domainEvent.events.CharacterUpdatedEvent;
+import com.platform.chat.engines.application.enums.ApplicationMessageKey;
+import com.platform.chat.engines.application.enums.ApplicationStatus;
+import com.platform.chat.engines.domainEvent.events.CharacterUpdatedEvent;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

@@ -1,13 +1,13 @@
-package com.platform.chat.modules.work.service;
-import com.platform.chat.modules.work.dto.WorkResultResponse;
+package com.platform.chat.features.work.service;
+import com.platform.chat.features.work.dto.WorkResultResponse;
 
-import com.platform.chat.base.chatUser.service.EnergyService;
-import com.platform.chat.base.chatUser.entity.ChatUser;
-import com.platform.chat.base.chatUser.repository.ChatUserRepository;
-import com.platform.chat.base.chatUser.enums.Profession;
+import com.platform.chat.domain.chatUser.service.EnergyService;
+import com.platform.chat.domain.chatUser.service.ChatUserService;
+import com.platform.chat.domain.chatUser.entity.ChatUser;
+import com.platform.chat.domain.chatUser.enums.Profession;
 
-import com.platform.chat.modules.coin.service.CoinService;
-import com.platform.chat.core.modules.transactionLog.enums.CoinUpdateReason;
+import com.platform.chat.engines.economy.service.CoinService;
+import com.platform.chat.engines.transactionLog.enums.CoinUpdateReason;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ public class WorkService {
     private static final long COINS_PER_SHIFT = 2;
     private static final long XP_PER_SHIFT = 1;
 
-    private final ChatUserRepository chatUserRepository;
+    private final ChatUserService chatUserService;
     private final CoinService coinService;
     private final EnergyService energyService;
 
@@ -37,8 +37,7 @@ public class WorkService {
 
     @Transactional
     public WorkResultResponse workAsDvornik(Long userId) {
-        ChatUser user = chatUserRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Персонаж не найден: " + userId));
+        ChatUser user = chatUserService.getChatUserById(userId);
 
         if (user.getProfession() != Profession.DVORNIK) {
             throw new IllegalStateException("У персонажа нет профессии дворника");
@@ -52,7 +51,7 @@ public class WorkService {
 
         lastWorkAt.put(userId, Instant.now());
 
-        ChatUser refreshed = chatUserRepository.findById(userId).orElseThrow();
+        ChatUser refreshed = chatUserService.getChatUserById(userId);
         return new WorkResultResponse(
                 COINS_PER_SHIFT,
                 XP_PER_SHIFT,

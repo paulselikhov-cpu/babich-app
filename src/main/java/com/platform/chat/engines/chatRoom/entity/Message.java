@@ -1,11 +1,11 @@
-package com.platform.chat.core.modules.chatRoom.entity;
+package com.platform.chat.engines.chatRoom.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import com.platform.chat.core.modules.chatRoom.enums.MessageType;
+import com.platform.chat.engines.chatRoom.enums.MessageType;
 
-import com.platform.chat.base.chatUser.entity.ChatUser;
-import com.platform.chat.base.room.entity.Room;
+import com.platform.chat.domain.chatUser.entity.ChatUser;
+import com.platform.chat.domain.room.entity.Room;
 
 import jakarta.persistence.*;
 import lombok.Data;

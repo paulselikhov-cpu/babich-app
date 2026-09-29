@@ -1,6 +1,6 @@
-package com.platform.chat.core.modules.application.i18n;
+package com.platform.chat.engines.application.i18n;
 
-import com.platform.chat.core.modules.application.enums.ApplicationMessageKey;
+import com.platform.chat.engines.application.enums.ApplicationMessageKey;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;

@@ -1,14 +1,14 @@
-package com.platform.chat.core.modules.domainEvent;
+package com.platform.chat.engines.domainEvent;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.platform.chat.core.modules.domainEvent.events.ApplicationResolvedEvent;
-import com.platform.chat.core.modules.domainEvent.events.CharacterUpdatedEvent;
-import com.platform.chat.core.modules.domainEvent.events.CoinsChangedEvent;
-import com.platform.chat.core.modules.domainEvent.events.ElectionClosedEvent;
-import com.platform.chat.core.modules.domainEvent.events.ElectionStartedEvent;
-import com.platform.chat.core.modules.domainEvent.events.PollClosedEvent;
-import com.platform.chat.core.modules.domainEvent.events.XpChangedEvent;
-import com.platform.chat.core.modules.transactionLog.enums.CoinUpdateReason;
+import com.platform.chat.engines.domainEvent.events.ApplicationResolvedEvent;
+import com.platform.chat.engines.domainEvent.events.CharacterUpdatedEvent;
+import com.platform.chat.engines.domainEvent.events.CoinsChangedEvent;
+import com.platform.chat.engines.domainEvent.events.ElectionClosedEvent;
+import com.platform.chat.engines.domainEvent.events.ElectionStartedEvent;
+import com.platform.chat.engines.domainEvent.events.PollClosedEvent;
+import com.platform.chat.engines.domainEvent.events.XpChangedEvent;
+import com.platform.chat.engines.transactionLog.enums.CoinUpdateReason;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

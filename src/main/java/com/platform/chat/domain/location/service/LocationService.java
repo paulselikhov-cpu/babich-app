@@ -1,22 +1,22 @@
-package com.platform.chat.base.location.service;
+package com.platform.chat.domain.location.service;
 
-import com.platform.chat.base.chatUser.entity.ChatUser;
-import com.platform.chat.base.district.entity.District;
-import com.platform.chat.base.location.dto.LocationResponse;
-import com.platform.chat.base.location.enums.LocationUserRole;
-import com.platform.chat.base.chatUser.repository.ChatUserRepository;
-import com.platform.chat.base.district.repository.DistrictRepository;
-import com.platform.chat.base.location.entity.Location;
-import com.platform.chat.base.location.entity.LocationTemplate;
-import com.platform.chat.base.location.entity.LocationUser;
-import com.platform.chat.base.location.repository.LocationUserRepository;
-import com.platform.chat.base.location.repository.LocationRepository;
-import com.platform.chat.base.location.repository.LocationTemplateRepository;
-import com.platform.chat.base.location.port.LocationPaymentPort;
-import com.platform.chat.base.room.entity.Room;
-import com.platform.chat.base.room.port.RoomContentCleaner;
-import com.platform.chat.base.room.repository.RoomReadStatusRepository;
-import com.platform.chat.base.room.repository.RoomRepository;
+import com.platform.chat.domain.chatUser.entity.ChatUser;
+import com.platform.chat.domain.district.entity.District;
+import com.platform.chat.domain.location.dto.LocationResponse;
+import com.platform.chat.domain.location.enums.LocationUserRole;
+import com.platform.chat.domain.chatUser.repository.ChatUserRepository;
+import com.platform.chat.domain.district.repository.DistrictRepository;
+import com.platform.chat.domain.location.entity.Location;
+import com.platform.chat.domain.location.entity.LocationTemplate;
+import com.platform.chat.domain.location.entity.LocationUser;
+import com.platform.chat.domain.location.repository.LocationUserRepository;
+import com.platform.chat.domain.location.repository.LocationRepository;
+import com.platform.chat.domain.location.repository.LocationTemplateRepository;
+import com.platform.chat.domain.location.port.LocationPaymentPort;
+import com.platform.chat.domain.room.entity.Room;
+import com.platform.chat.domain.room.port.RoomContentCleaner;
+import com.platform.chat.domain.room.repository.RoomReadStatusRepository;
+import com.platform.chat.domain.room.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -360,7 +360,7 @@ public class LocationService {
         List<Long> roomIds = rooms.stream().map(Room::getId).toList();
 
         // 2. Чистим содержимое комнат (сообщения). Владелец данных — слайс
-        // chat.core.modules.chatRoom, поэтому работаем через его имплементацию
+        // chat.engines.chatRoom, поэтому работаем через его имплементацию
         // Обязательно ДО удаления rooms — иначе FK messages.room_id → rooms.id.
         roomContentCleaner.cleanRooms(roomIds);
 

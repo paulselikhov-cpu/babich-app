@@ -1,19 +1,19 @@
-package com.platform.chat.modules.application.service;
+package com.platform.chat.features.application.service;
 
-import com.platform.chat.base.chatUser.entity.ChatUser;
-import com.platform.chat.core.modules.application.dto.ApplicationSummary;
-import com.platform.chat.core.modules.application.entity.Application;
-import com.platform.chat.core.modules.application.enums.ApplicationMessageKey;
-import com.platform.chat.core.modules.application.enums.ApplicationType;
-import com.platform.chat.core.modules.application.exception.ApplicationSubmissionRejectedException;
-import com.platform.chat.core.modules.application.i18n.ApplicationMessages;
-import com.platform.chat.core.modules.application.service.ApplicationService;
+import com.platform.chat.domain.chatUser.entity.ChatUser;
+import com.platform.chat.engines.application.dto.ApplicationSummary;
+import com.platform.chat.engines.application.entity.Application;
+import com.platform.chat.engines.application.enums.ApplicationMessageKey;
+import com.platform.chat.engines.application.enums.ApplicationType;
+import com.platform.chat.engines.application.exception.ApplicationSubmissionRejectedException;
+import com.platform.chat.engines.application.i18n.ApplicationMessages;
+import com.platform.chat.engines.application.service.ApplicationService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 /**
- * Подача заявок: связывает персонажа ({@code chat.base.chatUser}) с ядром процесса
+ * Подача заявок: связывает персонажа ({@code chat.domain.chatUser}) с ядром процесса
  * заявки. Здесь живут правила, которым нужны оба модуля сразу — «у персонажа уже
  * есть такой документ» и «нельзя подать вторую незакрытую заявку того же типа».
  *

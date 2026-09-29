@@ -1,13 +1,13 @@
-package com.platform.chat.core.config;
+package com.platform.chat.config;
 
-import com.platform.chat.base.district.entity.District;
-import com.platform.chat.base.location.entity.Location;
-import com.platform.chat.base.room.entity.Room;
-import com.platform.chat.base.location.enums.PublicLocationType;
-import com.platform.chat.base.district.repository.DistrictRepository;
-import com.platform.chat.base.location.repository.LocationRepository;
-import com.platform.chat.base.room.repository.RoomRepository;
-import com.platform.chat.base.district.service.DistrictSettingsService;
+import com.platform.chat.domain.district.entity.District;
+import com.platform.chat.domain.location.entity.Location;
+import com.platform.chat.domain.room.entity.Room;
+import com.platform.chat.domain.location.enums.PublicLocationType;
+import com.platform.chat.domain.district.repository.DistrictRepository;
+import com.platform.chat.domain.location.repository.LocationRepository;
+import com.platform.chat.domain.room.repository.RoomRepository;
+import com.platform.chat.domain.district.service.DistrictSettingsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
