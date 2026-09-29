@@ -193,7 +193,7 @@ public class ElectionService {
         }).toList();
 
         int totalVoted = pollService.totalVoteCount(relevant.getId());
-        int aliveWindowDays = districtSettingsService.getElectionSettings(districtId).aliveWindowDays();
+        int aliveWindowDays = districtSettingsService.getSettings(districtId).electionAliveWindowDays();
         long alive = chatUserRepository.countByDistrictIdAndLastSeenAfter(
                 districtId, LocalDateTime.now().minusDays(aliveWindowDays));
         int quorum = relevant.getQuorumThreshold();

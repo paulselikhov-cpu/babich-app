@@ -1,11 +1,10 @@
 @ApplicationModule(
         allowedDependencies = {
                 "chat.base.chatUser",
-                "chat.core.modules.domainEvent",
-                "chat.core.modules.transactionLog",
+                "chat.base.location",
         },
         type = ApplicationModule.Type.OPEN
 )
-package com.platform.chat.modules.coin;
+package com.platform.chat.base.district;
 
 import org.springframework.modulith.ApplicationModule;

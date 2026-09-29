@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.platform.chat.base.chatUser.entity.ChatUser;
 import com.platform.chat.base.district.entity.District;
 import com.platform.chat.base.location.enums.LocationCategoryType;
-import com.platform.chat.modules.gang.entity.Gang;
 import com.platform.chat.base.location.enums.PublicLocationType;
 import com.platform.chat.base.room.entity.Room;
 import jakarta.persistence.*;

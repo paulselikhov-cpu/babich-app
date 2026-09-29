@@ -5,7 +5,6 @@ import com.platform.chat.base.district.entity.District;
 import com.platform.chat.base.district.entity.DistrictSettings;
 import com.platform.chat.base.district.repository.DistrictRepository;
 import com.platform.chat.base.district.repository.DistrictSettingsRepository;
-import com.platform.chat.core.modules.poll.dto.PollSettingsDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,31 +37,7 @@ public class DistrictSettingsService {
                 });
     }
 
-    /** Эффективные настройки выборов губернатора района. */
-    @Transactional
-    public PollSettingsDto getElectionSettings(Long districtId) {
-        DistrictSettings s = getOrCreate(districtId);
-        return new PollSettingsDto(
-                s.getElectionDurationHours(),
-                s.getElectionAliveWindowDays(),
-                s.getElectionQuorumPercent(),
-                s.getElectionMaxCandidates()
-        );
-    }
-
-    /** Эффективные настройки обжалования/переизбрания (запланировано). */
-    @Transactional
-    public PollSettingsDto getRecallSettings(Long districtId) {
-        DistrictSettings s = getOrCreate(districtId);
-        return new PollSettingsDto(
-                s.getRecallDurationHours(),
-                s.getRecallAliveWindowDays(),
-                s.getRecallQuorumPercent(),
-                null
-        );
-    }
-
-    /** Текущие настройки района для админской панели. */
+    /** Текущие настройки района для админской панели и внешних модулей. */
     @Transactional
     public DistrictSettingsDto getSettings(Long districtId) {
         DistrictSettings s = getOrCreate(districtId);

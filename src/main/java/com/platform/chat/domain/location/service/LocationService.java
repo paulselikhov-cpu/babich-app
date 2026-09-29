@@ -12,12 +12,11 @@ import com.platform.chat.base.location.entity.LocationUser;
 import com.platform.chat.base.location.repository.LocationUserRepository;
 import com.platform.chat.base.location.repository.LocationRepository;
 import com.platform.chat.base.location.repository.LocationTemplateRepository;
+import com.platform.chat.base.location.port.LocationPaymentPort;
 import com.platform.chat.base.room.entity.Room;
 import com.platform.chat.base.room.port.RoomContentCleaner;
 import com.platform.chat.base.room.repository.RoomReadStatusRepository;
 import com.platform.chat.base.room.repository.RoomRepository;
-import com.platform.chat.core.modules.transactionLog.enums.CoinUpdateReason;
-import com.platform.chat.modules.coin.service.CoinService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +45,7 @@ public class LocationService {
     private final RoomContentCleaner roomContentCleaner;
     private final ChatUserRepository chatUserRepository;
     private final DistrictRepository districtRepository;
-    private final CoinService coinService;
+    private final LocationPaymentPort locationPaymentPort;
 
     /**
      * Получить все публичные пользовательские локации.
@@ -147,10 +146,9 @@ public class LocationService {
 
         Location savedLocation = locationRepository.save(location);
 
-        // шаг 3b: списываем Coin за создание (аудит — через доменное событие)
+        // шаг 3b: списываем Coin за создание (через порт оплаты)
         if (template.getPriceCoin() > 0) {
-            coinService.takeCoins(characterId, template.getPriceCoin(),
-                    CoinUpdateReason.LOCATION_CREATE, savedLocation.getId());
+            locationPaymentPort.chargeLocationCreation(characterId, template.getPriceCoin(), savedLocation.getId());
         }
 
         // шаг 5: копируем базовые комнаты из шаблона
@@ -249,7 +247,7 @@ public class LocationService {
             );
         }
 
-        // проверяем баланс и списываем Coin через CoinService
+        // проверяем баланс и списываем Coin через порт оплаты
         Long price = template.getExtendPriceCoin();
         if (price != null && price > 0) {
             ChatUser character = chatUserRepository.findById(characterId)
@@ -263,8 +261,7 @@ public class LocationService {
                                 ", есть: " + character.getCoinBalance()
                 );
             }
-            coinService.takeCoins(characterId, price,
-                    CoinUpdateReason.LOCATION_EXTEND_ROOM, locationId);
+            locationPaymentPort.chargeRoomExtension(characterId, price, locationId);
         }
 
         // определяем порядковый номер новой комнаты
