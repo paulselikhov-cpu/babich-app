@@ -1,5 +1,6 @@
 package com.platform.chat.domain.chatUser.service;
 
+import com.platform.auth.entity.User;
 import com.platform.auth.repository.UserRepository;
 import com.platform.chat.domain.chatUser.entity.ChatUser;
 import com.platform.chat.domain.chatUser.dto.CreateChatUserRequest;
@@ -9,10 +10,12 @@ import com.platform.chat.domain.chatUser.enums.Profession;
 import com.platform.chat.domain.chatUser.repository.ChatUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -69,6 +72,75 @@ public class ChatUserService {
             return null;
         }
         return chatUser;
+    }
+
+    /**
+     * Проверяет, что переданный в запросе {@code characterId} принадлежит
+     * авторизованному пользователю.
+     *
+     * <p>Ручки исторически принимают {@code characterId} параметром запроса, а не
+     * берут его из {@code Principal}; без такой проверки любой залогиненный игрок
+     * мог читать/менять состояние чужого персонажа (IDOR). Принимаются три формы
+     * идентификатора, потому что фронт использует и {@code ChatUser.id}, и
+     * {@code User.id}: id своего персонажа, id своего аккаунта и id любого
+     * персонажа этого же аккаунта (персонажей может быть несколько — по одному
+     * на район).</p>
+     *
+     * @throws AccessDeniedException если персонаж не найден, id не указан
+     *                               или принадлежит чужому аккаунту
+     */
+    public void assertCharacterOwnedBy(String username, Long characterId) {
+        if (characterId == null) {
+            throw new AccessDeniedException("Персонаж не указан");
+        }
+
+        ChatUser actor = getChatUserByUserName(username);
+        if (actor == null) {
+            throw new AccessDeniedException("Персонаж не найден");
+        }
+
+        if (characterId.equals(actor.getId()) || characterId.equals(actor.getUserId())) {
+            return;
+        }
+
+        boolean sameAccount = chatUserRepository.findById(characterId)
+                .map(other -> Objects.equals(other.getUserId(), actor.getUserId()))
+                .orElse(false);
+
+        if (!sameAccount) {
+            log.warn("Отклонён доступ к чужому персонажу: actorId={}, requestedCharacterId={}",
+                    actor.getId(), characterId);
+            throw new AccessDeniedException("Доступ к чужому персонажу запрещён");
+        }
+    }
+
+    /**
+     * Проверяет, что запрошенный {@code userId} — аккаунт авторизованного
+     * пользователя (администратору доступен любой аккаунт).
+     *
+     * <p>Нужен ручкам онбординга, которые вызываются <b>до</b> появления
+     * персонажа: там проверка «персонаж принадлежит мне» неприменима, потому что
+     * персонажа ещё нет.</p>
+     *
+     * @throws AccessDeniedException если id не указан, аккаунт не найден
+     *                               или принадлежит другому пользователю
+     */
+    public void assertAccountIsSelfOrAdmin(String username, Long userId) {
+        if (userId == null) {
+            throw new AccessDeniedException("Пользователь не указан");
+        }
+
+        Long ownUserId = userRepository.findByUsername(username)
+                .map(User::getId)
+                .orElse(null);
+
+        if (userId.equals(ownUserId) || isAdmin(username)) {
+            return;
+        }
+
+        log.warn("Отклонён доступ к чужому аккаунту: actor='{}', requestedUserId={}",
+                username, userId);
+        throw new AccessDeniedException("Доступ к чужому аккаунту запрещён");
     }
 
     /** Все персонажи района (для админской таблицы). */

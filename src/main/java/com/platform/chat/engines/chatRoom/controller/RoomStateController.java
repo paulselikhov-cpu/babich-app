@@ -1,11 +1,13 @@
 package com.platform.chat.engines.chatRoom.controller;
 
+import com.platform.chat.domain.chatUser.service.ChatUserService;
 import com.platform.chat.engines.chatRoom.service.OnlineSessionService;
 import com.platform.chat.engines.chatRoom.service.UnreadService;
 import com.platform.chat.engines.chatRoom.service.UnreadService.LocationUnreadSummary;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 
@@ -30,14 +32,14 @@ public class RoomStateController {
 
     private final UnreadService unreadService;
     private final OnlineSessionService onlineSessionService;
+    private final ChatUserService chatUserService;
 
-    // characterId — временно как query-параметр, заменить на извлечение из Principal,
-    // когда будет готова авторизация персонажей на уровне REST
-    /** Разбивка непрочитанных по комнатам локации. */
+    /** Разбивка непрочитанных по комнатам локации. {@code characterId} — только свой. */
     @GetMapping("/{locationId}/unread")
     public LocationUnreadSummary getUnreadSummary(
-            @PathVariable Long locationId, @RequestParam Long characterId
+            @PathVariable Long locationId, @RequestParam Long characterId, Principal principal
     ) {
+        chatUserService.assertCharacterOwnedBy(principal.getName(), characterId);
         return unreadService.getLocationUnreadSummary(characterId, locationId);
     }
 
@@ -59,11 +61,12 @@ public class RoomStateController {
         return onlineSessionService.getOnlineCounts(locationIds);
     }
 
-    /** Суммарные непрочитанные по локациям (бейджи сайдбара). */
+    /** Суммарные непрочитанные по локациям (бейджи сайдбара). {@code characterId} — только свой. */
     @GetMapping("/unread-counts")
     public Map<Long, Long> getUnreadCounts(
-            @RequestParam List<Long> locationIds, @RequestParam Long characterId
+            @RequestParam List<Long> locationIds, @RequestParam Long characterId, Principal principal
     ) {
+        chatUserService.assertCharacterOwnedBy(principal.getName(), characterId);
         return unreadService.getUnreadTotalsForLocations(characterId, locationIds);
     }
 }

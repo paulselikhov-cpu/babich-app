@@ -1,5 +1,6 @@
 package com.platform.chat.features.governorElection.sheduledCheck;
 
+import com.platform.chat.engines.poll.PollCheckType;
 import com.platform.chat.engines.scheduledCheck.entity.ScheduledCheck;
 import com.platform.chat.engines.scheduledCheck.models.ScheduledCheckHandler;
 import com.platform.chat.features.governorElection.service.ElectionService;
@@ -26,7 +27,12 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ElectionClose implements ScheduledCheckHandler {
 
-    public static final String CHECK_TYPE = "POLL_CLOSE";
+    /**
+     * Тип проверки — константа объявлена в движке голосований
+     * ({@link PollCheckType#POLL_CLOSE}), чтобы {@code PollService} не зависел
+     * от этого фич-слайса (зависимость строго feature → engine).
+     */
+    public static final String CHECK_TYPE = PollCheckType.POLL_CLOSE;
 
     private static final Logger log = LoggerFactory.getLogger(ElectionClose.class);
 

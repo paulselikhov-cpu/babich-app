@@ -98,9 +98,19 @@ public class ElectionController {
 
     /**
      * Шаг 4: Закрыть выборы и обработать результат (вручную).
+     *
+     * <p>Только ADMIN: закрытие подводит итог и назначает губернатора
+     * ({@code PollResultDispatcher}), поэтому кнопку «досрочно завершить»
+     * не должен дёргать любой игрок. Таймерная ветка (истёк {@code endsAt})
+     * идёт мимо контроллера — через чек {@code ElectionClose}, и в проверке
+     * роли не нуждается.</p>
      */
     @PostMapping("/{pollId}/close")
-    public ResponseEntity<?> close(@PathVariable Long pollId) {
+    public ResponseEntity<?> close(@PathVariable Long pollId, Principal principal) {
+        if (principal == null || !chatUserService.isAdmin(principal.getName())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "Закрытие выборов доступно только администратору"));
+        }
         try {
             Poll closed = electionService.closeElection(pollId);
             return ResponseEntity.ok(closed);

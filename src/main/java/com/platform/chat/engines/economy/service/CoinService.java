@@ -19,6 +19,13 @@ import org.springframework.transaction.annotation.Transactional;
  * что каждая операция публикует доменное событие (CoinsChangedEvent/
  * XpChangedEvent), а аудит-запись в TransactionLog пишет подписчик
  * (TransactionLogEventListener) после коммита транзакции.
+ *
+ * <p>Чтение персонажа идёт с {@code PESSIMISTIC_WRITE} (SELECT ... FOR UPDATE):
+ * проверка «баланса хватает» и запись должны видеть одну и ту же строку,
+ * иначе два конкурентных списания читают один баланс, обе проходят проверку
+ * и списывается меньше, чем потрачено (двойное списание), а параллельные
+ * начисления теряются (lost update). Методы и сообщения об ошибках при этом
+ * не меняются — блокировка прозрачна для бизнес-логики.</p>
  */
 @Service
 @RequiredArgsConstructor
@@ -58,7 +65,7 @@ public class CoinService {
     }
 
     private ChatUser getUser(Long userId) {
-        return chatUserRepository.findById(userId)
+        return chatUserRepository.findByIdForUpdate(userId)
                 .orElseThrow(() -> new RuntimeException("Персонаж не найден: " + userId));
     }
 }

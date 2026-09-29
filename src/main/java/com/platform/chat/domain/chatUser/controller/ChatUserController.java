@@ -22,8 +22,13 @@ public class ChatUserController {
     private final ChatUserService chatUserService;
 
     @GetMapping
-    public List<ChatUser> getAllChatUsers() {
-        return chatUserService.getAllChatUsers();
+    public ResponseEntity<List<ChatUser>> getAllChatUsers(Principal principal) {
+        // Отдаёт всех персонажей платформы (включая балансы) — только ADMIN.
+        // UI этот список не использует: админская таблица ходит в /district/{id}.
+        if (isNotAdmin(principal)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        return ResponseEntity.ok(chatUserService.getAllChatUsers());
     }
 
     @GetMapping("/{id}")
@@ -36,10 +41,18 @@ public class ChatUserController {
         return chatUserService.getChatUserLevelById(id);
     }
 
+    /**
+     * GET /api/chat/users/{userId}/characters?districtId={districtId}
+     * Персонаж авторизованного аккаунта в районе (null-ответ, если ещё нет).
+     * Вызывается до создания персонажа, поэтому проверяем
+     * владение аккаунтом (userId из запроса), а не персонажем.
+     */
     @GetMapping("/{userId}/characters")
     public ResponseEntity<ChatUser> getChatUserByUserIdAndDistrict(
             @PathVariable Long userId,
-            @RequestParam Long districtId) {
+            @RequestParam Long districtId,
+            Principal principal) {
+        chatUserService.assertAccountIsSelfOrAdmin(principal.getName(), userId);
         return chatUserService.findChatUserByUserIdAndDistrictId(userId, districtId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -67,11 +80,16 @@ public class ChatUserController {
         return ResponseEntity.ok(chatUserService.listByDistrict(districtId));
     }
 
-    /** Создать персонажа для авторизованного пользователя в указанном районе. Только ADMIN. */
+    /**
+     * Создать персонажа в указанном районе — для своего аккаунта
+     * или для любого, если вызывающий ADMIN.
+     */
     @PostMapping("/{userId}/characters")
     public ResponseEntity<ChatUser> createChatUser(
             @PathVariable Long userId,
-            @Valid @RequestBody CreateChatUserRequest request) {
+            @Valid @RequestBody CreateChatUserRequest request,
+            Principal principal) {
+        chatUserService.assertAccountIsSelfOrAdmin(principal.getName(), userId);
         return ResponseEntity.ok(chatUserService.createChatUser(userId, request));
     }
 

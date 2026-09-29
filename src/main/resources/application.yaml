@@ -30,7 +30,10 @@ logging:
     org.springframework.web: DEBUG
 
 jwt:
-  secret: "babich-super-secret-key-minimum-256-bits-long-for-hs256-algorithm"
+  # Секрет читается из переменной окружения JWT_SECRET; значение после ":"
+  # — только dev-fallback для локального запуска. В прод-конфиге секрет
+  # ДОЛЖЕН приходить из окружения/секрет-хранилища.
+  secret: ${JWT_SECRET:babich-super-secret-key-minimum-256-bits-long-for-hs256-algorithm}
   expiration: 86400000   # 24 часа в миллисекундах
 cors:
   allowed-origins:

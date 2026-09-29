@@ -2,7 +2,13 @@ package com.platform;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.modulith.core.ApplicationModules;
-import org.springframework.modulith.core.Violations;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -13,41 +19,34 @@ import static org.assertj.core.api.Assertions.assertThat;
  * модули не могут импортировать друг друга напрямую, минуя разрешённые
  * зависимости ({@code allowedDependencies} в {@code package-info.java}).</p>
  *
- * <p>Предсуществующий технический долг границ обрабатывается в два шага:</p>
+ * <p>Проверка идёт в двух плоскостях — одной Modulith-проверки мало:</p>
  * <ol>
- *   <li>направленные зависимости (chat→auth, chat→economy, civic→chat,
- *       economy→chat, notification→chat/core, poll→chat/core) легализованы
- *       через {@code allowedDependencies} в {@code package-info.java}
- *       соответствующих модулей — новые НЕЗАЯВЛЕННЫЕ направленные
- *       зависимости уронят тест;</li>
- *   <li>известный ЦИКЛ {@code chat ↔ economy} отфильтрован явно
- *       ({@link #KNOWN_CYCLE}) — Modulith детектит циклы отдельным
- *       механизмом, на который {@code allowedDependencies} не влияет.
- *       Фильтр завязан на точный текст конкретного цикла: любой НОВЫЙ
- *       цикл или новый участник этого цикла уронит тест.</li>
+ *   <li>{@link #verifyModuleStructure()} — байткодный анализ Modulith
+ *       ({@code detectViolations()}): незаявленные направленные зависимости
+ *       роняют тест. Исключающих фильтров больше нет: цикл, который раньше
+ *       глушился вручную, устранён, и любой новый цикл должен падать;</li>
+ *   <li>{@link #enginesMustNotImportFeatures()} и
+ *       {@link #domainMustNotImportEnginesOrFeatures()} — проверка
+ *       <b>исходников</b>. Нужна потому, что {@code public static final
+ *       String}-константы javac инлайнит: импорт вида
+ *       {@code chat.features.…ElectionClose} не оставляет ссылки в байткоде,
+ *       и Modulith такую зависимость не видит (так проходил цикл
+ *       {@code engines.poll / features.governorElection}).</li>
  * </ol>
+ *
+ * <p>Правило слоёв: {@code domain} не знает про {@code engines} и
+ * {@code features}, {@code engines} не знает про {@code features}.</p>
  *
  * <p>Границы слайсов доменных событий (ядро шины ↔ реакции) описаны в
  * {@code documentation/architecture/event/domain-event-module-layers.md}.</p>
  *
- * <p>Не требует БД — это статический анализ структуры пакетов.</p>
+ * <p>Не требует БД — это статический анализ структуры пакетов и исходников.</p>
  */
 class ModuleBoundaryTest {
 
-    /**
-     * Точный текст известного предсуществующего цикла {@code chat ↔ economy},
-     * зафиксированный по фактическому выводу Modulith:
-     * «Cycle detected: Slice chat -> Slice economy -> Slice chat».
-     *
-     * <p>Фильтруется ТОЛЬКО этот цикл. Всё остальное — включая циклы с новыми
-     * участниками и любые другие циклы между {@code chat.*}-слайсами — падение
-     * теста. Раньше здесь стоял префикс «Cycle detected: Slice chat», который
-     * глушил ЛЮБОЙ цикл, начинающийся со слайса chat.* (например, цикл
-     * «ядро процесса заявки ↔ исполнители заявок»), из-за чего нарушение
-     * границ проходило бесшумно.</p>
-     */
-    private static final String KNOWN_CYCLE =
-            "Cycle detected: Slice chat -> Slice economy -> Slice chat";
+    /** Корень исходников chat-слоёв (тесты запускаются из каталога {@code babich-app}). */
+    private static final Path CHAT_SOURCE_ROOT =
+            Path.of("src", "main", "java", "com", "platform", "chat");
 
     @Test
     void moduleStructureIsRecognized() {
@@ -61,9 +60,49 @@ class ModuleBoundaryTest {
     void verifyModuleStructure() {
         ApplicationModules modules = ApplicationModules.of(PlatformApplication.class);
 
-        Violations violations = modules.detectViolations()
-                .filter(v -> !v.hasMessageContaining(KNOWN_CYCLE));
+        // Без фильтров: исключений из правил границ быть не должно.
+        modules.detectViolations().throwIfPresent();
+    }
 
-        violations.throwIfPresent();
+    /**
+     * Слой движков не имеет права знать про прикладные фичи.
+     */
+    @Test
+    void enginesMustNotImportFeatures() throws IOException {
+        assertNoImports(CHAT_SOURCE_ROOT.resolve("engines"), "com.platform.chat.features.");
+    }
+
+    /**
+     * Онтология мира ({@code domain}) не зависит ни от движков, ни от фич.
+     */
+    @Test
+    void domainMustNotImportEnginesOrFeatures() throws IOException {
+        assertNoImports(CHAT_SOURCE_ROOT.resolve("domain"), "com.platform.chat.engines.");
+        assertNoImports(CHAT_SOURCE_ROOT.resolve("domain"), "com.platform.chat.features.");
+    }
+
+    /**
+     * Ищет в исходниках каталога {@code root} импорты с запрещённым префиксом.
+     * Проверяется текст файла, а не байткод: константы времени компиляции
+     * javac инлайнит, поэтому в байткоде от такой зависимости не остаётся следа
+     * и Modulith её не видит.
+     */
+    private void assertNoImports(Path root, String forbiddenPrefix) throws IOException {
+        List<String> violations = new ArrayList<>();
+
+        try (Stream<Path> files = Files.walk(root)) {
+            for (Path file : files.filter(p -> p.toString().endsWith(".java")).toList()) {
+                List<String> lines = Files.readAllLines(file, StandardCharsets.UTF_8);
+                for (int i = 0; i < lines.size(); i++) {
+                    if (lines.get(i).trim().startsWith("import " + forbiddenPrefix)) {
+                        violations.add(file + ":" + (i + 1) + " -> " + lines.get(i).trim());
+                    }
+                }
+            }
+        }
+
+        assertThat(violations)
+                .describedAs("Слой не должен зависеть вверх: запрещён импорт %s", forbiddenPrefix)
+                .isEmpty();
     }
 }

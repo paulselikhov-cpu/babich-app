@@ -2,7 +2,9 @@ package com.platform.chat.domain.chatUser.repository;
 
 import com.platform.chat.domain.chatUser.entity.ChatUser;
 import com.platform.chat.domain.chatUser.enums.ChatRole;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -27,6 +29,14 @@ public interface ChatUserRepository extends JpaRepository<ChatUser, Long> {
     // найти всех персонажей пользователя (теперь может быть несколько — по одному на район)
     @Query("SELECT c FROM ChatUser c WHERE c.userId = :userId")
     List<ChatUser> findAllByUserId(@Param("userId") Long userId);
+
+    // SELECT ... FOR UPDATE: блокирует строку до конца транзакции.
+    // Нужен CoinService — там read-check-write баланса, без блокировки
+    // конкурентные списания читают один и тот же баланс и обе проходят
+    // проверку «достаточно монет» (двойное списание), а начисления теряются.
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT c FROM ChatUser c WHERE c.id = :id")
+    Optional<ChatUser> findByIdForUpdate(@Param("id") Long id);
 
     // найти персонажа пользователя в конкретном районе
     @Query("SELECT c FROM ChatUser c WHERE c.userId = :userId AND c.districtId = :districtId")

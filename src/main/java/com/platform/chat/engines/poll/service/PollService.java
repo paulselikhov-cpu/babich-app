@@ -1,5 +1,6 @@
 package com.platform.chat.engines.poll.service;
 
+import com.platform.chat.engines.poll.PollCheckType;
 import com.platform.chat.engines.poll.repository.PollCandidateRepository;
 import com.platform.chat.engines.poll.repository.PollRepository;
 import com.platform.chat.engines.poll.repository.PollVoteRepository;
@@ -25,7 +26,6 @@ import com.platform.chat.domain.district.repository.DistrictRepository;
 import com.platform.chat.domain.district.service.DistrictSettingsService;
 
 
-import com.platform.chat.features.governorElection.sheduledCheck.ElectionClose;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -127,7 +127,7 @@ public class PollService {
         // Реестр отложенных проверок (Этап 5): закрытие выборов по истечении
         // endsAt идёт через ScheduledCheck, а не через полный скан таблицы polls.
         scheduledCheckService.schedule(
-                ElectionClose.CHECK_TYPE,
+                PollCheckType.POLL_CLOSE,
                 Poll.class.getSimpleName(),
                 poll.getId(),
                 poll.getEndsAt());
@@ -266,7 +266,7 @@ public class PollService {
 
         // Отложенная проверка закрытия больше не нужна — Poll уже закрыт вручную.
         scheduledCheckService.cancelPending(
-                ElectionClose.CHECK_TYPE,
+                PollCheckType.POLL_CLOSE,
                 Poll.class.getSimpleName(),
                 pollId);
 

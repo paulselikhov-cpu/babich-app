@@ -1,5 +1,6 @@
 package com.platform.chat.domain.location.controller;
 
+import com.platform.chat.domain.chatUser.service.ChatUserService;
 import com.platform.chat.domain.location.dto.AddRoomRequest;
 import com.platform.chat.domain.location.dto.CreateLocationRequest;
 import com.platform.chat.domain.location.service.LocationService;
@@ -12,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.security.Principal;
 import java.util.List;
 
 /**
@@ -33,6 +35,7 @@ public class LocationController {
 
     private final LocationService locationService;
     private final RoomService roomService;
+    private final ChatUserService chatUserService;
 
     /**
      * GET /api/locations
@@ -50,7 +53,8 @@ public class LocationController {
      * Показываем в боковом меню — "мои локации".
      */
     @GetMapping("/my/{characterId}")
-    public List<LocationResponse> getMyLocations(@PathVariable Long characterId) {
+    public List<LocationResponse> getMyLocations(@PathVariable Long characterId, Principal principal) {
+        chatUserService.assertCharacterOwnedBy(principal.getName(), characterId);
         return locationService.getMyLocations(characterId);
     }
 
@@ -68,7 +72,9 @@ public class LocationController {
      */
     @PostMapping
     public ResponseEntity<Location> createLocation(
-            @Valid @RequestBody CreateLocationRequest request) {
+            @Valid @RequestBody CreateLocationRequest request,
+            Principal principal) {
+        chatUserService.assertCharacterOwnedBy(principal.getName(), request.getCharacterId());
         Location location = locationService.createLocation(
                 request.getTemplateId(),
                 request.getCharacterId(),
@@ -91,7 +97,9 @@ public class LocationController {
     @PostMapping("/join/{inviteCode}")
     public ResponseEntity<LocationUser> joinLocation(
             @PathVariable String inviteCode,
-            @RequestParam Long characterId) {
+            @RequestParam Long characterId,
+            Principal principal) {
+        chatUserService.assertCharacterOwnedBy(principal.getName(), characterId);
         LocationUser member = locationService.joinByInviteCode(
                 inviteCode,
                 characterId
@@ -123,7 +131,9 @@ public class LocationController {
     @PostMapping("/{locationId}/rooms")
     public ResponseEntity<Room> addRoom(
             @PathVariable Long locationId,
-            @Valid @RequestBody AddRoomRequest request) {
+            @Valid @RequestBody AddRoomRequest request,
+            Principal principal) {
+        chatUserService.assertCharacterOwnedBy(principal.getName(), request.getCharacterId());
         Room room = locationService.addCustomRoom(
                 locationId,
                 request.getCharacterId(),
@@ -145,7 +155,9 @@ public class LocationController {
     public ResponseEntity<LocationUser> appointModerator(
             @PathVariable Long locationId,
             @PathVariable Long targetCharacterId,
-            @RequestParam Long ownerId) {
+            @RequestParam Long ownerId,
+            Principal principal) {
+        chatUserService.assertCharacterOwnedBy(principal.getName(), ownerId);
         LocationUser member = locationService.appointModerator(
                 locationId,
                 ownerId,
@@ -158,7 +170,9 @@ public class LocationController {
     @DeleteMapping("/{locationId}/leave")
     public ResponseEntity<Void> leaveLocation(
             @PathVariable Long locationId,
-            @RequestParam Long characterId) {
+            @RequestParam Long characterId,
+            Principal principal) {
+        chatUserService.assertCharacterOwnedBy(principal.getName(), characterId);
         locationService.leaveLocation(locationId, characterId);
         return ResponseEntity.ok().build();
     }
@@ -167,7 +181,9 @@ public class LocationController {
     @DeleteMapping("/{locationId}")
     public ResponseEntity<Void> deleteLocation(
             @PathVariable Long locationId,
-            @RequestParam Long characterId) {
+            @RequestParam Long characterId,
+            Principal principal) {
+        chatUserService.assertCharacterOwnedBy(principal.getName(), characterId);
         locationService.deleteLocation(locationId, characterId);
         return ResponseEntity.ok().build();
     }

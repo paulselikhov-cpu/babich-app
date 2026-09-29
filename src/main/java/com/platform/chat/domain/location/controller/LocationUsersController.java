@@ -1,5 +1,6 @@
 package com.platform.chat.domain.location.controller;
 
+import com.platform.chat.domain.chatUser.service.ChatUserService;
 import com.platform.chat.domain.location.dto.LocationSystemRoleView;
 import com.platform.chat.domain.location.dto.LocationUserResponse;
 import com.platform.chat.domain.location.dto.LocationUsersPagedResponse;
@@ -29,6 +30,7 @@ public class LocationUsersController {
 
     private final LocationUsersService locationUsersService;
     private final ChatUserRepository chatUserRepository;
+    private final ChatUserService chatUserService;
 
     @GetMapping("/{locationId}/users")
     public LocationUsersPagedResponse<LocationUserResponse> getLocationUsers(
@@ -47,9 +49,12 @@ public class LocationUsersController {
         return locationUsersService.getSystemRolesByLocation(locationId);
     }
 
-    /** Все должности персонажа. */
+    /** Все должности персонажа. Чужой персонаж недоступен (id приходит из запроса). */
     @GetMapping("/by-character/{characterId}/system-roles")
-    public List<LocationSystemRoleView> getSystemRolesByCharacter(@PathVariable Long characterId) {
+    public List<LocationSystemRoleView> getSystemRolesByCharacter(
+            @PathVariable Long characterId,
+            Principal principal) {
+        chatUserService.assertCharacterOwnedBy(principal.getName(), characterId);
         return locationUsersService.getSystemRolesByCharacter(characterId);
     }
 

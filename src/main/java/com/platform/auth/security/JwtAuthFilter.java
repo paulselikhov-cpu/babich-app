@@ -36,7 +36,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         String token = authHeader.substring(7);
-        log.debug("Token received: {}", token.substring(0, 20) + "...");
+        // Сам токен в лог не пишем (даже часть) — только признак и длину:
+        // JWT даёт доступ к аккаунту, а логи уходят в файлы/агрегаторы.
+        log.debug("Bearer-токен получен: длина={}, метод={} {}", token.length(),
+                request.getMethod(), request.getRequestURI());
         log.debug("Token valid: {}", jwtService.isTokenValid(token));
 
         if (jwtService.isTokenValid(token)) {
