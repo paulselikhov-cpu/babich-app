@@ -93,17 +93,6 @@ FROM location_templates WHERE code = 'PRIVATE_HOUSE'
         WHERE lt.code = 'PRIVATE_HOUSE' AND tr.name = 'Двор'
     );
 
--- =================================== //TODO зачем здесь это?
--- Дефолтные значения экономики в chat_users
--- (страховка на случай если Hibernate ещё не успел создать колонки —
---  в норме они уже есть за счёт полей в @Entity ChatUser)
--- ===================================
-ALTER TABLE chat_users ADD COLUMN IF NOT EXISTS xp_user BIGINT NOT NULL DEFAULT 0;
-ALTER TABLE chat_users ADD COLUMN IF NOT EXISTS energy INTEGER NOT NULL DEFAULT 100;
-ALTER TABLE chat_users ADD COLUMN IF NOT EXISTS energy_last_updated TIMESTAMP;
-ALTER TABLE chat_users ADD COLUMN IF NOT EXISTS game_status VARCHAR(20) NOT NULL DEFAULT 'HOMELESS';
-ALTER TABLE chat_users ADD COLUMN IF NOT EXISTS profession VARCHAR(30) NOT NULL DEFAULT 'DVORNIK';
-
 -- ===================================
 -- Дефолтный район
 -- ===================================
@@ -163,9 +152,9 @@ FROM districts d WHERE d.code = 'CENTRAL'
         SELECT 1 FROM locations l WHERE l.district_id = d.id AND l.is_system = TRUE AND l.type = 'WAREHOUSE'
     );
 
--- 7. Рынок (общий, "Авито")
+-- 7. Магазин
 INSERT INTO locations (district_id, type, name, description, is_system, is_public, xp_location, created_at)
-SELECT d.id, 'GENERAL_MARKET', 'Рынок', 'Общий рынок района. Аренда прилавка доступна всем без участия мэрии.', TRUE, FALSE, 0, NOW()
+SELECT d.id, 'GENERAL_MARKET', 'Магазин', 'Главный магазин района', TRUE, FALSE, 0, NOW()
 FROM districts d WHERE d.code = 'CENTRAL'
                    AND NOT EXISTS (
         SELECT 1 FROM locations l WHERE l.district_id = d.id AND l.is_system = TRUE AND l.type = 'GENERAL_MARKET'
@@ -263,7 +252,7 @@ SELECT l.id, 'Офис', 'Административное помещение', 
 FROM locations l WHERE l.is_system = TRUE AND l.type = 'WAREHOUSE'
                    AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.location_id = l.id AND r.name = 'Офис');
 
--- Рынок: 2 комнаты
+-- Магазин: 2 комнаты
 INSERT INTO rooms (location_id, name, description, store_history, is_custom, order_index, code)
 SELECT l.id, 'Торговый зал', 'Основная торговая площадь', true, false, 0, 'DEFAULT'
 FROM locations l WHERE l.is_system = TRUE AND l.type = 'GENERAL_MARKET'
