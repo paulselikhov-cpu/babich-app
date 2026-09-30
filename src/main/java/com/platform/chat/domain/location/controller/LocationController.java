@@ -59,6 +59,24 @@ public class LocationController {
     }
 
     /**
+     * GET /api/locations/{locationId}
+     * Локация по id с проверкой доступа текущего персонажа.
+     * Используется глубоким переходом по маршруту /chat/location/{locationId}.
+     *
+     * Доступ: системная → всегда; публичная → всегда;
+     * приватная → только для участника (иначе 403).
+     * Локация не найдена → 404.
+     */
+    @GetMapping("/{locationId}")
+    public LocationResponse getLocationById(
+            @PathVariable Long locationId,
+            @RequestParam Long characterId,
+            Principal principal) {
+        chatUserService.assertCharacterOwnedBy(principal.getName(), characterId);
+        return locationService.getLocationForView(locationId, characterId);
+    }
+
+    /**
      * POST /api/locations
      * Создать новую локацию из шаблона.
      * Тело запроса:

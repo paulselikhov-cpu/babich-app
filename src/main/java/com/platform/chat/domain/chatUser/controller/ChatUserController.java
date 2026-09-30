@@ -43,7 +43,9 @@ public class ChatUserController {
 
     /**
      * GET /api/chat/users/{userId}/characters?districtId={districtId}
-     * Персонаж авторизованного аккаунта в районе (null-ответ, если ещё нет).
+     * Персонаж авторизованного аккаунта в районе.
+     * 204 No Content, если персонажа в этом районе ещё нет: для онбординга это
+     * нормальное состояние, а не ошибка (фронт показывает «Создать персонажа»).
      * Вызывается до создания персонажа, поэтому проверяем
      * владение аккаунтом (userId из запроса), а не персонажем.
      */
@@ -55,7 +57,7 @@ public class ChatUserController {
         chatUserService.assertAccountIsSelfOrAdmin(principal.getName(), userId);
         return chatUserService.findChatUserByUserIdAndDistrictId(userId, districtId)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .orElseGet(() -> ResponseEntity.noContent().build());
     }
 
     @GetMapping("/top")

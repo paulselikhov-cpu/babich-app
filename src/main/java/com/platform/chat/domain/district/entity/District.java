@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.platform.chat.domain.location.entity.Location;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.SQLRestriction;
 import java.util.List;
 
 /**
@@ -41,17 +42,16 @@ public class District {
     private String code;
 
     /**
-     * Системные локации района (мэрия, банк, полиция и т.д.)
-     * Создаются автоматически при инициализации района.
+     * Системные локации района (мэрия, банк, полиция и т.д.).
+     *
+     * <p>{@code mappedBy} сам по себе только связывает коллекцию с FK
+     * {@code locations.district_id} и вернул бы ВСЕ локации района, включая
+     * пользовательские. Реальный фильтр даёт {@link SQLRestriction}: коллекция
+     * содержит только {@code is_system = true}. Ограничение применяется и к
+     * {@code LEFT JOIN FETCH d.systemLocations} в {@code DistrictRepository}.</p>
      */
     @JsonIgnore
     @OneToMany(mappedBy = "district", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @SQLRestriction("is_system = true")
     private List<Location> systemLocations;
-
-    /**
-     * Пользовательские локации в этом районе (жильё игроков)
-     */
-    @JsonIgnore
-    @OneToMany(mappedBy = "district", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Location> locations;
 }

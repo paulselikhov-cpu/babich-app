@@ -3,6 +3,7 @@ package com.platform.chat.config;
 import com.platform.chat.engines.application.exception.ApplicationAlreadyResolvedException;
 import com.platform.chat.engines.application.exception.ApplicationNotFoundException;
 import com.platform.chat.engines.application.exception.ApplicationSubmissionRejectedException;
+import com.platform.chat.domain.location.exception.LocationNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -68,6 +69,13 @@ public class GlobalExceptionHandler {
             ApplicationSubmissionRejectedException ex) {
         log.warn("Подача заявки отклонена: {}", ex.getMessage());
         return build(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    /** Локация не найдена (глубокий переход по /chat/location/{id}) — ошибка клиента. */
+    @ExceptionHandler(LocationNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleLocationNotFound(LocationNotFoundException ex) {
+        log.warn("Локация не найдена: {}", ex.getMessage());
+        return build(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
     /**

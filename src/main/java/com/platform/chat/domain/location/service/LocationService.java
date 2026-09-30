@@ -9,6 +9,7 @@ import com.platform.chat.domain.district.repository.DistrictRepository;
 import com.platform.chat.domain.location.entity.Location;
 import com.platform.chat.domain.location.entity.LocationTemplate;
 import com.platform.chat.domain.location.entity.LocationUser;
+import com.platform.chat.domain.location.exception.LocationNotFoundException;
 import com.platform.chat.domain.location.repository.LocationUserRepository;
 import com.platform.chat.domain.location.repository.LocationRepository;
 import com.platform.chat.domain.location.repository.LocationTemplateRepository;
@@ -18,6 +19,7 @@ import com.platform.chat.domain.room.port.RoomContentCleaner;
 import com.platform.chat.domain.room.repository.RoomReadStatusRepository;
 import com.platform.chat.domain.room.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -78,6 +80,52 @@ public class LocationService {
                         member.getRole()
                 ))
                 .collect(java.util.stream.Collectors.toList());
+    }
+
+    /**
+     * Получить локацию по id с учётом прав доступа текущего персонажа.
+     * Используется глубоким переходом по маршруту /chat/location/{id}.
+     *
+     * Правила доступа:
+     * - системная локация (isSystem) — доступ всегда (всем жителям района);
+     * - публичная локация (isPublic) — доступ всегда;
+     * - приватная локация (не public) — только для участника (LocationUser),
+     *   иначе AccessDeniedException → 403.
+     *
+     * @return LocationResponse с ролью текущего персонажа в этой локации
+     * @throws LocationNotFoundException если локации нет → 404
+     * @throws AccessDeniedException     если приватная и персонаж не member → 403
+     */
+    @Transactional(readOnly = true)
+    public LocationResponse getLocationForView(Long locationId, Long characterId) {
+        Location location = locationRepository.findById(locationId)
+                .orElseThrow(() -> new LocationNotFoundException(locationId));
+
+        // системная локация — доступ всем жителям без членства
+        if (Boolean.TRUE.equals(location.getIsSystem())) {
+            Optional<LocationUser> membership = locationUserRepository
+                    .findByLocationIdAndCharacterId(locationId, characterId);
+            return membership
+                    .map(member -> LocationResponse.from(location, member.getRole()))
+                    .orElseGet(() -> LocationResponse.fromEntity(location));
+        }
+
+        // публичная локация — доступ всем
+        if (!Boolean.FALSE.equals(location.getIsPublic())) {
+            Optional<LocationUser> membership = locationUserRepository
+                    .findByLocationIdAndCharacterId(locationId, characterId);
+            return membership
+                    .map(member -> LocationResponse.from(location, member.getRole()))
+                    .orElseGet(() -> LocationResponse.fromEntity(location));
+        }
+
+        // приватная локация — только для участника
+        LocationUser member = locationUserRepository
+                .findByLocationIdAndCharacterId(locationId, characterId)
+                .orElseThrow(() -> new AccessDeniedException(
+                        "Доступ к локации запрещён: вы не являетесь участником"));
+
+        return LocationResponse.from(location, member.getRole());
     }
 
     /**
