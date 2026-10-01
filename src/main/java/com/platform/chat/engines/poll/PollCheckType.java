@@ -8,7 +8,7 @@ package com.platform.chat.engines.poll;
  * а обработчик ({@code ElectionClose} в {@code chat.features.governorElection})
  * только подписывается на этот тип. Так зависимость идёт строго
  * {@code feature → engine} и не образуется направленного цикла
- * «движок ↔ фича» (раньше константа жила в фиче, и движок тянул фичу).</p>
+ * «движок ↔ фича».</p>
  */
 public final class PollCheckType {
 

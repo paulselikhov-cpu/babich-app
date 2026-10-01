@@ -5,7 +5,7 @@ import com.platform.chat.domain.chatUser.enums.SystemRoleType;
 import com.platform.chat.domain.chatUser.repository.ChatUserRepository;
 import com.platform.chat.domain.location.entity.LocationUser;
 import com.platform.chat.domain.location.enums.LocationUserRole;
-import com.platform.chat.domain.location.enums.LocationType;
+import com.platform.chat.domain.location.enums.SystemLocationCode;
 import com.platform.chat.domain.location.repository.LocationUserRepository;
 import com.platform.chat.domain.location.repository.LocationRepository;
 
@@ -33,9 +33,9 @@ import java.util.Set;
 /**
  * Обработчик результатов выборов губернатора.
  * <p>
- * Адаптер над прежней логикой закрытия выборов: подсчитывает голоса по
- * кандидатам и назначает победителя на единоличную должность (GOVERNOR) в
- * системных локациях района. Зарегистрирован как {@link PollResultHandler} для
+ * Подсчитывает голоса по кандидатам и назначает победителя на единоличную
+ * должность (GOVERNOR) в мэрии района. Зарегистрирован как
+ * {@link PollResultHandler} для
  * {@link PollType#ELECTION} — {@link PollResultDispatcher} находит его по типу
  * голосования, {@code ElectionService} больше не знает про конкретного
  * обработчика.
@@ -89,7 +89,7 @@ public class ElectionResult implements PollResultHandler {
                 ChatUser newMayor = winnerCharacter.get();
                 ChatUser finalNewMayor = newMayor;
                 locationRepository
-                        .findByDistrictIdAndIsSystemTrueAndType(scopeId, LocationType.CITY_HALL)
+                        .findByDistrictIdAndCode(scopeId, SystemLocationCode.CITY_HALL)
                         .ifPresent(cityHall -> {
                             // 1. снять действующего губернатора (в системной локации membership == должность)
                             locationUserRepository

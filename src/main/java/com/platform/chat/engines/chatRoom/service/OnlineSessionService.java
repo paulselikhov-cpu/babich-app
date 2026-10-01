@@ -44,14 +44,12 @@ public class OnlineSessionService implements TickHandler {
 
 
     /**
-     * Было: @PostConstruct — не работает с @Transactional, т.к. вызывается
-     * ДО того, как вокруг бина появляется AOP-прокси (который и открывает
-     * транзакцию). Метод вызывался напрямую на "сыром" объекте, отсюда
-     * TransactionRequiredException.
+     * Очистка протухшего presence при старте.
      *
-     * Стало: @EventListener(ApplicationReadyEvent) — срабатывает после того,
-     * как ВЕСЬ контекст, включая прокси, полностью инициализирован. Вызов
-     * идёт уже через прокси, @Transactional работает штатно.
+     * <p>Инициализация через {@code @EventListener(ApplicationReadyEvent)} —
+     * на этом этапе AOP-прокси бина уже создан, поэтому {@code @Transactional}
+     * открывает транзакцию штатно. В {@code @PostConstruct} прокси ещё нет,
+     * и вызов шёл на «сырой» объект ({@code TransactionRequiredException}).</p>
      */
     @EventListener(ApplicationReadyEvent.class)
     @Transactional
@@ -170,7 +168,7 @@ public class OnlineSessionService implements TickHandler {
     }
 
     /**
-     * Интервал срабатывания — 15 секунд (было @Scheduled(fixedDelay = 15_000)).
+     * Интервал срабатывания — 15 секунд.
      */
     @Override
     public long intervalMillis() {

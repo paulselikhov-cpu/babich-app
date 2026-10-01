@@ -47,11 +47,11 @@ public class District {
      * <p>{@code mappedBy} сам по себе только связывает коллекцию с FK
      * {@code locations.district_id} и вернул бы ВСЕ локации района, включая
      * пользовательские. Реальный фильтр даёт {@link SQLRestriction}: коллекция
-     * содержит только {@code is_system = true}. Ограничение применяется и к
+     * содержит только {@code type = 'SYSTEM'}. Ограничение применяется и к
      * {@code LEFT JOIN FETCH d.systemLocations} в {@code DistrictRepository}.</p>
      */
     @JsonIgnore
     @OneToMany(mappedBy = "district", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @SQLRestriction("is_system = true")
+    @SQLRestriction("type = 'SYSTEM'")
     private List<Location> systemLocations;
 }

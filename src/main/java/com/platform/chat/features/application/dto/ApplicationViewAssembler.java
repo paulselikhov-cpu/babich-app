@@ -14,10 +14,9 @@ import java.util.Objects;
  * Собирает DTO модерации: заявки + имя заявителя.
  *
  * <p>Имя берётся через публичный API модуля {@code auth}
- * ({@link UserService#getUsernamesByIds}) — одним запросом на всю пачку: раньше
- * маппинг жил в контроллере и делал {@code userRepository.findById} внутри
- * {@code stream().map(...)} — N+1 запросов на {@code /api/applications/all}.
- * Прямой доступ в чужой репозиторий модулю заявок не нужен.</p>
+ * ({@link UserService#getUsernamesByIds}) — одним запросом на всю пачку, без
+ * N+1 на {@code /api/applications/all}. Прямой доступ в чужой репозиторий
+ * модулю заявок не нужен.</p>
  */
 @Component
 @RequiredArgsConstructor

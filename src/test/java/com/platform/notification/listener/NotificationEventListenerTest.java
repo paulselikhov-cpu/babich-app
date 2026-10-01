@@ -3,6 +3,7 @@ package com.platform.notification.listener;
 import com.platform.chat.domain.chatUser.entity.ChatUser;
 import com.platform.chat.features.domainEvent.listeners.NotificationEventListener;
 import com.platform.chat.domain.chatUser.repository.ChatUserRepository;
+import com.platform.chat.domain.location.repository.LocationRepository;
 import com.platform.chat.engines.domainEvent.events.ElectionClosedEvent;
 import com.platform.chat.engines.domainEvent.events.ApplicationResolvedEvent;
 import com.platform.chat.engines.notification.dto.NotificationResponse;
@@ -46,6 +47,10 @@ class NotificationEventListenerTest {
     @Mock
     private SimpMessagingTemplate messagingTemplate;
 
+    /** Нужен для резолва площади Ленина по коду в onElectionStarted. */
+    @Mock
+    private LocationRepository locationRepository;
+
     private NotificationEventListener listener;
 
     @Captor
@@ -57,7 +62,7 @@ class NotificationEventListenerTest {
     @BeforeEach
     void setUp() {
         listener = new NotificationEventListener(
-                notificationService, chatUserRepository, messagingTemplate);
+                notificationService, chatUserRepository, locationRepository, messagingTemplate);
     }
 
     @Test

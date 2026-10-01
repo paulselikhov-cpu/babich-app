@@ -7,7 +7,7 @@ import com.platform.chat.engines.scheduledCheck.service.SchedulerGateway;
 import com.platform.chat.domain.chatUser.entity.ChatUser;
 import com.platform.chat.domain.location.entity.Location;
 import com.platform.chat.domain.chatUser.enums.SystemRoleType;
-import com.platform.chat.domain.location.enums.LocationType;
+import com.platform.chat.domain.location.enums.SystemLocationCode;
 import com.platform.chat.domain.chatUser.repository.ChatUserRepository;
 import com.platform.chat.domain.location.repository.LocationUserRepository;
 import com.platform.chat.domain.location.repository.LocationRepository;
@@ -133,12 +133,9 @@ class SchedulerGatewayIntegrationTest {
 
     /** Убирает действующего губернатора района, чтобы гейт «нет губернатора» не блокировал повторный прогон теста. */
     private void clearGovernor(Long districtId) {
-        List<Location> systemLocations = locationRepository.findByDistrictIdAndIsSystemTrue(districtId);
-        for (Location loc : systemLocations) {
-            if (loc.getType() == LocationType.CITY_HALL) {
-                locationUserRepository.findByLocationIdAndSystemRole(loc.getId(), SystemRoleType.GOVERNOR)
-                        .ifPresent(locationUserRepository::delete);
-            }
-        }
+        locationRepository.findByDistrictIdAndCode(districtId, SystemLocationCode.CITY_HALL)
+                .ifPresent(cityHall ->
+                        locationUserRepository.findByLocationIdAndSystemRole(cityHall.getId(), SystemRoleType.GOVERNOR)
+                                .ifPresent(locationUserRepository::delete));
     }
 }

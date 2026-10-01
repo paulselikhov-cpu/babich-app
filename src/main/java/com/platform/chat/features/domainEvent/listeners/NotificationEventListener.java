@@ -3,7 +3,7 @@ package com.platform.chat.features.domainEvent.listeners;
 import com.platform.chat.domain.chatUser.entity.ChatUser;
 import com.platform.chat.domain.chatUser.repository.ChatUserRepository;
 import com.platform.chat.domain.location.entity.Location;
-import com.platform.chat.domain.location.enums.LocationType;
+import com.platform.chat.domain.location.enums.SystemLocationCode;
 import com.platform.chat.domain.location.repository.LocationRepository;
 import com.platform.chat.engines.domainEvent.events.ApplicationResolvedEvent;
 import com.platform.chat.engines.domainEvent.events.ElectionClosedEvent;
@@ -65,13 +65,15 @@ public class NotificationEventListener {
                 + "Придите на Площадь Ленина, чтобы проголосовать или выдвинуть свою кандидатуру.";
 
         // Ссылка «Перейти к выборам» на фронте строится из этих данных:
-        // locationId площади Ленина + id экрана раздела фичи локации.
-        Long leninSquareId = locationRepository
-                .findByDistrictIdAndIsSystemTrueAndType(districtId, LocationType.LENIN_SQUARE)
-                .map(Location::getId)
+        // code площади Ленина + id экрана раздела фичи локации.
+        // Передаём code (а не id): код уникален в пределах района, и фронт
+        // адресует локацию именно им (/chat/location/:code/feature/:screenId).
+        String leninSquareCode = locationRepository
+                .findByDistrictIdAndCode(districtId, SystemLocationCode.LENIN_SQUARE)
+                .map(Location::getCode)
                 .orElse(null);
         Map<String, Object> data = Map.of(
-                "electionLocationId", leninSquareId == null ? -1L : leninSquareId,
+                "electionLocationCode", leninSquareCode == null ? "" : leninSquareCode,
                 "electionFeatureId", "election"
         );
 

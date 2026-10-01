@@ -57,7 +57,7 @@ public class ApplicationSubmissionService {
         return ApplicationSummary.from(application);
     }
 
-    /** Отказ в подаче: тот же текст, что показывался фронту раньше («Не удалось подать заявку: …»). */
+    /** Отказ в подаче с текстом для фронта («Не удалось подать заявку: …»). */
     private ApplicationSubmissionRejectedException rejected(ApplicationMessageKey reason) {
         return new ApplicationSubmissionRejectedException(
                 messages.resolve(ApplicationMessageKey.CANCELED) + ": " + messages.resolve(reason));

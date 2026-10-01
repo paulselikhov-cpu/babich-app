@@ -67,6 +67,24 @@ public class LocationController {
      * приватная → только для участника (иначе 403).
      * Локация не найдена → 404.
      */
+    /**
+     * GET /api/locations/by-code/{code}
+     * Локация по коду с проверкой доступа текущего персонажа.
+     * Используется переходом по маршруту /chat/location/{code}.
+     *
+     * <p>Код уникален в пределах района, поэтому ищем в районе ПЕРСОНАЖА —
+     * район берётся из БД по characterId, а не из запроса. В URL района нет,
+     * поэтому адресовать локацию чужого района структурно невозможно.</p>
+     */
+    @GetMapping("/by-code/{code}")
+    public LocationResponse getLocationByCode(
+            @PathVariable String code,
+            @RequestParam Long characterId,
+            Principal principal) {
+        chatUserService.assertCharacterOwnedBy(principal.getName(), characterId);
+        return locationService.getLocationForCode(code, characterId);
+    }
+
     @GetMapping("/{locationId}")
     public LocationResponse getLocationById(
             @PathVariable Long locationId,
@@ -82,6 +100,7 @@ public class LocationController {
      * Тело запроса:
      * {
      *   "templateId": 1,
+     *   "code": "IVAN_KVARTIRA",
      *   "name": "Квартира Ивана",
      *   "description": "Уютная хрущевка",
      *   "isPublic": true,
@@ -96,6 +115,7 @@ public class LocationController {
         Location location = locationService.createLocation(
                 request.getTemplateId(),
                 request.getCharacterId(),
+                request.getCode(),
                 request.getName(),
                 request.getDescription(),
                 request.getIsPublic()

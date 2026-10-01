@@ -16,11 +16,15 @@ import java.time.LocalDateTime;
 public class LocationResponse {
 
     private Long id;
+    /**
+     * Код локации — то, чем локация адресуется в URL и в запросах
+     * ({@code /chat/location/:code/...}). Уникален в пределах района.
+     */
+    private String code;
     private String name;
     private String description;
     private String inviteCode;
     private Boolean isPublic;
-    private Boolean isSystem;
     private LocationType type;
     private LocalDateTime createdAt;
     private String templateName;
@@ -35,7 +39,7 @@ public class LocationResponse {
         dto.setDescription(location.getDescription());
         dto.setInviteCode(location.getInviteCode());
         dto.setIsPublic(location.getIsPublic());
-        dto.setIsSystem(location.getIsSystem());
+        dto.setCode(location.getCode());
         dto.setType(location.getType());
         dto.setCreatedAt(location.getCreatedAt());
         dto.setTemplateName(location.getTemplate() != null
@@ -53,7 +57,7 @@ public class LocationResponse {
         dto.setId(location.getId());
         dto.setName(location.getName());
         dto.setDescription(location.getDescription());
-        dto.setIsSystem(location.getIsSystem());
+        dto.setCode(location.getCode());
         dto.setType(location.getType());
         dto.setCreatedAt(location.getCreatedAt());
         dto.setMemberRole("SYSTEM");

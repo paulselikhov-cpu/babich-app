@@ -16,7 +16,7 @@ import com.platform.chat.engines.poll.enums.WeightStrategy;
 import com.platform.chat.engines.scheduledCheck.service.ScheduledCheckService;
 
 import com.platform.chat.domain.location.entity.Location;
-import com.platform.chat.domain.location.enums.LocationType;
+import com.platform.chat.domain.location.enums.SystemLocationCode;
 import com.platform.chat.domain.location.repository.LocationUserRepository;
 import com.platform.chat.domain.location.repository.LocationRepository;
 import com.platform.chat.domain.chatUser.enums.SystemRoleType;
@@ -72,7 +72,7 @@ public class PollService {
         // Гейт-условие (сценарий №2): выборы доступны только если в районе нет
         // действующего губернатора (LocationUser с systemRole = GOVERNOR в мэрии).
         boolean hasGovernor = locationRepository
-                .findByDistrictIdAndIsSystemTrueAndType(districtId, LocationType.CITY_HALL)
+                .findByDistrictIdAndCode(districtId, SystemLocationCode.CITY_HALL)
                 .map(cityHall -> locationUserRepository
                         .findByLocationIdAndSystemRole(cityHall.getId(), SystemRoleType.GOVERNOR)
                         .isPresent())
@@ -91,7 +91,7 @@ public class PollService {
         }
 
         Location leninSquare = locationRepository
-                .findByDistrictIdAndIsSystemTrueAndType(districtId, LocationType.LENIN_SQUARE)
+                .findByDistrictIdAndCode(districtId, SystemLocationCode.LENIN_SQUARE)
                 .orElseThrow(() -> new IllegalStateException("Площадь Ленина не найдена в районе: " + districtId));
 
         // Настройки района (длительность, окно «живого», кворум, число слотов)

@@ -11,7 +11,7 @@ package com.platform.chat.engines.transactionLog.enums;
  * {@link com.platform.chat.engines.transactionLog.entity.TransactionLog})
  * типизирована этим enum, а события {@code CoinsChangedEvent}/
  * {@code XpChangedEvent} несут причину в payload. Иначе ядро зависело бы от
- * фичи (было {@code chat.engines.economy.enums.CoinUpdateReason}).</p>
+ * фичи-модуля кошелька.</p>
  */
 public enum CoinUpdateReason {
     WORK_SHIFT,             // заработок за смену/тап-фарм (профессия)

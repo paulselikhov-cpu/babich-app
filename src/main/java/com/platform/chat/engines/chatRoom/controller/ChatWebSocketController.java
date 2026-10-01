@@ -50,8 +50,7 @@ public class ChatWebSocketController {
     }
 
     // ─── вошёл в комнату ─────────────────────────────────────────────────
-    // добавлен вызов presenceService.enterRoom — одно STOMP-сообщение теперь
-    // и шлёт системное сообщение "X вошёл в комнату" (как раньше),
+    // одно STOMP-сообщение и шлёт системное сообщение "X вошёл в комнату",
     // и обновляет OnlineSession (presence: где юзер сейчас online)
     @MessageMapping("/chat.join")
     public void joinChat(

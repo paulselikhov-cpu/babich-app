@@ -19,14 +19,24 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
     // все публичные пользовательские локации — показываем в общем списке
     List<Location> findByIsPublicTrue();
 
-    // все системные локации
-    List<Location> findByIsSystemTrue();
+    // все системные локации (по всем районам)
+    List<Location> findByType(LocationType type);
 
     // все системные локации района
-    List<Location> findByDistrictIdAndIsSystemTrue(Long districtId);
+    List<Location> findByDistrictIdAndType(Long districtId, LocationType type);
 
-    // найти системную локацию района по типу (например, мэрию)
-    Optional<Location> findByDistrictIdAndIsSystemTrueAndType(Long districtId, LocationType type);
+    /**
+     * Найти локацию по коду ВНУТРИ района.
+     *
+     * <p>Основной способ адресации локации: код уникален только в пределах
+     * района (район = «сервер»), поэтому вызывающий обязан передать именно тот
+     * район, в котором ищет. Для системных локаций — константы из
+     * {@code SystemLocationCode}.</p>
+     */
+    Optional<Location> findByDistrictIdAndCode(Long districtId, String code);
+
+    // существует ли такой код в районе — проверка уникальности при создании
+    boolean existsByDistrictIdAndCode(Long districtId, String code);
 
     // все локации конкретного владельца
     // используется в профиле персонажа — "мои локации"

@@ -42,7 +42,7 @@ class DistrictSystemLocationsIntegrationTest {
     private LocationRepository locationRepository;
 
     @Test
-    @DisplayName("systemLocations района содержит только локации с is_system = true")
+    @DisplayName("systemLocations района содержит только локации с type = SYSTEM")
     void systemLocationsContainsOnlySystemLocations() {
         String code = "TEST-DIST-" + System.nanoTime();
         District district = new District();
@@ -53,15 +53,15 @@ class DistrictSystemLocationsIntegrationTest {
         Location systemLocation = new Location();
         systemLocation.setDistrict(district);
         systemLocation.setName("Мэрия (тест)");
-        systemLocation.setIsSystem(true);
-        systemLocation.setType(LocationType.CITY_HALL);
+        systemLocation.setCode("CITY_HALL");
+        systemLocation.setType(LocationType.SYSTEM);
         systemLocation = locationRepository.save(systemLocation);
 
         Location userLocation = new Location();
         userLocation.setDistrict(district);
         userLocation.setName("Квартира игрока (тест)");
-        userLocation.setIsSystem(false);
-        userLocation.setType(LocationType.HOME);
+        userLocation.setCode("PLAYER_" + (System.nanoTime() % 1_000_000));
+        userLocation.setType(LocationType.DEFAULT);
         userLocation.setIsPublic(false);
         userLocation = locationRepository.save(userLocation);
 
@@ -73,7 +73,7 @@ class DistrictSystemLocationsIntegrationTest {
                 .extracting(Location::getId)
                 .containsExactly(systemLocation.getId());
         assertThat(systemLocations)
-                .allMatch(l -> Boolean.TRUE.equals(l.getIsSystem()));
+                .allMatch(l -> l.getType() == LocationType.SYSTEM);
         assertThat(systemLocations)
                 .extracting(Location::getId)
                 .doesNotContain(userLocation.getId());

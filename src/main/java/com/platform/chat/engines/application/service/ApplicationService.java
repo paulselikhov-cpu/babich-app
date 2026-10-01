@@ -102,7 +102,7 @@ public class ApplicationService {
 
     /**
      * Найти заявку и убедиться, что она ещё не решена — общий guard команд
-     * approve/reject (раньше был скопирован в обоих методах).
+     * approve/reject.
      */
     private Application requirePending(Long applicationId) {
         Application application = applicationRepository.findById(applicationId)

@@ -9,6 +9,7 @@ import com.platform.chat.domain.location.entity.Location;
 import com.platform.chat.domain.location.entity.LocationUser;
 import com.platform.chat.domain.location.enums.LocationUserRole;
 import com.platform.chat.domain.location.enums.LocationType;
+import com.platform.chat.domain.location.enums.SystemLocationCode;
 import com.platform.chat.domain.chatUser.enums.SystemRoleType;
 import com.platform.chat.domain.chatUser.repository.ChatUserRepository;
 import com.platform.chat.domain.location.repository.LocationRepository;
@@ -39,15 +40,21 @@ public class LocationUsersService {
             SystemRoleType.REAL_ESTATE_DIRECTOR
     );
 
-    /** Какие должности допустимы для каждого типа системной локации (карта из плана 2.3). */
-    private static final Map<LocationType, Set<SystemRoleType>> ALLOWED_ROLES = Map.of(
-            LocationType.CITY_HALL,
+    /**
+     * Какие должности допустимы для каждой системной локации (карта из плана 2.3).
+     *
+     * <p>Ключ — {@code Location.code} (константы {@link SystemLocationCode}): тип
+     * различает только SYSTEM/DEFAULT/BUSINESS и не говорит, какая именно
+     * системная локация перед нами.</p>
+     */
+    private static final Map<String, Set<SystemRoleType>> ALLOWED_ROLES = Map.of(
+            SystemLocationCode.CITY_HALL,
             EnumSet.of(SystemRoleType.GOVERNOR, SystemRoleType.MAYOR, SystemRoleType.DEPUTY),
-            LocationType.POLICE_STATION,
+            SystemLocationCode.POLICE_STATION,
             EnumSet.of(SystemRoleType.POLICE_OFFICER),
-            LocationType.BANK,
+            SystemLocationCode.BANK,
             EnumSet.of(SystemRoleType.BANK_DIRECTOR, SystemRoleType.BANK_EMPLOYEE),
-            LocationType.REAL_ESTATE_MARKET,
+            SystemLocationCode.REAL_ESTATE_MARKET,
             EnumSet.of(SystemRoleType.REAL_ESTATE_DIRECTOR)
     );
 
@@ -129,12 +136,12 @@ public class LocationUsersService {
         Location location = locationRepository.findById(locationId)
                 .orElseThrow(() -> new RuntimeException("Локация не найдена: " + locationId));
 
-        if (!location.getIsSystem()) {
+        if (location.getType() != LocationType.SYSTEM) {
             throw new RuntimeException("Системные должности можно назначать только в системных локациях");
         }
 
         // должность допустима для типа локации
-        Set<SystemRoleType> allowed = ALLOWED_ROLES.get(location.getType());
+        Set<SystemRoleType> allowed = ALLOWED_ROLES.get(location.getCode());
         if (allowed == null || !allowed.contains(systemRole)) {
             throw new RuntimeException("Должность " + systemRole + " недопустима для локации типа "
                     + location.getType());
@@ -143,7 +150,7 @@ public class LocationUsersService {
         ChatUser character = chatUserRepository.findById(characterId)
                 .orElseThrow(() -> new RuntimeException("Персонаж не найден: " + characterId));
 
-        // назначаемый — житель того же района (замена прежней проверки membership)
+        // назначаемый — житель того же района
         if (!character.getDistrictId().equals(location.getDistrict().getId())) {
             throw new RuntimeException("Персонаж живёт в другом районе — нельзя назначить на должность здесь");
         }
@@ -200,7 +207,7 @@ public class LocationUsersService {
         Location location = locationRepository.findById(locationId)
                 .orElseThrow(() -> new RuntimeException("Локация не найдена: " + locationId));
 
-        if (!location.getIsSystem()) {
+        if (location.getType() != LocationType.SYSTEM) {
             throw new RuntimeException("Системные должности существуют только в системных локациях");
         }
 

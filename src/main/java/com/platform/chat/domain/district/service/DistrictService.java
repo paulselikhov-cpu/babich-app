@@ -52,18 +52,23 @@ public class DistrictService {
      */
     @Transactional(readOnly = true)
     public List<Location> getSystemLocationsByDistrict(Long districtId) {
-        return locationRepository.findByDistrictIdAndIsSystemTrue(districtId);
+        return locationRepository.findByDistrictIdAndType(districtId, LocationType.SYSTEM);
     }
 
     /**
-     * Получить конкретную системную локацию района по типу
-     * (например, мэрию или полицейский участок конкретного района)
+     * Получить конкретную системную локацию района по её code
+     * (например, мэрию или полицейский участок конкретного района).
+     *
+     * <p>Адресация по {@code code}, а не по {@link LocationType}: тип различает
+     * лишь SYSTEM/DEFAULT/BUSINESS и не указывает, какая это локация.
+     * Ожидается одна из констант {@link com.platform.chat.domain.location.enums.SystemLocationCode}.</p>
      */
     @Transactional(readOnly = true)
-    public Location getSystemLocationByType(Long districtId, LocationType type) {
-        return locationRepository.findByDistrictIdAndIsSystemTrueAndType(districtId, type)
+    public Location getSystemLocationByCode(Long districtId, String code) {
+        return locationRepository.findByDistrictIdAndCode(districtId, code)
+                .filter(l -> l.getType() == LocationType.SYSTEM)
                 .orElseThrow(() -> new RuntimeException(
-                        "Системная локация типа " + type + " в районе " + districtId + " не найдена"
+                        "Системная локация " + code + " в районе " + districtId + " не найдена"
                 ));
     }
 }

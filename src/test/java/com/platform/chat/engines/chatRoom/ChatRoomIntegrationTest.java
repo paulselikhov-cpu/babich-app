@@ -31,11 +31,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Сквозные тесты слайса «чат комнаты» ({@code chat.engines.chatRoom}).
  *
- * <p>Покрывают то, что раньше было вообще без тестов (два раздельных слайса
- * message/onlineSession): непрочитанное, отметку чтения, присутствие и связку
- * «удаление локации → чистка содержимого комнат через порт
- * {@code base.room.port.RoomContentPurger}» (раньше это делал JPA-каскад
- * упразднённой связи {@code Room.messages}).</p>
+ * <p>Покрывают слайс целиком (непрочитанное, отметку чтения, присутствие) и
+ * связку «удаление локации → чистка содержимого комнат через порт
+ * {@code base.room.port.RoomContentPurger}».</p>
  *
  * <p>Тест не транзакционный: данные коммитятся в dev-БД (как в остальных
  * интеграционных тестах проекта), поэтому все имена/id уникальны на каждый
@@ -108,8 +106,8 @@ class ChatRoomIntegrationTest {
         Location created = new Location();
         created.setName(name);
         created.setDistrict(district);
-        created.setIsSystem(false);
-        created.setType(LocationType.BUSINESS);
+        created.setCode("ROOM_" + (unique % 1_000_000));
+        created.setType(LocationType.DEFAULT);
         created.setIsPublic(false);
         created.setOwner(author);
         created.setInviteCode(String.valueOf(unique % 1_000_000_000_000L));
@@ -193,7 +191,7 @@ class ChatRoomIntegrationTest {
     }
 
     @Test
-    @DisplayName("Удаление локации чистит сообщения и статусы чтения (порт RoomContentPurger вместо бывшего cascade)")
+    @DisplayName("Удаление локации чистит сообщения и статусы чтения через порт RoomContentPurger")
     void deleteLocation_purgesRoomContent() {
         Long roomId = room.getId();
         messageService.saveByUser(author, "сообщение 1", String.valueOf(roomId), null);

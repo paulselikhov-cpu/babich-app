@@ -4,6 +4,7 @@ import com.platform.chat.domain.chatUser.entity.ChatUser;
 import com.platform.chat.domain.district.entity.District;
 import com.platform.chat.domain.location.dto.LocationResponse;
 import com.platform.chat.domain.location.enums.LocationType;
+import com.platform.chat.domain.location.enums.SystemLocationCode;
 import com.platform.chat.domain.location.enums.LocationUserRole;
 import com.platform.chat.domain.chatUser.repository.ChatUserRepository;
 import com.platform.chat.domain.district.repository.DistrictRepository;
@@ -62,7 +63,7 @@ public class LocationService {
      * Получить все системные локации.
      */
     public List<Location> getSystemLocations() {
-        return locationRepository.findByIsSystemTrue();
+        return locationRepository.findByType(LocationType.SYSTEM);
     }
 
     /**
@@ -88,7 +89,7 @@ public class LocationService {
      * Используется глубоким переходом по маршруту /chat/location/{id}.
      *
      * Правила доступа:
-     * - системная локация (isSystem) — доступ всегда (всем жителям района);
+     * - системная локация (type = SYSTEM) — доступ всегда (всем жителям района);
      * - публичная локация (isPublic) — доступ всегда;
      * - приватная локация (не public) — только для участника (LocationUser),
      *   иначе AccessDeniedException → 403.
@@ -97,15 +98,48 @@ public class LocationService {
      * @throws LocationNotFoundException если локации нет → 404
      * @throws AccessDeniedException     если приватная и персонаж не member → 403
      */
+    /**
+     * Получить локацию по коду ВНУТРИ РАЙОНА ПЕРСОНАЖА.
+     *
+     * <p>Основная точка входа для фронта: маршрут {@code /chat/location/:code/...}
+     * адресует локацию кодом, а не числовым id.</p>
+     *
+     * <p>Район берётся у персонажа, а не из запроса: код уникален только внутри
+     * района (район = «сервер»), поэтому подставив чужой район в параметр,
+     * нельзя было бы адресовать чужую локацию. Здесь это сделано структурно —
+     * в URL района нет вообще.</p>
+     *
+     * @throws LocationNotFoundException если в районе нет локации с таким кодом → 404
+     * @throws AccessDeniedException     если приватная и персонаж не участник → 403
+     */
+    @Transactional(readOnly = true)
+    public LocationResponse getLocationForCode(String code, Long characterId) {
+        ChatUser character = chatUserRepository.findById(characterId)
+                .orElseThrow(() -> new RuntimeException("Персонаж не найден: " + characterId));
+
+        Location location = locationRepository
+                .findByDistrictIdAndCode(character.getDistrictId(), code)
+                .orElseThrow(() -> new LocationNotFoundException(code));
+
+        return resolveForView(location, characterId);
+    }
+
     @Transactional(readOnly = true)
     public LocationResponse getLocationForView(Long locationId, Long characterId) {
         Location location = locationRepository.findById(locationId)
                 .orElseThrow(() -> new LocationNotFoundException(locationId));
+        return resolveForView(location, characterId);
+    }
 
+    /**
+     * Проверка доступа и сбор DTO. Системная локация доступна всем жителям района,
+     * публичная — всем, приватная — только участникам.
+     */
+    private LocationResponse resolveForView(Location location, Long characterId) {
         // системная локация — доступ всем жителям без членства
-        if (Boolean.TRUE.equals(location.getIsSystem())) {
+        if (location.getType() == LocationType.SYSTEM) {
             Optional<LocationUser> membership = locationUserRepository
-                    .findByLocationIdAndCharacterId(locationId, characterId);
+                    .findByLocationIdAndCharacterId(location.getId(), characterId);
             return membership
                     .map(member -> LocationResponse.from(location, member.getRole()))
                     .orElseGet(() -> LocationResponse.fromEntity(location));
@@ -114,7 +148,7 @@ public class LocationService {
         // публичная локация — доступ всем
         if (!Boolean.FALSE.equals(location.getIsPublic())) {
             Optional<LocationUser> membership = locationUserRepository
-                    .findByLocationIdAndCharacterId(locationId, characterId);
+                    .findByLocationIdAndCharacterId(location.getId(), characterId);
             return membership
                     .map(member -> LocationResponse.from(location, member.getRole()))
                     .orElseGet(() -> LocationResponse.fromEntity(location));
@@ -122,7 +156,7 @@ public class LocationService {
 
         // приватная локация — только для участника
         LocationUser member = locationUserRepository
-                .findByLocationIdAndCharacterId(locationId, characterId)
+                .findByLocationIdAndCharacterId(location.getId(), characterId)
                 .orElseThrow(() -> new AccessDeniedException(
                         "Доступ к локации запрещён: вы не являетесь участником"));
 
@@ -154,6 +188,7 @@ public class LocationService {
     @Transactional
     public Location createLocation(Long templateId,
                                    Long characterId,
+                                   String code,
                                    String name,
                                    String description,
                                    Boolean isPublic) {
@@ -180,20 +215,36 @@ public class LocationService {
         }
 
         // шаг 4: получаем дефолтный район (персонаж всегда живёт в каком-то районе)
-        District defaultDistrict = districtRepository.findByCode("CENTRAL")
-                .orElseThrow(() -> new RuntimeException("Дефолтный район не найден"));
+        District district = districtRepository.findById(character.getDistrictId())
+                .orElseThrow(() -> new RuntimeException(
+                        "Район персонажа не найден: " + character.getDistrictId()
+                ));
+
+        String normalizedCode = normalizeLocationCode(code);
+
+        if (SystemLocationCode.isReserved(normalizedCode)) {
+            throw new RuntimeException(
+                    "Код «" + normalizedCode + "» зарезервирован за системной локацией"
+            );
+        }
+        if (locationRepository.existsByDistrictIdAndCode(district.getId(), normalizedCode)) {
+            throw new RuntimeException(
+                    "Код «" + normalizedCode + "» уже занят в этом районе"
+            );
+        }
 
         // шаг 5: создаём локацию
         Location location = new Location();
         location.setTemplate(template);
         location.setOwner(character);
-        location.setDistrict(defaultDistrict);
+        location.setDistrict(district);
+        location.setCode(normalizedCode);
         location.setName(name);
         location.setDescription(description);
         location.setIsPublic(isPublic);
         // Пользовательская локация: пока всем ставим HOME (жилая).
         // Механизм выбора бизнес-локации (LocationType.BUSINESS) появится позже.
-        location.setType(LocationType.HOME);
+        location.setType(LocationType.DEFAULT);
         location.setInviteCode(generateUniqueInviteCode());
 
         Location savedLocation = locationRepository.save(location);
@@ -364,6 +415,33 @@ public class LocationService {
         targetMember.setIsRegistered(true);
 
         return locationUserRepository.save(targetMember);
+    }
+
+    /**
+     * Нормализовать код локации, придуманный игроком.
+     *
+     * <p>Код попадает прямо в URL ({@code /chat/location/:code/...}), поэтому
+     * допускаем только безопасный алфавит и приводим к верхнему регистру:
+     * {@code ivan_kvartira} и {@code IVAN_KVARTIRA} — это одна и та же локация.</p>
+     *
+     * @throws RuntimeException если код пустой, слишком короткий/длинный
+     *                        или содержит недопустимые символы
+     */
+    private String normalizeLocationCode(String rawCode) {
+        String code = rawCode == null ? "" : rawCode.trim().toUpperCase();
+
+        if (code.isEmpty()) {
+            throw new RuntimeException("Код локации обязателен");
+        }
+        if (code.length() < 3 || code.length() > 50) {
+            throw new RuntimeException("Код локации должен быть от 3 до 50 символов");
+        }
+        if (!code.matches("[A-Z0-9_]+")) {
+            throw new RuntimeException(
+                    "Код локации может содержать только латинские буквы, цифры и «_»"
+            );
+        }
+        return code;
     }
 
     private String generateUniqueInviteCode() {

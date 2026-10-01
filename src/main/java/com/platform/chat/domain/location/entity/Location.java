@@ -11,24 +11,35 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Локация — может быть как пользовательской (созданной из шаблона), так и системной
- * (принадлежит району, создаётся автоматически).
+ * Локация — может быть как пользовательской (созданной игроком), так и системной
+ * (принадлежит району, создаётся сидером автоматически).
  *
  * Пользовательская локация:
- * - Создаётся игроком из LocationTemplate
- * - Имеет владельца (owner), invite_code, is_public
+ * - Создаётся игроком из LocationTemplate по адресу /chat/location/create
+ * - Имеет владельца (owner), придуманный игроком code, invite_code, is_public
+ * - {@link LocationType#DEFAULT} (или BUSINESS под будущий механизм)
  * - Пример: "Квартира Ивана", "Клуб 'Рюмочная'"
  *
- * Системная локация (isSystem = true):
- * - Создаётся системой при инициализации района
+ * Системная локация ({@link LocationType#SYSTEM}):
+ * - Создаётся `data.sql` при инициализации района
  * - Не имеет владельца, invite_code, is_public
- * - Имеет тип (LocationType) — мэрия, банк, полиция и т.д.
+ * - Её конкретный вид задаётся полем {@code code}
+ *   (см. {@link com.platform.chat.domain.location.enums.SystemLocationCode})
  * - Доступна всем жителям района без приглашения
- * - Пример: "Центральная площадь", "Полицейский участок"
+ * - Пример: "Мэрия" (CITY_HALL), "Площадь Ленина" (LENIN_SQUARE)
+ *
+ * <p>Отличие системной от пользовательской определяется полем {@link #type},
+ * а не отдельным флагом {@code is_system} — флаг был удалён.</p>
  */
 @Data
 @Entity
-@Table(name = "locations")
+@Table(
+        name = "locations",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uq_locations_district_code",
+                columnNames = {"district_id", "code"}
+        )
+)
 public class Location {
 
     @Id
@@ -77,16 +88,23 @@ public class Location {
     private String description;
 
     /**
-     * Флаг: системная локация (true) или пользовательская (false).
-     * Системные создаются автоматически при инициализации района.
+     * Код локации — то, что определяет конкретную локацию.
+     *
+     * <p>Уникален в пределах района: {@code UNIQUE (district_id, code)}.
+     * Район работает как «сервер» в онлайн-игре — у каждого района своя
+     * «Площадь Ленина», и персонаж подключён ровно к одному району.
+     * Поэтому код резолвится только внутри района текущего персонажа.</p>
+     *
+     * <p>У системных локаций — одна из констант {@link com.platform.chat.domain.location.enums.SystemLocationCode}
+     * (задаётся сидером). У пользовательских — код, придуманный игроком при
+     * создании (латиница, заглавные, цифры и «_»).</p>
      */
-    @Column(name = "is_system", nullable = false)
-    private Boolean isSystem = false;
+    @Column(name = "code", nullable = false, length = 50)
+    private String code;
 
     /**
-     * Тип локации (единая классификация {@link LocationType}).
-     * Системные — CITY_HALL…REAL_ESTATE_MARKET (проставляются при инициализации района).
-     * Пользовательские — BUSINESS / HOME (проставляются при создании).
+     * Тип локации (классификация {@link LocationType}: SYSTEM / DEFAULT / BUSINESS).
+     * Конкретная разновидность задаётся полем {@link #code}.
      */
     @Enumerated(EnumType.STRING)
     @Column(name = "type", length = 30)

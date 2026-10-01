@@ -8,9 +8,8 @@ import java.time.LocalDateTime;
 
 /**
  * Гражданская заявка для модерации: данные заявки + имя (username) заявителя.
- * Поля повторяют прежний контракт {@code /api/applications} (фронт читает
- * {@code id}, {@code type}, {@code status}, {@code resultMessage},
- * {@code userId}, {@code applicantUsername}).
+ * Фронт читает {@code id}, {@code type}, {@code status}, {@code resultMessage},
+ * {@code userId}, {@code applicantUsername}.
  *
  * <p>Живёт в модуле-исполнителе, а не в ядре: имя заявителя берётся из
  * {@code auth.User}, про который ядро процесса не знает (см.

@@ -88,8 +88,7 @@ public class ApplicationController {
     }
 
     /**
-     * Персонаж текущего запроса. Раньше этот резолв с null-check повторялся
-     * в каждом методе контроллера.
+     * Персонаж текущего запроса.
      */
     private ChatUser requireCharacter(Principal principal) {
         ChatUser character = chatUserService.getChatUserByUserName(principal.getName());
