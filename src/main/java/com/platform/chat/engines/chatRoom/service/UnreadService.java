@@ -73,7 +73,10 @@ public class UnreadService {
      */
     // UnreadService.java
 
-    @Transactional(readOnly = true)
+    // Обычная (не readOnly) транзакция: для участников, которые сейчас в этой
+    // комнате, ниже вызывается markRead — запись. В readOnly-транзакции Hibernate
+    // ставит FlushMode.MANUAL, и lastReadAt молча не сохранился бы.
+    @Transactional
     public void notifyRoomUnreadChanged(Long roomId, Long authorCharacterId) {
         Room room = roomRepository.findById(roomId).orElse(null);
         if (room == null) return;
