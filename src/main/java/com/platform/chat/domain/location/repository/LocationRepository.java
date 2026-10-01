@@ -1,7 +1,7 @@
 package com.platform.chat.domain.location.repository;
 
 import com.platform.chat.domain.location.entity.Location;
-import com.platform.chat.domain.location.enums.PublicLocationType;
+import com.platform.chat.domain.location.enums.LocationType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -26,7 +26,7 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
     List<Location> findByDistrictIdAndIsSystemTrue(Long districtId);
 
     // найти системную локацию района по типу (например, мэрию)
-    Optional<Location> findByDistrictIdAndIsSystemTrueAndType(Long districtId, PublicLocationType type);
+    Optional<Location> findByDistrictIdAndIsSystemTrueAndType(Long districtId, LocationType type);
 
     // все локации конкретного владельца
     // используется в профиле персонажа — "мои локации"

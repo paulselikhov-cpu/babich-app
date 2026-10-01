@@ -3,8 +3,7 @@ package com.platform.chat.domain.district;
 import com.platform.chat.domain.district.entity.District;
 import com.platform.chat.domain.district.repository.DistrictRepository;
 import com.platform.chat.domain.location.entity.Location;
-import com.platform.chat.domain.location.enums.LocationCategoryType;
-import com.platform.chat.domain.location.enums.PublicLocationType;
+import com.platform.chat.domain.location.enums.LocationType;
 import com.platform.chat.domain.location.repository.LocationRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -55,15 +54,14 @@ class DistrictSystemLocationsIntegrationTest {
         systemLocation.setDistrict(district);
         systemLocation.setName("Мэрия (тест)");
         systemLocation.setIsSystem(true);
-        systemLocation.setType(PublicLocationType.CITY_HALL);
-        systemLocation.setCategory(LocationCategoryType.BUSINESS);
+        systemLocation.setType(LocationType.CITY_HALL);
         systemLocation = locationRepository.save(systemLocation);
 
         Location userLocation = new Location();
         userLocation.setDistrict(district);
         userLocation.setName("Квартира игрока (тест)");
         userLocation.setIsSystem(false);
-        userLocation.setCategory(LocationCategoryType.HOME);
+        userLocation.setType(LocationType.HOME);
         userLocation.setIsPublic(false);
         userLocation = locationRepository.save(userLocation);
 

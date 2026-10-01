@@ -4,7 +4,7 @@ package com.platform.chat.domain.chatUser.enums;
  * Должность персонажа в системной локации (SystemRole). Бывший LocationPostType:
  * должность переехала из отдельной таблицы location_posts в поле LocationUser.systemRole.
  *
- * Каждая должность привязана к конкретному типу системной локации (PublicLocationType).
+ * Каждая должность привязана к конкретному типу системной локации (LocationType).
  */
 public enum SystemRoleType {
     // === Мэрия (CITY_HALL) ===

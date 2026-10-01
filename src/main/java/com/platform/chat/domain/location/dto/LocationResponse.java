@@ -2,7 +2,7 @@ package com.platform.chat.domain.location.dto;
 
 import com.platform.chat.domain.location.entity.Location;
 import com.platform.chat.domain.location.enums.LocationUserRole;
-import com.platform.chat.domain.location.enums.PublicLocationType;
+import com.platform.chat.domain.location.enums.LocationType;
 import lombok.Data;
 import java.time.LocalDateTime;
 
@@ -21,7 +21,7 @@ public class LocationResponse {
     private String inviteCode;
     private Boolean isPublic;
     private Boolean isSystem;
-    private PublicLocationType type;
+    private LocationType type;
     private LocalDateTime createdAt;
     private String templateName;
 

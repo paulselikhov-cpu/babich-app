@@ -6,7 +6,7 @@ import com.platform.chat.domain.district.entity.District;
 import com.platform.chat.domain.district.repository.DistrictRepository;
 import com.platform.chat.domain.location.entity.Location;
 import com.platform.chat.domain.location.entity.LocationUser;
-import com.platform.chat.domain.location.enums.LocationCategoryType;
+import com.platform.chat.domain.location.enums.LocationType;
 import com.platform.chat.domain.location.enums.LocationUserRole;
 import com.platform.chat.domain.location.repository.LocationRepository;
 import com.platform.chat.domain.location.repository.LocationUserRepository;
@@ -109,7 +109,7 @@ class ChatRoomIntegrationTest {
         created.setName(name);
         created.setDistrict(district);
         created.setIsSystem(false);
-        created.setCategory(LocationCategoryType.BUSINESS);
+        created.setType(LocationType.BUSINESS);
         created.setIsPublic(false);
         created.setOwner(author);
         created.setInviteCode(String.valueOf(unique % 1_000_000_000_000L));

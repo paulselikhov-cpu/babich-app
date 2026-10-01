@@ -8,7 +8,7 @@ import com.platform.chat.domain.chatUser.entity.ChatUser;
 import com.platform.chat.domain.location.entity.Location;
 import com.platform.chat.domain.location.entity.LocationUser;
 import com.platform.chat.domain.location.enums.LocationUserRole;
-import com.platform.chat.domain.location.enums.PublicLocationType;
+import com.platform.chat.domain.location.enums.LocationType;
 import com.platform.chat.domain.chatUser.enums.SystemRoleType;
 import com.platform.chat.domain.chatUser.repository.ChatUserRepository;
 import com.platform.chat.domain.location.repository.LocationRepository;
@@ -40,14 +40,14 @@ public class LocationUsersService {
     );
 
     /** Какие должности допустимы для каждого типа системной локации (карта из плана 2.3). */
-    private static final Map<PublicLocationType, Set<SystemRoleType>> ALLOWED_ROLES = Map.of(
-            PublicLocationType.CITY_HALL,
+    private static final Map<LocationType, Set<SystemRoleType>> ALLOWED_ROLES = Map.of(
+            LocationType.CITY_HALL,
             EnumSet.of(SystemRoleType.GOVERNOR, SystemRoleType.MAYOR, SystemRoleType.DEPUTY),
-            PublicLocationType.POLICE_STATION,
+            LocationType.POLICE_STATION,
             EnumSet.of(SystemRoleType.POLICE_OFFICER),
-            PublicLocationType.BANK,
+            LocationType.BANK,
             EnumSet.of(SystemRoleType.BANK_DIRECTOR, SystemRoleType.BANK_EMPLOYEE),
-            PublicLocationType.REAL_ESTATE_MARKET,
+            LocationType.REAL_ESTATE_MARKET,
             EnumSet.of(SystemRoleType.REAL_ESTATE_DIRECTOR)
     );
 

@@ -3,6 +3,7 @@ package com.platform.chat.domain.location.service;
 import com.platform.chat.domain.chatUser.entity.ChatUser;
 import com.platform.chat.domain.district.entity.District;
 import com.platform.chat.domain.location.dto.LocationResponse;
+import com.platform.chat.domain.location.enums.LocationType;
 import com.platform.chat.domain.location.enums.LocationUserRole;
 import com.platform.chat.domain.chatUser.repository.ChatUserRepository;
 import com.platform.chat.domain.district.repository.DistrictRepository;
@@ -190,6 +191,9 @@ public class LocationService {
         location.setName(name);
         location.setDescription(description);
         location.setIsPublic(isPublic);
+        // Пользовательская локация: пока всем ставим HOME (жилая).
+        // Механизм выбора бизнес-локации (LocationType.BUSINESS) появится позже.
+        location.setType(LocationType.HOME);
         location.setInviteCode(generateUniqueInviteCode());
 
         Location savedLocation = locationRepository.save(location);

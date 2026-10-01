@@ -2,6 +2,9 @@ package com.platform.chat.features.domainEvent.listeners;
 
 import com.platform.chat.domain.chatUser.entity.ChatUser;
 import com.platform.chat.domain.chatUser.repository.ChatUserRepository;
+import com.platform.chat.domain.location.entity.Location;
+import com.platform.chat.domain.location.enums.LocationType;
+import com.platform.chat.domain.location.repository.LocationRepository;
 import com.platform.chat.engines.domainEvent.events.ApplicationResolvedEvent;
 import com.platform.chat.engines.domainEvent.events.ElectionClosedEvent;
 import com.platform.chat.engines.domainEvent.events.ElectionStartedEvent;
@@ -32,6 +35,7 @@ public class NotificationEventListener {
 
     private final NotificationService notificationService;
     private final ChatUserRepository chatUserRepository;
+    private final LocationRepository locationRepository;
     private final SimpMessagingTemplate messagingTemplate;
 
     /**
@@ -60,9 +64,20 @@ public class NotificationEventListener {
                 : "Выборы губернатора начались! ")
                 + "Придите на Площадь Ленина, чтобы проголосовать или выдвинуть свою кандидатуру.";
 
+        // Ссылка «Перейти к выборам» на фронте строится из этих данных:
+        // locationId площади Ленина + id экрана раздела фичи локации.
+        Long leninSquareId = locationRepository
+                .findByDistrictIdAndIsSystemTrueAndType(districtId, LocationType.LENIN_SQUARE)
+                .map(Location::getId)
+                .orElse(null);
+        Map<String, Object> data = Map.of(
+                "electionLocationId", leninSquareId == null ? -1L : leninSquareId,
+                "electionFeatureId", "election"
+        );
+
         for (ChatUser resident : residents) {
             Notification notification = notificationService.notify(
-                    resident.getId(), title, body, "ELECTION_STARTED", pollId);
+                    resident.getId(), title, body, "ELECTION_STARTED", pollId, data);
 
             messagingTemplate.convertAndSendToUser(
                     resident.getUsername(),

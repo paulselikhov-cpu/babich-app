@@ -3,8 +3,7 @@ package com.platform.chat.domain.location.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.platform.chat.domain.chatUser.entity.ChatUser;
 import com.platform.chat.domain.district.entity.District;
-import com.platform.chat.domain.location.enums.LocationCategoryType;
-import com.platform.chat.domain.location.enums.PublicLocationType;
+import com.platform.chat.domain.location.enums.LocationType;
 import com.platform.chat.domain.room.entity.Room;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -23,7 +22,7 @@ import java.util.List;
  * Системная локация (isSystem = true):
  * - Создаётся системой при инициализации района
  * - Не имеет владельца, invite_code, is_public
- * - Имеет тип (PublicLocationType) — мэрия, банк, полиция и т.д.
+ * - Имеет тип (LocationType) — мэрия, банк, полиция и т.д.
  * - Доступна всем жителям района без приглашения
  * - Пример: "Центральная площадь", "Полицейский участок"
  */
@@ -85,21 +84,13 @@ public class Location {
     private Boolean isSystem = false;
 
     /**
-     * Тип системной локации (только для isSystem = true).
-     * Для пользовательских локаций — null.
+     * Тип локации (единая классификация {@link LocationType}).
+     * Системные — CITY_HALL…REAL_ESTATE_MARKET (проставляются при инициализации района).
+     * Пользовательские — BUSINESS / HOME (проставляются при создании).
      */
     @Enumerated(EnumType.STRING)
     @Column(name = "type", length = 30)
-    private PublicLocationType type;
-
-    /**
-     * Категория локации. Проставляется всем при создании:
-     * BUSINESS / HOME — пользовательские, системным — при инициализации района.
-     * Термин не смешивать с {@link #type} (PublicLocationType — только системные).
-     */
-    @Enumerated(EnumType.STRING)
-    @Column(name = "category", length = 20)
-    private LocationCategoryType category;
+    private LocationType type;
 
     /**
      * XP самой локации как игрового объекта (прокачка заведения).

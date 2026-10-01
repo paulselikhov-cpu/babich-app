@@ -2,7 +2,7 @@ package com.platform.chat.domain.district.service;
 
 import com.platform.chat.domain.district.entity.District;
 import com.platform.chat.domain.location.entity.Location;
-import com.platform.chat.domain.location.enums.PublicLocationType;
+import com.platform.chat.domain.location.enums.LocationType;
 import com.platform.chat.domain.district.repository.DistrictRepository;
 import com.platform.chat.domain.location.repository.LocationRepository;
 import lombok.RequiredArgsConstructor;
@@ -60,7 +60,7 @@ public class DistrictService {
      * (например, мэрию или полицейский участок конкретного района)
      */
     @Transactional(readOnly = true)
-    public Location getSystemLocationByType(Long districtId, PublicLocationType type) {
+    public Location getSystemLocationByType(Long districtId, LocationType type) {
         return locationRepository.findByDistrictIdAndIsSystemTrueAndType(districtId, type)
                 .orElseThrow(() -> new RuntimeException(
                         "Системная локация типа " + type + " в районе " + districtId + " не найдена"
