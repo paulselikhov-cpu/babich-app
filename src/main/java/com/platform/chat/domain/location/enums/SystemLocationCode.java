@@ -16,21 +16,21 @@ import java.util.Set;
  */
 public final class SystemLocationCode {
 
-    /** Мэрия — управление районом. */
+    /** Мэрия*/
     public static final String CITY_HALL = "CITY_HALL";
-    /** Площадь Ленина — народные голосования + комната «Тёплые трубы» для бомжей. */
+    /** Площадь Ленина*/
     public static final String LENIN_SQUARE = "LENIN_SQUARE";
-    /** Полицейский участок — база должности POLICE_OFFICER. */
+    /** Полицейский участок*/
     public static final String POLICE_STATION = "POLICE_STATION";
-    /** Тюрьма. */
+    /** Тюрьма*/
     public static final String PRISON = "PRISON";
-    /** Банк — должности BANK_DIRECTOR / BANK_EMPLOYEE. */
+    /** Банк*/
     public static final String BANK = "BANK";
-    /** Склад — работает только для бизнесменов. */
+    /** Склад*/
     public static final String WAREHOUSE = "WAREHOUSE";
-    /** Магазин. */
+    /** Магазин*/
     public static final String GENERAL_MARKET = "GENERAL_MARKET";
-    /** Рынок недвижимости — должность REAL_ESTATE_DIRECTOR. */
+    /** Рынок недвижимости*/
     public static final String REAL_ESTATE_MARKET = "REAL_ESTATE_MARKET";
 
     private static final Set<String> ALL = Set.of(

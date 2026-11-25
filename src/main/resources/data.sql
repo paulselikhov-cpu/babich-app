@@ -176,25 +176,25 @@ FROM districts d WHERE d.code = 'CENTRAL'
 
 -- Мэрия: 3 комнаты
 INSERT INTO rooms (location_id, name, description, store_history, is_custom, order_index, code)
-SELECT l.id, 'Приёмная', 'Место ожидания приёма', true, false, 0, 'RECEPTION'
+SELECT l.id, 'Приёмная', 'Место ожидания приёма', true, false, 0, 'CITY_HALL_RECEPTION'
 FROM locations l WHERE l.code = 'CITY_HALL'
                    AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.location_id = l.id AND r.name = 'Приёмная');
 INSERT INTO rooms (location_id, name, description, store_history, is_custom, order_index, code)
-SELECT l.id, 'Зал заседаний', 'Зал для совещаний', true, false, 1, 'DEFAULT'
+SELECT l.id, 'Зал заседаний', 'Здесь проходят совещания в мэрии', true, false, 1, 'DEFAULT'
 FROM locations l WHERE l.code = 'CITY_HALL'
                    AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.location_id = l.id AND r.name = 'Зал заседаний');
 INSERT INTO rooms (location_id, name, description, store_history, is_custom, order_index, code)
-SELECT l.id, 'Кабинет губернатора', 'Личный кабинет главы района', true, false, 2, 'GOVERNORS_OFFICE'
+SELECT l.id, 'Кабинет губернатора', 'Личный кабинет главы района', true, false, 2, 'CITY_HALL_GOVERNORS_OFFICE'
 FROM locations l WHERE l.code = 'CITY_HALL'
                    AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.location_id = l.id AND r.name = 'Кабинет губернатора');
 
 -- Площадь Ленина: 2 комнаты
 INSERT INTO rooms (location_id, name, description, store_history, is_custom, order_index, code)
-SELECT l.id, 'Площадь', 'Открытое пространство для собраний', true, false, 0, 'LENIN_SQUARE'
+SELECT l.id, 'Площадь', 'Открытое пространство для собраний', true, false, 0, 'LENIN_SQUARE_MAIN'
 FROM locations l WHERE l.code = 'LENIN_SQUARE'
                    AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.location_id = l.id AND r.name = 'Площадь');
 INSERT INTO rooms (location_id, name, description, store_history, is_custom, order_index, code)
-SELECT l.id, 'Тёплые трубы', 'Место для ночлега бомжей', true, false, 1, 'DEFAULT'
+SELECT l.id, 'Тёплые трубы', 'Место для ночлега бомжей', true, false, 1, 'LENIN_SQUARE_HOMELESS'
 FROM locations l WHERE l.code = 'LENIN_SQUARE'
                    AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.location_id = l.id AND r.name = 'Тёплые трубы');
 
