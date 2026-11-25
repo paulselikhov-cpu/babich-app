@@ -256,7 +256,7 @@ FROM locations l WHERE l.code = 'WAREHOUSE'
 
 -- Магазин: 2 комнаты
 INSERT INTO rooms (location_id, name, description, store_history, is_custom, order_index, code)
-SELECT l.id, 'Торговый зал', 'Основная торговая площадь', true, false, 0, 'DEFAULT'
+SELECT l.id, 'Торговый зал', 'Основная торговая площадь', true, false, 0, 'GENERAL_MARKET_MAIN'
 FROM locations l WHERE l.code = 'GENERAL_MARKET'
                    AND NOT EXISTS (SELECT 1 FROM rooms r WHERE r.location_id = l.id AND r.name = 'Торговый зал');
 INSERT INTO rooms (location_id, name, description, store_history, is_custom, order_index, code)

@@ -5,4 +5,5 @@ public enum RoomCode {
     LENIN_SQUARE,
     GOVERNORS_OFFICE,
     RECEPTION,
+    GENERAL_MARKET_MAIN
 }
